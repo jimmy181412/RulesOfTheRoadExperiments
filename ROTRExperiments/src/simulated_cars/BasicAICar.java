@@ -11,9 +11,14 @@ public class BasicAICar extends AbstractCar {
 
 	Direction toDrive;
 	ArrayDeque<Direction> movement = new ArrayDeque<Direction>();
-	public BasicAICar(Point startPos, int startingSpeed, Direction directionToDrive) 
+	// Basic AI car has 4 attributes
+	// 1. Start Position
+	// 2. end Position
+	// 3. starting speed
+	// 4. its driving direction
+	public BasicAICar(Point startPos, Point endPos,int startingSpeed, Direction directionToDrive) 
 	{
-		super(startPos, startingSpeed, System.getProperty("user.dir") + "/resources/redcar.png");
+		super(startPos, endPos, startingSpeed, System.getProperty("user.dir") + "/resources/redcar.png");
 		toDrive = directionToDrive;
 	}
 

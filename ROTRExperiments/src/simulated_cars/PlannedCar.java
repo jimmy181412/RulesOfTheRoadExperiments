@@ -12,9 +12,11 @@ public class PlannedCar extends AbstractROTRCar
 	private boolean haveMoved = false;
 	ArrayDeque<Direction> movement = new ArrayDeque<Direction>();
 	
-	public PlannedCar(Point startPos, int startingSpeed)
+	
+	
+	public PlannedCar(Point startPos,Point endPos, int startingSpeed)
 	{
-		super(startPos, startingSpeed, System.getProperty("user.dir") + "/resources/redcar.png");
+		super(startPos, endPos,startingSpeed, System.getProperty("user.dir") + "/resources/redcar.png");
 		// TODO Auto-generated constructor stub
 	}
 

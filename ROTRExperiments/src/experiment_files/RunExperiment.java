@@ -36,40 +36,33 @@ import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 
 
-public class RunExperiment
-{
-	public class Simulate implements Runnable
-	{
+public class RunExperiment{
+	public class Simulate implements Runnable{
 		int delay = 0;
 		int until = 0;
 		int stepsSimulated = 0;
 		public boolean finished = false;
 		
-		public Simulate(int delayTime, int noOfSteps)
-		{
+		public Simulate(int delayTime, int noOfSteps){
 			delay = delayTime;
 			until = noOfSteps;
 		}
 		
 		@Override
-		public void run()
-		{
+		public void run(){
 			int i = 0;
 			
-			while (!finished)
-			{
+			while (!finished){
 				simworld.simulate(1);
-				try
-				{
+				try{
 					Thread.sleep(delay);
-				} catch (InterruptedException e)
-				{
+				} 
+				catch (InterruptedException e){
 					e.printStackTrace();
 				}
 				updateGUIWorld();
 				lblNewLabel.setText("Steps simulated: " + ++stepsSimulated);
-				if (!finished)
-				{
+				if (!finished){
 					finished = until == 0 ? simworld.allFinished() : until == ++i;
 				}
 			}
@@ -89,8 +82,8 @@ public class RunExperiment
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
+	public static void main(String[] args){
+		EventQueue.invokeLater(new Runnable(){
 			public void run() {
 				try {
 					RunExperiment window = new RunExperiment();
@@ -109,41 +102,31 @@ public class RunExperiment
 		initialize();
 		cal = new CarAddedListener() {
 			@Override
-			public AbstractCar createCar(String name, Point startingLoca)
-			{
-				if (name.equalsIgnoreCase("slow"))
-				{
-					return new BasicAICar(startingLoca, 1, Direction.north);
+			public AbstractCar createCar(String name, Point startingLoca, Point endingLoca){
+				if(name.equalsIgnoreCase("slow")){
+					return new BasicAICar(startingLoca, endingLoca, 1, Direction.north);
 				}
-				else
-				{
-					if (cbAI.getSelectedItem() == "Reactive")
-					{
-						return new ReactiveCar(startingLoca, 1);
+				else{
+					if (cbAI.getSelectedItem() == "Reactive"){
+						return new ReactiveCar(startingLoca, endingLoca,1);
 					}
-					else
-					{
-						return new RudeCar(startingLoca, 1);
+					else{
+						return new RudeCar(startingLoca, endingLoca, 1);
 					}
 				}
 			}
 	
 			@Override
-			public AbstractCar createCar(String name, Point startingLoca, String[] information)
-			{
-				if (name.equalsIgnoreCase("slow"))
-				{
-					return new BasicAICar(startingLoca, 1, Direction.valueOf(information[0]));
+			public AbstractCar createCar(String name, Point startingLoca, Point endingLoca, String av){
+				if(name.equalsIgnoreCase("slow")){
+					return new BasicAICar(startingLoca, endingLoca, 1, Direction.north);
 				}
-				else
-				{
-					if (cbAI.getSelectedItem() == "Reactive")
-					{
-						return new ReactiveCar(startingLoca, 1);
+				else{
+					if (cbAI.getSelectedItem() == "Reactive"){
+						return new ReactiveCar(startingLoca, endingLoca, 1);
 					}
-					else
-					{
-						return new RudeCar(startingLoca, 1);
+					else{
+						return new RudeCar(startingLoca, endingLoca, 1);
 					}
 				}
 			}
@@ -153,7 +136,7 @@ public class RunExperiment
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() {
+	private void initialize(){
 		frame = new JFrame();
 		frame.setBounds(100, 100, 966, 615);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -163,19 +146,37 @@ public class RunExperiment
 		flowLayout.setAlignment(FlowLayout.LEFT);
 		frame.getContentPane().add(panel, BorderLayout.NORTH);
 		
-		JButton btnNewButton = new JButton("Load Overtaking");
+		
+		// button1
+		JButton btnNewButton = new JButton("Load example1");
+		btnNewButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                try{
+                    BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/src/simulated_cars/example1.txt"));
+                    simworld = LoadWorld.loadWorldFromFile(br, cal);
+                    pnlWorld.setLayout(new GridLayout(simworld.getHeight(), simworld.getWidth(), 1, 1));
+                    updateGUIWorld();   
+                } 
+                catch (IOException e1){
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
 		panel.add(btnNewButton);
 		
-		JButton btnNewButton_2 = new JButton("Load Traffic Light");
-		btnNewButton_2.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/src/simulated_cars/TrafficLightExperiment.txt"));
+		//button2
+		JButton btnNewButton_2 = new JButton("Load example2");
+		btnNewButton_2.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				try{
+					BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/src/simulated_cars/example2.txt"));
 					simworld = LoadWorld.loadWorldFromFile(br, cal);
 					pnlWorld.setLayout(new GridLayout(simworld.getHeight(), simworld.getWidth(), 1, 1));
 					updateGUIWorld();
-					
-				} catch (IOException e1) {
+				
+				}
+				catch (IOException e1){
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
@@ -183,16 +184,17 @@ public class RunExperiment
 		});
 		panel.add(btnNewButton_2);
 		
-		JButton btnNewButton_3 = new JButton("Load Turn Right");
-		btnNewButton_3.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/src/simulated_cars/TurnRightExperiment.txt"));
+		// button3
+		JButton btnNewButton_3 = new JButton("Load example3");
+		btnNewButton_3.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				try{
+					BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/src/simulated_cars/example3.txt"));
 					simworld = LoadWorld.loadWorldFromFile(br, cal);
 					pnlWorld.setLayout(new GridLayout(simworld.getHeight(), simworld.getWidth(), 1, 1));
-					updateGUIWorld();
-					
-				} catch (IOException e1) {
+					updateGUIWorld();	
+				} 
+				catch(IOException e1){
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
@@ -227,39 +229,20 @@ public class RunExperiment
 		frame.getContentPane().add(pnlWorld, BorderLayout.CENTER);
 		pnlWorld.setLayout(new GridLayout(3, 3, 0, 0));
 		
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/src/simulated_cars/OvertakingExperiment.txt"));
-					simworld = LoadWorld.loadWorldFromFile(br, cal);
-					pnlWorld.setLayout(new GridLayout(simworld.getHeight(), simworld.getWidth(), 1, 1));
-					updateGUIWorld();
-					
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			}
-		});
+	
 		
-		btnNewButton_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) 
-			{
-				if (currentlyRunning == null)
-				{
-					if (rdbtnNewRadioButton.isSelected())
-					{
-						currentlyRunning = new Simulate(250, 0);
-						
+		btnNewButton_1.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				if (currentlyRunning == null){
+					if (rdbtnNewRadioButton.isSelected()){
+						currentlyRunning = new Simulate(250, 0);	
 					}
-					else
-					{
+					else{
 						currentlyRunning = new Simulate(250, (Integer)spinner.getValue());
 					}
 					simulationThread.execute(currentlyRunning);
 				}
-				else
-				{
+				else{
 					currentlyRunning.finished = true;
 					currentlyRunning = null;
 				}
@@ -267,19 +250,15 @@ public class RunExperiment
 		});
 	}
 	
-	private void updateGUIWorld()
-	{
+	private void updateGUIWorld(){
 		pnlWorld.removeAll();
-		for (int y = 0; y < simworld.getHeight(); y++)
-		{
-			for (int x = 0; x < simworld.getWidth(); x++)
-			{
+		for (int y = 0; y < simworld.getHeight(); y++){
+			for (int x = 0; x < simworld.getWidth(); x++){
 				simworld.getCell(x, y).removeAll();
 				pnlWorld.add(simworld.getCell(x, y));
 			}
 		}
-		for (AbstractCar car : simworld.getCars())
-		{
+		for (AbstractCar car : simworld.getCars()){
 			Point p = simworld.getCarPosition(car);
 			JLabel icon = new JLabel(car.getCarIcon());
 			icon.setSize(simworld.getCell(p.getX(), p.getY()).getWidth(), simworld.getCell(p.getX(), p.getY()).getHeight());

@@ -10,6 +10,7 @@ import core_car_sim.Point;
 import core_car_sim.TrafficLightCell;
 import core_car_sim.WorldSim;
 
+// Rude car: it will only follow the "should" recommendation from RoTRA
 public class RudeCar extends AbstractROTRCar implements CarEvents
 {
 	private boolean isFinished = false;
@@ -24,9 +25,10 @@ public class RudeCar extends AbstractROTRCar implements CarEvents
 	
 	private HashSet<CarAction> actionsToDo = new HashSet<CarAction>();
 	
-	public RudeCar(Point startPos, int startingSpeed)
+	
+	public RudeCar(Point startPos, Point endPos, int startingSpeed)
 	{
-		super(startPos, startingSpeed, System.getProperty("user.dir") + "/resources/bluecar.png");
+		super(startPos, endPos,startingSpeed, System.getProperty("user.dir") + "/resources/bluecar.png");
 		addCarEventListener(this);
 	}
 

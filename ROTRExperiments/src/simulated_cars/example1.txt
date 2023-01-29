@@ -1,0 +1,97 @@
+14
+11
+1
+------^V------
+|     ^V     |
+|     ^V     |
+|     ^V     |
+>>>>>>++>>>>>>
+<<<<<<++<<<<<<
+|     ^V     |
+|     ^V     |
+|     ^V     |
+|     ^V     |
+------^V------
+TrLd tl1 5 6 6 6 V
+Trlr tl2 8 6 8 5 >
+trlu tl3 8 3 7 3 ^
+trll tl4 5 3 5 4 <
+Zebrah 6 7
+Zebrah 7 7
+zebrav 9 4
+zebrav 9 5
+zebrav 4 4
+zebrav 4 5
+zebrah 6 2
+zebrah 7 2
+
+solidlineleft 6 0
+solidlineleft 6 1
+solidlineleft 6 2 
+solidlineleft 6 3
+solidlineleft 6 6
+solidlineleft 6 7
+solidlineleft 6 8
+solidlineleft 6 9
+solidlineleft 6 10
+
+solidlineright 7 0
+solidlineright 7 1
+solidlineright 7 2
+solidlineright 7 3
+solidlineright 7 6
+solidlineright 7 7
+solidlineright 7 8
+solidlineright 7 9
+solidlineright 7 10
+
+solidlineup 0 4
+solidlineup 1 4
+solidlineup 2 4
+solidlineup 3 4
+solidlineup 4 4
+solidlineup 5 4
+solidlineup 8 4
+solidlineup 9 4
+solidlineup 10 4
+solidlineup 11 4
+solidlineup 12 4
+solidlineup 13 4
+
+solidlinedown 0 5
+solidlinedown 1 5
+solidlinedown 2 5
+solidlinedown 3 5
+solidlinedown 4 5
+solidlinedown 5 5
+solidlinedown 8 5
+solidlinedown 9 5
+solidlinedown 10 5
+solidlinedown 11 5
+solidlinedown 12 5
+solidlinedown 13 5
+
+dottedlineleft 7 0
+dottedlineleft 7 1
+dottedlineleft 7 2
+dottedlineleft 7 3
+dottedlineleft 7 6
+dottedlineleft 7 7
+dottedlineleft 7 8
+dottedlineleft 7 9
+dottedlineleft 7 10
+
+dottedlineup 0 5
+dottedlineup 1 5
+dottedlineup 2 5
+dottedlineup 3 5
+dottedlineup 4 5
+dottedlineup 5 5
+dottedlineup 8 5
+dottedlineup 9 5
+dottedlineup 10 5
+dottedlineup 11 5
+dottedlineup 12 5
+dottedlineup 13 5
+
+Car testingCar 6 8 13 4 JIM

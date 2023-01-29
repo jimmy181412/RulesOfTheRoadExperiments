@@ -1,0 +1,91 @@
+14
+11
+1
+-----^^^^-----
+|    ^^^^    |
+|    ^^^^    |
+|    ^^^^    |
+|    ^^^^    |
+|    ^^^^    |
+|    ^^^^    |
+|    ^^^^    |
+|    ^^^^    |
+|    ^^^^    |
+|    ^^^^    |
+-----^^^^-----
+
+
+solidlineleft 5 10
+solidlineleft 5 9
+solidlineleft 5 8
+solidlineleft 5 7
+solidlineleft 5 6
+solidlineleft 5 5
+solidlineleft 5 4
+solidlineleft 5 3
+solidlineleft 5 2
+solidlineleft 5 1
+solidlineleft 5 0
+
+swll 6 10
+swll 6 9
+swll 6 8
+swll 6 7
+swll 6 6
+swll 6 5
+swll 6 4
+swll 6 3
+swll 6 2
+swll 6 1
+swll 6 0
+
+dottedlineleft 7 10
+dottedlineleft 7 9
+dottedlineleft 7 8
+dottedlineleft 7 7
+dottedlineleft 7 6
+dottedlineleft 7 5
+dottedlineleft 7 4
+dottedlineleft 7 3
+dottedlineleft 7 2
+dottedlineleft 7 1
+dottedlineleft 7 0
+
+dottedlineleft 8 10
+dottedlineleft 8 9
+dottedlineleft 8 8
+dottedlineleft 8 7
+dottedlineleft 8 6
+dottedlineleft 8 5
+dottedlineleft 8 4
+dottedlineleft 8 3
+dottedlineleft 8 2
+dottedlineleft 8 1
+dottedlineleft 8 0
+
+solidlineright 8 10
+solidlineright 8 9
+solidlineright 8 8
+solidlineright 8 7
+solidlineright 8 6
+solidlineright 8 5
+solidlineright 8 4
+solidlineright 8 3
+solidlineright 8 2
+solidlineright 8 1
+solidlineright 8 0
+
+hardshoulder 5 10
+hardshoulder 5 9
+hardshoulder 5 8
+hardshoulder 5 7
+hardshoulder 5 6
+hardshoulder 5 5
+hardshoulder 5 4
+hardshoulder 5 3
+hardshoulder 5 2
+hardshoulder 5 1
+hardshoulder 5 0
+
+Car testingCar 5 8 8 2 jim
+
