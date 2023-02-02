@@ -35,7 +35,14 @@ public class BasicAICar extends AbstractCar {
 	@Override
 	protected boolean isFinished(Point arg0) 
 	{
-		return false;
+	    boolean isFinished = false;
+	    if(currentPosition.equals(endPosition)) {
+            isFinished = true;
+        }
+        else {
+            isFinished = false;
+        }
+        return isFinished;
 	}
 
 	@Override

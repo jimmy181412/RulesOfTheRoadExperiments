@@ -3,6 +3,8 @@ package simulated_cars;
 import java.util.ArrayList;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import core_car_sim.AbstractCar;
 import core_car_sim.Point;
@@ -628,10 +630,13 @@ public abstract class AbstractROTRCar extends AbstractCar
     
     public enum CarPriority {CP_MUST, CP_SHOULD};
     
+    
+  //------------------------------------------------------------------------------------
     ArrayList<ROTROutcome> rulesOfTheRoad = new ArrayList<ROTROutcome>();
     HashMap<CarBelief, Boolean> beliefs = new HashMap<CarBelief, Boolean>();
     HashMap<CarIntention, Boolean> intentions = new HashMap<CarIntention, Boolean>();
     
+      
     public AbstractROTRCar(Point startPos, Point endPos, int startingSpeed, String fileImage)
     {
         super(startPos,endPos, startingSpeed,fileImage);
@@ -642,22 +647,6 @@ public abstract class AbstractROTRCar extends AbstractCar
     public void addCarEventListener(CarEvents ce)
     {
         cel.add(ce);
-    }
-    
-    private void clearBeliefs()
-    {
-        for (CarBelief cb : CarBelief.values())
-        {
-            beliefs.put(cb, false);
-        }
-    }
-    
-    private void clearIntentions()
-    {
-        for (CarIntention cb : CarIntention.values())
-        {
-            intentions.put(cb, false);
-        }
     }
     
     @Override
@@ -676,20 +665,75 @@ public abstract class AbstractROTRCar extends AbstractCar
 
     public void updateOutcomes()
     {
+        
+        // generate the recommendations using RoTra
         rulesOfTheRoad = RulesOfTheRoad.getROTRViolations(beliefs, intentions);
+        
+//        // print out the beliefs
+//        System.out.println("--------------------------------");
+//        for(Entry<CarBelief,Boolean> entry: beliefs.entrySet()) {
+//            if(entry.getValue() != false) {
+//                System.out.print(entry.getKey() + " ");
+//                System.out.println(entry.getValue());
+//            } 
+//        }
+//        System.out.println("--------------------------------");
+//        
+//        //print out the intentions
+//        System.out.println("++++++++++++++++++++++++++++++++");
+//        for(Entry<CarIntention, Boolean> entry : intentions.entrySet()) {
+//            if(entry.getValue() != false) {
+//                System.out.print(entry.getKey()+ " ");
+//                System.out.println(entry.getValue());
+//            }
+//        }
+//        System.out.println("++++++++++++++++++++++++++++++++");
+        
+//        // print out the outcome of Rotra
+//        System.out.println("********************************");
+//        for(int i = 0; i < rulesOfTheRoad.size(); i++) {
+//            String action1 = rulesOfTheRoad.get(i).action;
+//            String legal1 = Boolean.toString(rulesOfTheRoad.get(i).legalRequirement)  ;
+//            System.out.print(action1);
+//            System.out.print(" " +legal1 +"\n");
+//        }
+//        System.out.println("*********************************");
+//  
+ 
+        // the rotra will convey the recommendations to the car
+        // reactivate car will follow all recommendations
+        // rude car will only follow legal actions
         for (ROTROutcome rotr : rulesOfTheRoad)
         {
             for (CarEvents ce : cel)
-            {
+            {   
+                // rude car
                 if (rotr.legalRequirement)
                 {
                     ce.actionUpdate(CarAction.get(rotr.action), CarPriority.CP_MUST);
                 }
+                // reactivate car
                 else
                 {
                     ce.actionUpdate(CarAction.get(rotr.action), CarPriority.CP_SHOULD);
                 }
             }   
+        }
+    }
+    
+    protected void clearBeliefs()
+    {
+        for (CarBelief cb : CarBelief.values())
+        {
+            beliefs.put(cb, false);
+        }
+    }
+    
+    protected void clearIntentions()
+    {
+        for (CarIntention cb : CarIntention.values())
+        {
+            intentions.put(cb, false);
         }
     }
 }

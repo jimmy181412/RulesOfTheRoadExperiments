@@ -18,6 +18,8 @@ public class RulesOfTheRoad
 			+ System.lineSeparator()
 			+ "main :- getRecommendedActions(standard,BELIEFS,INTENTIONS,Actions), write(Actions), halt(0).";
 	
+	
+	// nested class of RoTROutcome
 	public static class ROTROutcome
 	{
 		public String action;
@@ -69,9 +71,13 @@ public class RulesOfTheRoad
 		}
 		bai.append("]");
 		toWrite = toWrite.replace("INTENTIONS", bai.toString());
-		System.out.println(toWrite);
+//		System.out.println(toWrite);
 		//$PATH of pb does not resolve properly on MacOS
-		ProcessBuilder pb = new ProcessBuilder("/Applications/SWI-Prolog.app/Contents/MacOS/swipl", fileLocation);
+		// for mac os user
+		String path1 =  "/Applications/SWI-Prolog.app/Contents/MacOS/swipl";
+		// for windows user
+		String path2 = "C:\\Program Files\\swipl\\bin\\swipl";
+		ProcessBuilder pb = new ProcessBuilder(path2, fileLocation);
 		try {
 			PrintWriter out = new PrintWriter(fileLocation);
 			out.print(toWrite);
@@ -81,7 +87,7 @@ public class RulesOfTheRoad
 			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			
 			String line = reader.readLine();
-			System.out.println("\n" + line);
+//			System.out.println("\n" + line);
 			String[] s = line.substring(1, line.length() - 1).split(",");
 			String[] item;
 			for (int i = 0; i < s.length; i++)

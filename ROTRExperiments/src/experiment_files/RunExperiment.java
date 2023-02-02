@@ -104,7 +104,7 @@ public class RunExperiment{
 			@Override
 			public AbstractCar createCar(String name, Point startingLoca, Point endingLoca){
 				if(name.equalsIgnoreCase("slow")){
-					return new BasicAICar(startingLoca, endingLoca, 1, Direction.north);
+					return new BasicAICar(startingLoca, endingLoca, 1, Direction.west);
 				}
 				else{
 					if (cbAI.getSelectedItem() == "Reactive"){
