@@ -25,10 +25,14 @@ public class BasicAICar extends AbstractCar {
 	@Override
 	protected ArrayDeque<Direction> getSimulationRoute() 
 	{
-		for (int i = 0; i < getSpeed(); i++)
-		{
-			movement.add(toDrive);
-		}
+//		for (int i = 0; i < getSpeed(); i++)
+//		{
+//			movement.add(toDrive);
+//		}
+//		
+//		System.out.println(getSpeed());
+//	    System.out.println(cmd.toString());
+	    movement.push(cmd);
 		return movement;
 	}
 

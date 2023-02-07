@@ -668,38 +668,7 @@ public abstract class AbstractROTRCar extends AbstractCar
         
         // generate the recommendations using RoTra
         rulesOfTheRoad = RulesOfTheRoad.getROTRViolations(beliefs, intentions);
-        
-//        // print out the beliefs
-//        System.out.println("--------------------------------");
-//        for(Entry<CarBelief,Boolean> entry: beliefs.entrySet()) {
-//            if(entry.getValue() != false) {
-//                System.out.print(entry.getKey() + " ");
-//                System.out.println(entry.getValue());
-//            } 
-//        }
-//        System.out.println("--------------------------------");
-//        
-//        //print out the intentions
-//        System.out.println("++++++++++++++++++++++++++++++++");
-//        for(Entry<CarIntention, Boolean> entry : intentions.entrySet()) {
-//            if(entry.getValue() != false) {
-//                System.out.print(entry.getKey()+ " ");
-//                System.out.println(entry.getValue());
-//            }
-//        }
-//        System.out.println("++++++++++++++++++++++++++++++++");
-        
-//        // print out the outcome of Rotra
-//        System.out.println("********************************");
-//        for(int i = 0; i < rulesOfTheRoad.size(); i++) {
-//            String action1 = rulesOfTheRoad.get(i).action;
-//            String legal1 = Boolean.toString(rulesOfTheRoad.get(i).legalRequirement)  ;
-//            System.out.print(action1);
-//            System.out.print(" " +legal1 +"\n");
-//        }
-//        System.out.println("*********************************");
-//  
- 
+
         // the rotra will convey the recommendations to the car
         // reactivate car will follow all recommendations
         // rude car will only follow legal actions

@@ -1,4 +1,4 @@
 :- include('findactions').
 :- initialization(main).
 
-main :- getRecommendedActions(standard,[vehicleDoesntFitsInCentralReservation,canReadNumberPlate,exitClear,bendInRoad,approachingCorner],[],Actions), write(Actions), halt(0).
+main :- getRecommendedActions(standard,[exitClear,vehicleDoesntFitsInCentralReservation,approachingCorner,atTrafficLight,bendInRoad,canReadNumberPlate,lightRed],[approachingTrafficLight,setOff],Actions), write(Actions), halt(0).

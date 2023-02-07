@@ -30,6 +30,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
     private boolean safegap = false;
     private boolean atRightTurn = false;
     private boolean wallAhead = false;
+    private boolean exitclear = false;
     
     private boolean trafficLightRed;
     private boolean atWhiteLine = false;
@@ -72,6 +73,8 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
         actionsToDo.clear();
     }
     
+    
+    //TODO
     //reset the observations
     public void reMakeDecisions() {
         this.trafficLightRed = false;
@@ -96,11 +99,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
     @Override
     protected ArrayDeque<Direction> getSimulationRoute(){ 
         updateOutcomes();
-        
-        
-        System.out.println(currentPosition.getX() + " " + currentPosition.getY());
-        int j = 0;
-        int m = 0;
+
         
         System.out.println("----------------------------------------------------------------------");
         // print out the car action list
@@ -110,30 +109,34 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
             System.out.println(ca1.getValue());
         }
         System.out.println("----------------------------------------------------------------------");
-        // print out the car intention list
-        System.out.println("intention list: "); 
-        for(Entry<CarIntention, Boolean> i : intentions.entrySet()){
-            if(i.getValue()) {
-               System.out.println(i.getKey().toString());
-               j++;
-            }        
-        }
-        System.out.println("----------------------------------------------------------------------");
+//        // print out the car intention list
+//        System.out.println("intention list: "); 
+//        for(Entry<CarIntention, Boolean> i : intentions.entrySet()){
+//            if(i.getValue()) {
+//               System.out.println(i.getKey().toString());
+//               j++;
+//            }        
+//        }
+//        System.out.println("----------------------------------------------------------------------");
         //print out the car belief list
-        System.out.println("belief list");
-        for(Entry<CarBelief,Boolean> k : beliefs.entrySet()){
-            if(k.getValue()){
-                System.out.println(k.getKey().toString());
-                m++;
-            }
-        }
-        System.out.println("----------------------------------------------------------------------");
-
-
+//        System.out.println("belief list");
+//        for(Entry<CarBelief,Boolean> k : beliefs.entrySet()){
+//            if(k.getValue()){
+//                System.out.println(k.getKey().toString());
+//               
+//            }
+//        }
+//        System.out.println("----------------------------------------------------------------------");
+        
+//        
+//        System.out.println(exitclear);
+       
+        
         if ((trafficLightRed && atWhiteLine) || finished)
         {
             setSpeed(0);
         }
+
         else if(atHardShoulder && no_down_turn && cmd == Direction.south) {
                 directions.push(cmd);
         }
@@ -1220,27 +1223,36 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
             // check whether there are cars will block current car's way 
             case CB_exitClear:
                 boolean exitIsClear = true;
-      
+                //TODO
+                exitclear = true;
+                int espeed = 1;
                 //check car current moving direction
                 if(cmd == Direction.north) {
                    //the position that the car will be at in the next move is
-                   Point predicted_point = new Point(location.getX(), location.getY() - speed);
-                   //the point list that the car will pass from its current location to its predicted point(without the current position) 
-                   ArrayList<Point> pointPassing = new ArrayList<>();
-                   
+                   Point predicted_point = new Point(location.getX(), location.getY() - espeed);
+           
+                  //the point list that the car will pass from its current location to its predicted point(without the current position) 
+                   ArrayList<Point> pointPassing = new ArrayList<>();  
                    for(int currentY = location.getY() - 1; currentY >= predicted_point.getY(); currentY--){
                        Point tmpPoint = new Point(location.getX(), currentY);
                        pointPassing.add(tmpPoint);
                    }
-                    
-                   for(int i = 0; i < visibleWorld.getWidth(); i++) {
-                       for(int j = location.getY() - 1; j >= location.getY() - speed;j--) {
-                           if(visibleWorld.containsCar(i,j)) {
-                               //get the car at this point
+                   
+                 //TODO
+//                 for(Point p: pointPassing) {
+//                     System.out.println("the car's passing position is: " + p.getX() + " " + p.getY());
+//                 }
+                   
+                 for(int i = 0; i < visibleWorld.getWidth(); i++) {
+                       for(int j = location.getY() - 1; j >= location.getY() - espeed;j--) {
+                           if(visibleWorld.containsCar(i,j)) {           
                                AbstractCar car1 = visibleWorld.getCarAtPosition(i, j);
                                //get the car's speed
                                int speed1 = car1.getSpeed();
                                Direction d1 = car1.getCMD();
+                               
+//                               System.out.println("other car's speed is: " + speed1);
+//                               System.out.println("other car's current moving direction is: " + d1.toString());
                                if(d1 == Direction.east) {
                                    //the predicted location the car will be at
                                    Point predicted_point1 = new Point(i + speed1, j);
@@ -1250,9 +1262,15 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                                    for(int currentX = i + 1; currentX <= predicted_point1.getX(); currentX++) {
                                        Point tmpPoint1 = new Point(currentX, predicted_point1.getY());
                                        pointPassing1.add(tmpPoint1);
-                                   }
+                                   }   
+                                   //TODO
+//                                   for(Point p: pointPassing1) {
+//                                       System.out.println("the other car's passing position is: " + p.getX() + " " + p.getY());
+//                                   }
+//     
                                    if(checkCommonPoint(pointPassing, pointPassing1)) {
                                        exitIsClear = false;
+                                       exitclear = false;
                                    }
                                }
                                else if(d1 == Direction.west) {
@@ -1264,17 +1282,22 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                                        Point tmpPoint1 = new Point(currentX, predicted_point1.getY());
                                        pointPassing1.add(tmpPoint1);
                                    }
+                                   //TODO
+//                                   for(Point p: pointPassing1) {
+//                                       System.out.println("the other car's passing position is: " + p.getX() + " " + p.getY());
+//                                   }
                                    if(checkCommonPoint(pointPassing, pointPassing1)) {
                                        exitIsClear = false;
+                                       exitclear = false;
                                    }
                                }
                            }
                        }
-                   } 
+                   }
                 }
                 else if(cmd == Direction.south) {
                     // the position that the car will be at in the next move is
-                    Point predicted_point = new Point(location.getX(), location.getY() + speed);
+                    Point predicted_point = new Point(location.getX(), location.getY() + espeed);
                     
                     //the point list that the car will pass from its current location to its predicted point(without the current position) 
                     ArrayList<Point> pointPassing = new ArrayList<>();
@@ -1285,7 +1308,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                     }
                     
                     for(int i = 0; i < visibleWorld.getWidth(); i++) {
-                        for(int j = location.getY() + 1; j <= location.getY() + speed; j++) {
+                        for(int j = location.getY() + 1; j <= location.getY() + espeed; j++) {
                             if(visibleWorld.containsCar(i, j)) {
                                 //get the car at this point
                                 AbstractCar car1 = visibleWorld.getCarAtPosition(i, j);
@@ -1304,6 +1327,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                                     }
                                     if(checkCommonPoint(pointPassing, pointPassing1)) {
                                         exitIsClear = false;
+                                        exitclear = false;
                                     }
                                 }
                                 else if(d1 == Direction.west) {
@@ -1317,6 +1341,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                                     }
                                     if(checkCommonPoint(pointPassing, pointPassing1)) {
                                         exitIsClear = false;
+                                        exitclear = false;
                                     }
                                 }
                             }
@@ -1325,7 +1350,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                 }
                 else if(cmd == Direction.east) {
                     //  the point the car will be at in the next move
-                    Point predicted_point = new Point(location.getX() + speed,location.getY());
+                    Point predicted_point = new Point(location.getX() + espeed,location.getY());
                     //  the points list the car passing by in the next move(without current point)
                     ArrayList<Point> pointPassing = new ArrayList<>();
                     for(int currentX = location.getX() + 1; currentX <= predicted_point.getX(); currentX++) {
@@ -1333,7 +1358,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                         pointPassing.add(tmpPoint);
                     }
                     
-                    for(int i = location.getX() + 1; i <= location.getX() + speed; i++) {
+                    for(int i = location.getX() + 1; i <= location.getX() + espeed; i++) {
                         for(int j = 0; j < visibleWorld.getHeight(); j++) {
                             if(visibleWorld.containsCar(i, j)) {
                                 AbstractCar car1 = visibleWorld.getCarAtPosition(i, j);
@@ -1352,6 +1377,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                                     // check if two ArrayLists conflict or not 
                                     if(checkCommonPoint(pointPassing, pointPassing1)) {
                                         exitIsClear = false;
+                                        exitclear = false;
                                     }
                                 }
                                 else if(d1 == Direction.north) {
@@ -1362,11 +1388,13 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                                     for(int currentY = j - 1; currentY >= predicted_point1.getY(); currentY--) {
                                         Point tmpPoint1 = new Point(i, currentY);
                                         pointPassing1.add(tmpPoint1);
+                                        
                                     }
                                     
                                     //  check if two ArrayLists conflict or not
                                     if(checkCommonPoint(pointPassing, pointPassing1)) {
                                         exitIsClear = false;
+                                        exitclear = false;
                                     }
                                 }
                             }
@@ -1376,7 +1404,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                 
                 else if(cmd == Direction.west) {
                     //  the point the car will be at in the next move
-                    Point predicted_point = new Point(location.getX() - speed,location.getY());
+                    Point predicted_point = new Point(location.getX() - espeed,location.getY());
                     //  the points list the car passing by in the next move(without current point)
                     ArrayList<Point> pointPassing = new ArrayList<>();
                     for(int currentX = location.getX() - 1; currentX >= predicted_point.getX(); currentX--) {
@@ -1384,7 +1412,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                         pointPassing.add(tmpPoint);
                     }
                     
-                    for(int i = location.getX() - 1; i >= location.getX() - speed; i--) {
+                    for(int i = location.getX() - 1; i >= location.getX() - espeed; i--) {
                         for(int j = 0; j < visibleWorld.getHeight(); j++) {
                             if(visibleWorld.containsCar(i, j)) {
                                 AbstractCar car1 = visibleWorld.getCarAtPosition(i, j);
@@ -1403,6 +1431,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                                     // check if two ArrayLists conflict or not 
                                     if(checkCommonPoint(pointPassing, pointPassing1)) {
                                         exitIsClear = false;
+                                        exitclear = false;
                                     }
                                 }
                                 else if(d1 == Direction.north) {
@@ -1418,6 +1447,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                                     //  check if two ArrayLists conflict or not
                                     if(checkCommonPoint(pointPassing, pointPassing1)) {
                                         exitIsClear = false;
+                                        exitclear = false;
                                     }
                                 }
                             }
