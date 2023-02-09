@@ -11,64 +11,63 @@
 |^^VV||||
 |^^VV||||
 
-Trll tl1 5 3 5 4 <
+trafficlight < 5 3 5 4 
 
-solidlineleft 1 8
-solidlineleft 1 7
-solidlineleft 1 6
-solidlineleft 1 5
-solidlineleft 1 4
-solidlineleft 1 3 
-solidlineleft 1 2
-solidlineleft 1 1
-solidlineleft 1 0 
+solidline < 1 8
+solidline < 1 7
+solidline < 1 6
+solidline < 1 5
+solidline < 1 4
+solidline < 1 3 
+solidline < 1 2
+solidline < 1 1
+solidline < 1 0 
 
-dottedlineleft 3 8
-dottedlineleft 3 7
-dottedlineleft 3 6
-dottedlineleft 3 5
-dottedlineleft 3 4
-dottedlineleft 3 3
-dottedlineleft 3 2
-dottedlineleft 3 1
-dottedlineleft 3 0
+dottedline < 3 8
+dottedline < 3 7
+dottedline < 3 6
+dottedline < 3 5
+dottedline < 3 4
+dottedline < 3 3
+dottedline < 3 2
+dottedline < 3 1
+dottedline < 3 0
 
-dottedlineleft 2 8
-dottedlineleft 2 7
-dottedlineleft 2 6
-dottedlineleft 2 5
-dottedlineleft 2 4
-dottedlineleft 2 3
-dottedlineleft 2 2
-dottedlineleft 2 1
-dottedlineleft 2 0
+dottedline < 2 8
+dottedline < 2 7
+dottedline < 2 6
+dottedline < 2 5
+dottedline < 2 4
+dottedline < 2 3
+dottedline < 2 2
+dottedline < 2 1
+dottedline < 2 0
 
-dottedlineleft 4 8
-dottedlineleft 4 7
-dottedlineleft 4 6
-dottedlineleft 4 5
-dottedlineleft 4 4
-dottedlineleft 4 3
-dottedlineleft 4 2
-dottedlineleft 4 1
-dottedlineleft 4 0
+dottedline < 4 8
+dottedline < 4 7
+dottedline < 4 6
+dottedline < 4 5
+dottedline < 4 4
+dottedline < 4 3
+dottedline < 4 2
+dottedline < 4 1
+dottedline < 4 0
 
-solidlineright 4 8
-solidlineright 4 7
-solidlineright 4 6
-solidlineright 4 5
-solidlineright 4 3
-solidlineright 4 2
-solidlineright 4 1
-solidlineright 4 0
+solidline > 4 8
+solidline > 4 7
+solidline > 4 6
+solidline > 4 5
+solidline > 4 3
+solidline > 4 2
+solidline > 4 1
+solidline > 4 0
 
-solidlineup 5 4
-solidlineup 6 4
-solidlineup 7 4
-solidlinedown 5 4
-solidlinedown 6 4
-solidlinedown 7 4
+solidline ^ 5 4
+solidline ^ 6 4
+solidline ^ 7 4
+solidline V 5 4
+solidline V 6 4
+solidline V 7 4
 
 Car Test 1 8 7 4 jim
-Car slow 2 8 2 1 
-
+Car Test 2 8 2 1 

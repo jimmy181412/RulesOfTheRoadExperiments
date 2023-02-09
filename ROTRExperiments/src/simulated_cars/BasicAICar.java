@@ -27,12 +27,13 @@ public class BasicAICar extends AbstractCar {
 	{
 //		for (int i = 0; i < getSpeed(); i++)
 //		{
-//			movement.add(toDrive);
+//			movement.add(cmd);
 //		}
 //		
 //		System.out.println(getSpeed());
 //	    System.out.println(cmd.toString());
-	    movement.push(cmd);
+	
+	    movement.add(cmd);
 		return movement;
 	}
 

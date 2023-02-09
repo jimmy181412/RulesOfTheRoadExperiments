@@ -1,98 +1,130 @@
 14
 11
 1
-------^V------
-|     ^V     |
-|     ^V     |
-|     ^V     |
+-----p^Vp-----
+|    p^Vp    |
+|    p^Vp    |
+pppppp^Vpppppp
 >>>>>>++>>>>>>
 <<<<<<++<<<<<<
-|     ^V     |
-|     ^V     |
-|     ^V     |
-|     ^V     |
-------^V------
-TrLd tl1 5 6 6 6 V
-Trlr tl2 8 6 8 5 >
-trlu tl3 8 3 7 3 ^
-trll tl4 5 3 5 4 <
-Zebrah 6 7
-Zebrah 7 7
-zebrav 9 4
-zebrav 9 5
-zebrav 4 4
-zebrav 4 5
-zebrah 6 2
-zebrah 7 2
+pppppp^Vpppppp
+|    p^Vp    |
+|    p^Vp    |
+|    p^Vp    |
+-----p^Vp-----
 
-solidlineleft 6 0
-solidlineleft 6 1
-solidlineleft 6 2 
-solidlineleft 6 3
-solidlineleft 6 6
-solidlineleft 6 7
-solidlineleft 6 8
-solidlineleft 6 9
-solidlineleft 6 10
 
-solidlineright 7 0
-solidlineright 7 1
-solidlineright 7 2
-solidlineright 7 3
-solidlineright 7 6
-solidlineright 7 7
-solidlineright 7 8
-solidlineright 7 9
-solidlineright 7 10
+trafficlight V 5 6 6 6
+trafficlight > 8 6 8 5
+trafficlight ^ 8 3 7 3
+trafficlight < 5 3 5 4
 
-solidlineup 0 4
-solidlineup 1 4
-solidlineup 2 4
-solidlineup 3 4
-solidlineup 4 4
-solidlineup 5 4
-solidlineup 8 4
-solidlineup 9 4
-solidlineup 10 4
-solidlineup 11 4
-solidlineup 12 4
-solidlineup 13 4
+zebracrossing > 6 7
+zebracrossing > 7 7
+zebracrossing > 6 2
+zebracrossing > 7 2
+zebracrossing ^ 4 4
+zebracrossing ^ 4 5
+zebracrossing ^ 9 4
+zebracrossing ^ 9 5
 
-solidlinedown 0 5
-solidlinedown 1 5
-solidlinedown 2 5
-solidlinedown 3 5
-solidlinedown 4 5
-solidlinedown 5 5
-solidlinedown 8 5
-solidlinedown 9 5
-solidlinedown 10 5
-solidlinedown 11 5
-solidlinedown 12 5
-solidlinedown 13 5
+solidline < 6 0
+solidline < 6 1
+solidline < 6 2
+solidline < 6 3
+solidline < 6 6
+solidline < 6 7
+solidline < 6 8 
+solidline < 6 9
+solidline < 6 10
+solidline > 7 0 
+solidline > 7 1
+solidline > 7 2
+solidline > 7 3
+solidline > 7 6
+solidline > 7 7
+solidline > 7 8
+solidline > 7 9
+solidline > 7 10
+solidline ^ 0 4
+solidline ^ 1 4
+solidline ^ 2 4
+solidline ^ 3 4 
+solidline ^ 4 4
+solidline ^ 5 4
+solidline ^ 8 4
+solidline ^ 9 4
+solidline ^ 10 4
+solidline ^ 11 4
+solidline ^ 12 4
+solidline ^ 13 4 
+solidline V 0 5
+solidline V 1 5
+solidline V 2 5
+solidline V 3 5
+solidline V 4 5 
+solidline V 5 5
+solidline V 8 5
+solidline V 9 5
+solidline V 10 5
+solidline V 11 5 
+solidline V 12 5 
+solidline V 13 5
 
-dottedlineleft 7 0
-dottedlineleft 7 1
-dottedlineleft 7 2
-dottedlineleft 7 3
-dottedlineleft 7 6
-dottedlineleft 7 7
-dottedlineleft 7 8
-dottedlineleft 7 9
-dottedlineleft 7 10
+dottedline < 7 0
+dottedline < 7 1
+dottedline < 7 3
+dottedline < 7 6
+dottedline < 7 8
+dottedline < 7 9
+dottedline < 7 10
+dottedline ^ 0 5
+dottedline ^ 1 5
+dottedline ^ 2 5
+dottedline ^ 3 5
+dottedline ^ 5 5
+dottedline ^ 8 5
+dottedline ^ 10 5
+dottedline ^ 11 5
+dottedline ^ 12 5
+dottedline ^ 13 5
 
-dottedlineup 0 5
-dottedlineup 1 5
-dottedlineup 2 5
-dottedlineup 3 5
-dottedlineup 4 5
-dottedlineup 5 5
-dottedlineup 8 5
-dottedlineup 9 5
-dottedlineup 10 5
-dottedlineup 11 5
-dottedlineup 12 5
-dottedlineup 13 5
+pavement > 5 10
+pavement > 5 9
+pavement > 5 8
+pavement > 5 7 
+pavement > 5 2
+pavement > 5 1
+pavement > 5 0
+pavement < 8 10
+pavement < 8 9
+pavement < 8 8
+pavement < 8 7
+pavement < 8 2
+pavement < 8 1
+pavement < 8 0
+pavement ^ 0 6
+pavement ^ 1 6
+pavement ^ 2 6
+pavement ^ 3 6
+pavement ^ 4 6
+pavement ^ 9 6
+pavement ^ 10 6
+pavement ^ 11 6
+pavement ^ 12 6
+pavement ^ 13 6
+pavement V 0 3
+pavement V 1 3
+pavement V 2 3
+pavement V 3 3
+pavement V 4 3
+pavement V 9 3
+pavement V 10 3
+pavement V 11 3
+pavement V 12 3
+pavement V 13 3
 
 Car testingCar 6 10 13 4 JIM
 Car slow 13 5 0 5 nick
+pedestrian p1 5 7 8 7 5 7 >
+pedestrian p3 8 2 5 2 8 2 <

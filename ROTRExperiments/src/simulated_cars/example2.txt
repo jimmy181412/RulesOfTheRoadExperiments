@@ -15,65 +15,65 @@
 -----^^^^-----
 
 
-solidlineleft 5 10
-solidlineleft 5 9
-solidlineleft 5 8
-solidlineleft 5 7
-solidlineleft 5 6
-solidlineleft 5 5
-solidlineleft 5 4
-solidlineleft 5 3
-solidlineleft 5 2
-solidlineleft 5 1
-solidlineleft 5 0
+solidline < 5 10
+solidline < 5 9
+solidline < 5 8
+solidline < 5 7
+solidline < 5 6
+solidline < 5 5
+solidline < 5 4
+solidline < 5 3
+solidline < 5 2
+solidline < 5 1
+solidline < 5 0
 
-swll 6 10
-swll 6 9
-swll 6 8
-swll 6 7
-swll 6 6
-swll 6 5
-swll 6 4
-swll 6 3
-swll 6 2
-swll 6 1
-swll 6 0
+solidwhiteline < 6 10
+solidwhiteline < 6 9
+solidwhiteline < 6 8
+solidwhiteline < 6 7
+solidwhiteline < 6 6
+solidwhiteline < 6 5
+solidwhiteline < 6 4
+solidwhiteline < 6 3
+solidwhiteline < 6 2
+solidwhiteline < 6 1
+solidwhiteline < 6 0
 
-dottedlineleft 7 10
-dottedlineleft 7 9
-dottedlineleft 7 8
-dottedlineleft 7 7
-dottedlineleft 7 6
-dottedlineleft 7 5
-dottedlineleft 7 4
-dottedlineleft 7 3
-dottedlineleft 7 2
-dottedlineleft 7 1
-dottedlineleft 7 0
+dottedline < 7 10
+dottedline < 7 9
+dottedline < 7 8
+dottedline < 7 7
+dottedline < 7 6
+dottedline < 7 5
+dottedline < 7 4
+dottedline < 7 3
+dottedline < 7 2
+dottedline < 7 1
+dottedline < 7 0
 
-dottedlineleft 8 10
-dottedlineleft 8 9
-dottedlineleft 8 8
-dottedlineleft 8 7
-dottedlineleft 8 6
-dottedlineleft 8 5
-dottedlineleft 8 4
-dottedlineleft 8 3
-dottedlineleft 8 2
-dottedlineleft 8 1
-dottedlineleft 8 0
+dottedline < 8 10
+dottedline < 8 9
+dottedline < 8 8
+dottedline < 8 7
+dottedline < 8 6
+dottedline < 8 5
+dottedline < 8 4
+dottedline < 8 3
+dottedline < 8 2
+dottedline < 8 1
+dottedline < 8 0
 
-solidlineright 8 10
-solidlineright 8 9
-solidlineright 8 8
-solidlineright 8 7
-solidlineright 8 6
-solidlineright 8 5
-solidlineright 8 4
-solidlineright 8 3
-solidlineright 8 2
-solidlineright 8 1
-solidlineright 8 0
+solidline > 8 10
+solidline > 8 9
+solidline > 8 8
+solidline > 8 7
+solidline > 8 6
+solidline > 8 5
+solidline > 8 4
+solidline > 8 3
+solidline > 8 2
+solidline > 8 1
+solidline > 8 0
 
 hardshoulder 5 10
 hardshoulder 5 9

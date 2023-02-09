@@ -16,6 +16,7 @@ import core_car_sim.RoadCell.RoadMarking;
 import core_car_sim.TrafficLightCell.TrafficLightCellInformation;
 import core_car_sim.AbstractInformationCell;
 import core_car_sim.Direction;
+import core_car_sim.Pedestrian;
 import core_car_sim.Point;
 import core_car_sim.RoadCell;
 import core_car_sim.TrafficLightCell;
@@ -25,80 +26,30 @@ import core_car_sim.WorldSim;
 public class ReactiveCar extends AbstractROTRCar implements CarEvents{
     
     private boolean isFinished = false;
-    private boolean overtakenOther = false;
-    private boolean getIntoLeftLane = false;
-    private boolean safegap = false;
-    private boolean atRightTurn = false;
-    private boolean wallAhead = false;
-    private boolean exitclear = false;
-    
-    private boolean trafficLightRed;
-    private boolean atWhiteLine = false;
-    private boolean finished = false;
-    private boolean atHardShoulder;
-    private boolean no_right_turn = false;
-    private boolean no_left_turn = false;
-    private boolean no_down_turn = false;
-    private boolean no_up_turn;
-    private boolean approaching_vertical_zebra = false;
-    private boolean approaching_horizontal_zebra = false;
-    private boolean no_overtake= false;
-    private boolean no_go_north_because_other_car = false;
-    private boolean no_go_south_because_other_car =false;
-    private boolean no_go_east_because_other_car = false;
-    private boolean no_go_west_because_other_car = false;
-        
+    private boolean wallAhead;
+    private boolean atWhiteLine;
+    private boolean exitIsClear;
+  
+
     ArrayDeque<Direction> directions = new ArrayDeque<Direction>();
+    private HashMap<CarAction,CarPriority> actionsRecommendation = new HashMap<>();
     private HashMap<CarAction,CarPriority> actionsToDo = new HashMap<CarAction,CarPriority>();
-    
-    // constructor
+   
     public ReactiveCar(Point startPos, Point endPos, int startingSpeed){
         super(startPos,endPos, startingSpeed, System.getProperty("user.dir") + "/resources/bluecar.png");
         addCarEventListener(this);
     }
-    
-    // check if there are same points between two arraylists
-    public Boolean checkCommonPoint(ArrayList<Point> l1, ArrayList<Point> l2) {
-        l1.retainAll(l2);
-        if(l1.isEmpty()) {
-            return false;
-        }
-        else {
-            return true;
-        }        
-    }
-    
-    // reset the action list
-    public void resetActions() { 
-        actionsToDo.clear();
-    }
-    
-    
-    //TODO
-    //reset the observations
-    public void reMakeDecisions() {
-        this.trafficLightRed = false;
-        this.atWhiteLine = false;
-        this.wallAhead = false;
-        this.atHardShoulder = false;
-        this.no_right_turn = false;
-        this.no_left_turn = false;
-        this.no_down_turn = false;
-        this.no_up_turn = false;
-        this.approaching_vertical_zebra = false;
-        this.approaching_horizontal_zebra = false;
-        this.no_overtake = false;
-        this.no_go_north_because_other_car = false;
-        this.no_go_south_because_other_car = false;
-        this.no_go_east_because_other_car = false;
-        this.no_go_west_because_other_car = false;
-     }
-
+   
     // car decision making system, make use of the received observations to decide what
     // should be the current moving direction 
     @Override
-    protected ArrayDeque<Direction> getSimulationRoute(){ 
+    protected ArrayDeque<Direction> getSimulationRoute(){
+        setSpeed(1);
+        directions.push(cmd);
         updateOutcomes();
+        if(getSpeed() == 0) {
+            directions.clear();
+        }
 
         
         System.out.println("----------------------------------------------------------------------");
@@ -109,89 +60,24 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
             System.out.println(ca1.getValue());
         }
         System.out.println("----------------------------------------------------------------------");
-//        // print out the car intention list
-//        System.out.println("intention list: "); 
-//        for(Entry<CarIntention, Boolean> i : intentions.entrySet()){
-//            if(i.getValue()) {
-//               System.out.println(i.getKey().toString());
-//               j++;
-//            }        
-//        }
-//        System.out.println("----------------------------------------------------------------------");
+        System.out.println("intention list: "); 
+        for(Entry<CarIntention, Boolean> i : intentions.entrySet()){
+            if(i.getValue()) {
+               System.out.println(i.getKey().toString());
+            }        
+        }
+        System.out.println("----------------------------------------------------------------------");
         //print out the car belief list
-//        System.out.println("belief list");
-//        for(Entry<CarBelief,Boolean> k : beliefs.entrySet()){
-//            if(k.getValue()){
-//                System.out.println(k.getKey().toString());
-//               
-//            }
-//        }
-//        System.out.println("----------------------------------------------------------------------");
-        
-//        
-//        System.out.println(exitclear);
-       
-        
-        if ((trafficLightRed && atWhiteLine) || finished)
-        {
-            setSpeed(0);
+        System.out.println("belief list");
+        for(Entry<CarBelief,Boolean> k : beliefs.entrySet()){
+            if(k.getValue()){
+                System.out.println(k.getKey().toString());
+               
+            }
         }
+        System.out.println("----------------------------------------------------------------------");
 
-        else if(atHardShoulder && no_down_turn && cmd == Direction.south) {
-                directions.push(cmd);
-        }
-        
-        else if(atHardShoulder && no_up_turn && cmd == Direction.north) {
-                    directions.push(cmd);
-        }
-        
-        else if(atHardShoulder && no_right_turn && cmd == Direction.east) {     
-                directions.push(cmd);
-        }
-        else if(atHardShoulder && no_left_turn && cmd == Direction.west) {
-                directions.push(cmd);
-        }
-        
-        else if(no_down_turn && cmd == Direction.south) {
-            if(atHardShoulder) {
-                directions.push(cmd);
-            }
-            else{
-                directions.push(Direction.east);    
-            }   
-        }
-        else if(no_up_turn && cmd == Direction.north) {
-            if(atHardShoulder) {
-                directions.push(cmd);
-            }
-            else {
-                directions.push(Direction.west);
-            }
-                
-        }
-        else if(no_right_turn && cmd == Direction.east) {
-            if(atHardShoulder) {
-                directions.push(cmd);
-            }
-            else {
-                directions.push(Direction.north);
-            }
-        }
-        else if(no_left_turn && cmd == Direction.west) {
-            if(atHardShoulder) {
-                directions.push(cmd);
-              }
-            else {
-                directions.push(Direction.south);
-            }
-                    
-        }
-        else {
-            directions.push(cmd);   
-        }
-        
         //clear beliefs,intentions,actions after we get the moving directions
-        reMakeDecisions();
         clearBeliefs();
         clearIntentions();
         resetActions();
@@ -222,407 +108,336 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
     {
         switch(action)
         {
+        //TODO
         case CA_adjust_speed:
             actionsToDo.put(action, priority);
             break;
-        case CA_allow_cyclists_moto_pass:
-            actionsToDo.put(action, priority);
+        case CA_allow_cyclists_moto_pass:   //not simulated 
             break;
-        case CA_allow_emergency_vehicle_to_pass:
-            actionsToDo.put(action, priority);
+        case CA_allow_emergency_vehicle_to_pass: //not simulated
             break;
-        case CA_allow_extra_space:
-            actionsToDo.put(action, priority);
+        case CA_allow_extra_space: //not simulated
             break;
-        case CA_allow_extra_space_for_works_vehicles:
-            actionsToDo.put(action, priority);
+        case CA_allow_extra_space_for_works_vehicles: //not simulated
             break;
-        case CA_allow_traffic_to_pass:
-            actionsToDo.put(action, priority);
+        case CA_allow_traffic_to_pass: //not simulated
             break;
-        case CA_allow_undertaking:
-            actionsToDo.put(action, priority);
+        case CA_allow_undertaking: //not simulated
             break;
-        case CA_allowed_to_proceed:
-            actionsToDo.put(action, priority);
+        case CA_allowed_to_proceed: //not simulated
             break;
-        case CA_approach_left_hand_lane:
-            actionsToDo.put(action, priority);
+        case CA_approach_left_hand_lane: //not simulated
             break;
-        case CA_approach_with_caution:
-            actionsToDo.put(action, priority);
+        case CA_approach_with_caution: //not simulated
             break;
+        // TODO
         case CA_avoidLaneChanges:
+            if((pmd == Direction.north && cmd == Direction.east) || (pmd == Direction.north && cmd == Direction.west)) {
+                
+            }
+            else if((pmd == Direction.south && cmd == Direction.east) || (pmd == Direction.north && cmd == Direction.west)) {
+                
+            }
+            else if((pmd == Direction.east && cmd == Direction.north) || (pmd == Direction.east && cmd == Direction.south)) {
+                
+            }
+            else if((pmd == Direction.west && cmd == Direction.north) || (pmd == Direction.west && cmd == Direction.south)) {
+                
+            }
             actionsToDo.put(action, priority);
             break;
         case CA_avoidRightHandLane:
-            actionsToDo.put(action, priority);
             break;
-        case CA_avoid_blocking_sideroads:
-            actionsToDo.put(action, priority);
+        case CA_avoid_blocking_sideroads://not simulated
             break;
-        case CA_avoid_bus_lane:
-            actionsToDo.put(action, priority);
+        case CA_avoid_bus_lane: //not simulated
             break;
-        case CA_avoid_closed_lane:
-            actionsToDo.put(action, priority);
+        case CA_avoid_closed_lane://not simulated
             break;
-        case CA_avoid_coasting:
-            actionsToDo.put(action, priority);
+        case CA_avoid_coasting://not simulated
             break;
-        case CA_avoid_coned_off_area:
-            actionsToDo.put(action, priority);
+        case CA_avoid_coned_off_area://not simulated
             break;
-        case CA_avoid_crossing_central_reservation:
-            actionsToDo.put(action, priority);
+        case CA_avoid_crossing_central_reservation://not simulated
             break;
-        case CA_avoid_crossing_crossing:
-            actionsToDo.put(action, priority);
+        case CA_avoid_crossing_crossing://not simulated
             break;
-        case CA_avoid_crossing_level_crossing:
-            actionsToDo.put(action, priority);
+        case CA_avoid_crossing_level_crossing://not simulated
             break;
-        case CA_avoid_cutting_corner:
-            actionsToDo.put(action, priority);
+        case CA_avoid_cutting_corner://not simulated
             break;
-        case CA_avoid_drive_against_traffic_flow:
-            actionsToDo.put(action, priority);
+        case CA_avoid_drive_against_traffic_flow://not simulated
             break;
-        case CA_avoid_driving_on_rails:
-            actionsToDo.put(action, priority);
+        case CA_avoid_driving_on_rails://not simulated
             break;
-        case CA_avoid_emergency_area:
-            actionsToDo.put(action, priority);
+        case CA_avoid_emergency_area://not simulated
             break;
+        //TODO
         case CA_avoid_hard_shoulder:
             actionsToDo.put(action, priority);
             break;
-        case CA_avoid_harsh_braking:
-            actionsToDo.put(action, priority);
+        case CA_avoid_harsh_braking://not simulated
             break;
-        case CA_avoid_horn:
-            actionsToDo.put(action, priority);
+        case CA_avoid_horn://not simulated
             break;
-        case CA_avoid_hov_lane:
-            actionsToDo.put(action, priority);
+        case CA_avoid_hov_lane://not simulated
             break;
-        case CA_avoid_lane_lane:
-            actionsToDo.put(action, priority);
+        case CA_avoid_lane_lane://not simulated
             break;
+        //TODO
         case CA_avoid_lane_switching:
             actionsToDo.put(action, priority);
             break;
-        case CA_avoid_level_crossing:
-            actionsToDo.put(action, priority);
+        case CA_avoid_level_crossing://not simulated
             break;
-        case CA_avoid_loading_unloading:
-            actionsToDo.put(action, priority);
+        case CA_avoid_loading_unloading://not simulated
             break;
-        case CA_avoid_motorway:
-            actionsToDo.put(action, priority);
+        case CA_avoid_motorway://not simulated
             break;
-        case CA_avoid_non:
-            actionsToDo.put(action, priority);
+        case CA_avoid_non://not simulated
             break;
+        //TODO
         case CA_avoid_overtaking:
             actionsToDo.put(action, priority);
             break;
+        //TODO
         case CA_avoid_overtaking_on_left:
             actionsToDo.put(action, priority);
             break;
-        case CA_avoid_parking:
-            actionsToDo.put(action, priority);
+        case CA_avoid_parking: // not simulated
             break;
-        case CA_avoid_parking_against_flow:
-            actionsToDo.put(action, priority);
+        case CA_avoid_parking_against_flow: //not simulated
             break;
-        case CA_avoid_pick_up_set_down:
-            actionsToDo.put(action, priority);
+        case CA_avoid_pick_up_set_down: // not simulated
             break;
+        //TODO
         case CA_avoid_reversing:
             actionsToDo.put(action, priority);
             break;
-        case CA_avoid_revs:
-            actionsToDo.put(action, priority);
+        case CA_avoid_revs:// not simulated
             break;
+        //TODO
         case CA_avoid_stopping:
             actionsToDo.put(action, priority);
             break;
-        case CA_avoid_tram_reserved_road:
-            actionsToDo.put(action, priority);
+        case CA_avoid_tram_reserved_road: // not simulated
             break;
+        //TODO
         case CA_avoid_undertaking:
             actionsToDo.put(action, priority);
             break;
-        case CA_avoid_uturn:
-            actionsToDo.put(action, priority);
+        case CA_avoid_uturn: //not simulated
             break;
-        case CA_avoid_waiting:
-            actionsToDo.put(action, priority);
+        case CA_avoid_waiting://not simulated
             break;
-        case CA_avoid_weaving:
-            actionsToDo.put(action, priority);
+        case CA_avoid_weaving://not simulated
             break;
-        case CA_brake_early_lightly:
-            actionsToDo.put(action, priority);
+        case CA_brake_early_lightly://not simulated
             break;
-        case CA_brake_hard:
-            actionsToDo.put(action, priority);
+        case CA_brake_hard://not simulated
             break;
-        case CA_buildup_speed_on_motorway:
-            actionsToDo.put(action, priority);
+        case CA_buildup_speed_on_motorway://not simulated
             break;
+        //TODO
         case CA_cancel_overtaking:
             actionsToDo.put(action, priority);
             break;
+        //TODO
         case CA_cancel_reverse:
             actionsToDo.put(action, priority);
             break;
-        case CA_cancel_signals:
-            actionsToDo.put(action, priority);
+        case CA_cancel_signals://not simulated
             break;
+        //TODO
         case CA_cancel_undertaking:
             actionsToDo.put(action, priority);
             break;
-        case CA_clear_ice_snow_all_windows:
-            actionsToDo.put(action, priority);
+        case CA_clear_ice_snow_all_windows://not simulated
             break;
-        case CA_close_to_kerb:
-            actionsToDo.put(action, priority);
+        case CA_close_to_kerb://not simulated
             break;
-        case CA_consideration_others:
-            actionsToDo.put(action, priority);
+        case CA_consideration_others://not simulated
             break;
-        case CA_doNotEnterWhiteDiagonalStripeWhiteBrokenBorder:
-            actionsToDo.put(action, priority);
+        case CA_doNotEnterWhiteDiagonalStripeWhiteBrokenBorder://not simulated
             break;
-        case CA_doNotEnterWhiteDiagonalStripeWhiteSolidBorder:
-            actionsToDo.put(action, priority);
+        case CA_doNotEnterWhiteDiagonalStripeWhiteSolidBorder://not simulated
             break;
-        case CA_do_not_drive:
-            actionsToDo.put(action, priority);
+        case CA_do_not_drive://not simulated
             break;
-        case CA_do_not_hestitate:
-            actionsToDo.put(action, priority);
+        case CA_do_not_hestitate://not simulated
             break;
+        //TODO
         case CA_do_not_overtake:
             actionsToDo.put(action, priority);
             break;
-        case CA_do_not_park_in_passing_place:
-            actionsToDo.put(action, priority);
+        case CA_do_not_park_in_passing_place: //not simulated
             break;
+        //TODO
         case CA_do_not_reverse:
             actionsToDo.put(action, priority);
             break;
+        //TODO
         case CA_do_not_stop:
             actionsToDo.put(action, priority);
             break;
+        //TODO
         case CA_dontExceedTempSpeedLimit:
             actionsToDo.put(action, priority);
             break;
-        case CA_dont_cross_solid_white:
-            actionsToDo.put(action, priority);
+        //TODO
+        case CA_dont_cross_solid_white: 
             break;
-        case CA_dont_use_central_reservation:
-            actionsToDo.put(action, priority);
+        case CA_dont_use_central_reservation://not simulated
             break;
-        case CA_drive_care_attention:
-            actionsToDo.put(action, priority);
+        case CA_drive_care_attention://not simulated
             break;
+        //TODO
         case CA_drive_slowly:
             actionsToDo.put(action, priority);
             break;
+        //TODO
         case CA_drive_very_slowly:
             actionsToDo.put(action, priority);
             break;
-        case CA_drive_very_slowly_on_bends:
-            actionsToDo.put(action, priority);
+        case CA_drive_very_slowly_on_bends: //not simulated
             break;
-        case CA_drop_back:
-            actionsToDo.put(action, priority);
+        case CA_drop_back://not simulated
             break;
-        case CA_dry_brakes:
-            actionsToDo.put(action, priority);
+        case CA_dry_brakes://not simulated
             break;
-        case CA_ease_off:
-            actionsToDo.put(action, priority);
+        case CA_ease_off://not simulated
             break;
-        case CA_engage_child_locks:
-            actionsToDo.put(action, priority);
+        case CA_engage_child_locks://not simulated
             break;
-        case CA_engage_parking_break:
-            actionsToDo.put(action, priority);
+        case CA_engage_parking_break://not simulated
             break;
         case CA_engine_off:
+            setSpeed(0);
             actionsToDo.put(action, priority);
             break;
-        case CA_find_other_route:
-            actionsToDo.put(action, priority);
+        case CA_find_other_route://not simulated
             break;
-        case CA_find_quiet_side_road:
-            actionsToDo.put(action, priority);
+        case CA_find_quiet_side_road://not simulated
             break;
-        case CA_find_safe_place_to_stop:
-            actionsToDo.put(action, priority);
+        case CA_find_safe_place_to_stop://not simulated
             break;
-        case CA_fit_booster_seat:
-            actionsToDo.put(action, priority);
+        case CA_fit_booster_seat://not simulated
             break;
-        case CA_flash_amber_beacon:
-            actionsToDo.put(action, priority);
+        case CA_flash_amber_beacon://not simulated
             break;
-        case CA_fog_lights_off:
-            actionsToDo.put(action, priority);
+        case CA_fog_lights_off://not simulated
             break;
-        case CA_fog_lights_on:
-            actionsToDo.put(action, priority);
+        case CA_fog_lights_on://not simulated
             break;
-        case CA_followLaneSigns:
-            actionsToDo.put(action, priority);
+        case CA_followLaneSigns://not simulated
             break;
-        case CA_follow_dvsa_until_stopped:
-            actionsToDo.put(action, priority);
+        case CA_follow_dvsa_until_stopped://not simulated
             break;
-        case CA_follow_police_direction:
-            actionsToDo.put(action, priority);
+        case CA_follow_police_direction://not simulated
             break;
-        case CA_follow_sign:
-            actionsToDo.put(action, priority);
+        case CA_follow_sign://not simulated
             break;
-        case CA_follow_signs:
-            actionsToDo.put(action, priority);
+        case CA_follow_signs://not simulated
             break;
-        case CA_get_in_lane:
-            actionsToDo.put(action, priority);
+        case CA_get_in_lane://not simulated
             break;
-        case CA_get_into_lane:
-            actionsToDo.put(action, priority);
+        case CA_get_into_lane://not simulated
             break;
-        case CA_get_off_road:
-            actionsToDo.put(action, priority);
+        case CA_get_off_road://not simulated
             break;
-        case CA_give_extensive_extra_seperation_distance:
-            actionsToDo.put(action, priority);
+        case CA_give_extensive_extra_seperation_distance://not simulated
             break;
-        case CA_give_extra_seperation_distance:
-            actionsToDo.put(action, priority);
+        case CA_give_extra_seperation_distance://not simulated
             break;
-        case CA_give_priority_to_public_transport:
-            actionsToDo.put(action, priority);
+        case CA_give_priority_to_public_transport://not simulated
             break;
-        case CA_give_priority_to_right:
-            actionsToDo.put(action, priority);
+        case CA_give_priority_to_right://not simulated
             break;
-        case CA_give_room_when_passing:
-            actionsToDo.put(action, priority);
+        case CA_give_room_when_passing://not simulated
             break;
-        case CA_give_signal:
-            actionsToDo.put(action, priority);
+        case CA_give_signal://not simulated
             break;
-        case CA_give_up_control:
-            actionsToDo.put(action, priority);
+        case CA_give_up_control://not simulated
             break;
-        case CA_give_way_at_dotted_white_line:
-            actionsToDo.put(action, priority);
+        case CA_give_way_at_dotted_white_line://not simulated
             break;
-        case CA_give_way_other_roads:
-            actionsToDo.put(action, priority);
+        case CA_give_way_other_roads://not simulated
             break;
-        case CA_give_way_to_other:
-            actionsToDo.put(action, priority);
+        case CA_give_way_to_other://not simulated
             break;
-        case CA_give_way_to_pedestrians:
-            actionsToDo.put(action, priority);
+        case CA_give_way_to_pedestrians: //TODO
+            setSpeed(0);
             break;
-        case CA_give_way_to_tram:
-            actionsToDo.put(action, priority);
+        case CA_give_way_to_tram://not simulated
             break;
-        case CA_goBetweenLaneDividers:
-            actionsToDo.put(action, priority);
+        case CA_goBetweenLaneDividers://not simulated
             break;
-        case CA_go_to_left_hand_land:
-            actionsToDo.put(action, priority);
+        case CA_go_to_left_hand_land://not simulated
             break;
-        case CA_going_left_use_left:
-            actionsToDo.put(action, priority);
+        case CA_going_left_use_left://not simulated
             break;
-        case CA_going_right_use_left:
-            actionsToDo.put(action, priority);
+        case CA_going_right_use_left://not simulated
             break;
-        case CA_handbrake_on:
-            actionsToDo.put(action, priority);
+        case CA_handbrake_on://not simulated
             break;
-        case CA_headlights_on:
-            actionsToDo.put(action, priority);
+        case CA_headlights_on://not simulated
             break;
+        //TODO
         case CA_increase_distance_to_car_infront:
             actionsToDo.put(action, priority);
             break;
-        case CA_indicatorOn:
-            actionsToDo.put(action, priority);
+        case CA_indicatorOn://not simulated
             break;
-        case CA_indicator_on:
-            actionsToDo.put(action, priority);
+        case CA_indicator_on://not simulated
             break;
-        case CA_keep_crossing_clear:
-            actionsToDo.put(action, priority);
+        case CA_keep_crossing_clear://not simulated
             break;
+        //TODO
         case CA_keep_left:
+            
             actionsToDo.put(action, priority);
             break;
+        //TODO
         case CA_keep_left_lane:
             actionsToDo.put(action, priority);
             break;
+        //TODO
         case CA_keep_safe_distance:
             actionsToDo.put(action, priority);
             break;
-        case CA_keep_sidelights_on:
-            actionsToDo.put(action, priority);
+        case CA_keep_sidelights_on://not simulated
             break;
+        //TODO
         case CA_keep_under_speed_limit:
             actionsToDo.put(action, priority);
             break;
-        case CA_keep_well_back:
-            actionsToDo.put(action, priority);
+        case CA_keep_well_back://not simulated
             break;
-        case CA_lane_clear:
-            actionsToDo.put(action, priority);
+        case CA_lane_clear://not simulated
             break;
-        case CA_leave_space_for_manover:
-            actionsToDo.put(action, priority);
+        case CA_leave_space_for_manover://not simulated
             break;
-        case CA_leave_space_to_stop:
-            actionsToDo.put(action, priority);
+        case CA_leave_space_to_stop://not simulated
             break;
-        case CA_light_and_number_plates_clean:
-            actionsToDo.put(action, priority);
+        case CA_light_and_number_plates_clean://not simulated
             break;
-        case CA_lock:
-            actionsToDo.put(action, priority);
+        case CA_lock://not simulated
             break;
-        case CA_maintained_reduced_speed:
-            actionsToDo.put(action, priority);
+        case CA_maintained_reduced_speed://not simulated
             break;
-        case CA_match_speed_to_motorway:
-            actionsToDo.put(action, priority);
+        case CA_match_speed_to_motorway://not simulated
             break;
-        case CA_mergeInTurn:
-            actionsToDo.put(action, priority);
+        case CA_mergeInTurn://not simulated
             break;
-        case CA_merge_in_turn:
-            actionsToDo.put(action, priority);
+        case CA_merge_in_turn://not simulated
             break;
-        case CA_mini:
-            actionsToDo.put(action, priority);
+        case CA_mini://not simulated
             break;
-        case CA_minimise_reversing:
-            actionsToDo.put(action, priority);
+        case CA_minimise_reversing://not simulated
             break;
-        case CA_mirrors_clear:
-            actionsToDo.put(action, priority);
+        case CA_mirrors_clear://not simulated
             break;
-        case CA_move_adjacent_lane:
-            actionsToDo.put(action, priority);
+        case CA_move_adjacent_lane://not simulated
             break;
         case CA_move_left: //TODO
             actionsToDo.put(action, priority);
@@ -636,254 +451,210 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
         case CA_must_stop_pedestrian_crossing://TODO
             actionsToDo.put(action, priority);
             break;
-        case CA_nextLaneClear:
-            actionsToDo.put(action, priority);
+        case CA_nextLaneClear://not simulated
             break;
-        case CA_next_safe_stop:
-            actionsToDo.put(action, priority);
+        case CA_next_safe_stop://not simulated
             break;
-        case CA_not_drive_dangerously:
-            actionsToDo.put(action, priority);
+        case CA_not_drive_dangerously://not simulated
             break;
         case CA_not_overtaken: //TODO
             actionsToDo.put(action, priority);
             break;
-        case CA_obey_signal: // TODO
-            actionsToDo.put(action, priority);
+        case CA_obey_signal://not simulated
             break;
-        case CA_obey_work_vehicle_sign:
-            actionsToDo.put(action, priority);
+        case CA_obey_work_vehicle_sign://not simulated
             break;
         case CA_overtake_on_right: //TODO
             actionsToDo.put(action, priority);
             break;
-        case CA_park_as_close_to_side:
-            actionsToDo.put(action, priority);
+        case CA_park_as_close_to_side://not simulated
             break;
-        case CA_parking_lights_on:
-            actionsToDo.put(action, priority);
+        case CA_parking_lights_on://not simulated
             break;
-        case CA_pass_around:
-            actionsToDo.put(action, priority);
+        case CA_pass_around://not simulated
             break;
-        case CA_position_right_turn:
-            actionsToDo.put(action, priority);
+        case CA_position_right_turn://not simulated
             break;
-        case CA_prepare_drop_back:
-            actionsToDo.put(action, priority);
+        case CA_prepare_drop_back://not simulated
             break;
-        case CA_prepare_load:
-            actionsToDo.put(action, priority);
+        case CA_prepare_load://not simulated
             break;
-        case CA_prepare_route:
-            actionsToDo.put(action, priority);
+        case CA_prepare_route://not simulated
             break;
-        case CA_prepare_to_change_lane:
-            actionsToDo.put(action, priority);
+        case CA_prepare_to_change_lane://not simulated
             break;
-        case CA_prepare_to_stop:
-            actionsToDo.put(action, priority);
+        case CA_prepare_to_stop://not simulated
             break;
-        case CA_priority_to_motoway_traffic:
-            actionsToDo.put(action, priority);
+        case CA_priority_to_motoway_traffic://not simulated
             break;
+        //TODO
         case CA_pull_into_hard_shoulder:
             actionsToDo.put(action, priority);
             break;
-        case CA_pull_into_passing_place:
-            actionsToDo.put(action, priority);
+        case CA_pull_into_passing_place://not simulated
             break;
-        case CA_pull_over_safe_place:
-            actionsToDo.put(action, priority);
+        case CA_pull_over_safe_place://not simulated
             break;
-        case CA_pull_up_in_visible_distance:
-            actionsToDo.put(action, priority);
+        case CA_pull_up_in_visible_distance://not simulated
             break;
-        case CA_put_on_seatbelts:
-            actionsToDo.put(action, priority);
+        case CA_put_on_seatbelts://not simulated
             break;
         case CA_reduce_distance_between_front_vehicle: //TODO
             actionsToDo.put(action, priority);
             break;
-        case CA_reduce_lighting:
-            actionsToDo.put(action, priority);
+        case CA_reduce_lighting://not simulated
             break;
         case CA_reduce_overall_speed:
+            //check current speed
+            int speed1 = getSpeed();
+            if(speed1 > 1) {
+                setSpeed(speed1 - 1);
+            }
             actionsToDo.put(action, priority);
             break;
         case CA_reduce_speed:
+            int speed2 = getSpeed();
+            if(speed2 > 1) {
+                setSpeed(speed2 - 1);
+            }
             actionsToDo.put(action, priority);
             break;
-        case CA_reduce_speed_if_pedestrians:
-            actionsToDo.put(action, priority);
+        case CA_reduce_speed_if_pedestrians://not simulated
             break;
-        case CA_reduce_speed_on_slip_road:
-            actionsToDo.put(action, priority);
+        case CA_reduce_speed_on_slip_road://not simulated
             break;
-        case CA_release_brake:
-            actionsToDo.put(action, priority);
+        case CA_release_brake://not simulated
             break;
-        case CA_remove_all_snow:
-            actionsToDo.put(action, priority);
+        case CA_remove_all_snow://not simulated
             break;
-        case CA_remove_flash_intention:
-            actionsToDo.put(action, priority);
+        case CA_remove_flash_intention://not simulated 
             break;
-        case CA_remove_horn_intention:
-            actionsToDo.put(action, priority);
+        case CA_remove_horn_intention://not simulated
             break;
-        case CA_reverse_into_drive:
-            actionsToDo.put(action, priority);
+        case CA_reverse_into_drive://not simulated
             break;
-        case CA_reverse_to_passing_place:
-            actionsToDo.put(action, priority);
+        case CA_reverse_to_passing_place://not simulated
             break;
-        case CA_road_clear_to_manover:
-            actionsToDo.put(action, priority);
+        case CA_road_clear_to_manover://not simulated
             break;
+        //TODO
         case CA_safe_distance:
             actionsToDo.put(action, priority);
             break;
-        case CA_safe_pull_over_and_stop:
-            actionsToDo.put(action, priority);
+        case CA_safe_pull_over_and_stop://not simulated
             break;
-        case CA_select_lane:
-            actionsToDo.put(action, priority);
+        case CA_select_lane://not simulated
             break;
-        case CA_set_hazards_off:
-            actionsToDo.put(action, priority);
+        case CA_set_hazards_off://not simulated (hazards is hazard warning light)
             break;
-        case CA_set_headlights_to_dipped:
-            actionsToDo.put(action, priority);
+        case CA_set_headlights_to_dipped://not simulated
             break;
-        case CA_signal:
-            actionsToDo.put(action, priority);
+        case CA_signal: //not simulated
             break;
-        case CA_signal_left:
-            actionsToDo.put(action, priority);
+        case CA_signal_left://not simulated
             break;
-        case CA_signal_left_on_exit:
-            actionsToDo.put(action, priority);
+        case CA_signal_left_on_exit://not simulated
             break;
-        case CA_signal_right:
-            actionsToDo.put(action, priority);
+        case CA_signal_right://not simulated
             break;
         case CA_slow_down:
+            int speed3 = getSpeed();
+            if(speed3 > 1) {
+                setSpeed(speed3 - 1);
+            }
             actionsToDo.put(action, priority);
             break;
         case CA_slow_down_and_stop:
+            setSpeed(0);
             actionsToDo.put(action, priority);
             break;
-        case CA_space_for_vehicle:
-            actionsToDo.put(action, priority);
+        case CA_space_for_vehicle://not simulated
             break;
-        case CA_stay_in_lane:
-            actionsToDo.put(action, priority);
+        case CA_stay_in_lane://not simulated
             break;
-        case CA_stay_on_running_lane:
-            actionsToDo.put(action, priority);
+        case CA_stay_on_running_lane://not simulated
             break;
-        case CA_steady_speed:
-            actionsToDo.put(action, priority);
+        case CA_steady_speed://not simulated
             break;
         case CA_stop:
+            setSpeed(0);
             actionsToDo.put(action, priority);
             break;
-        case CA_stopCrossDoubleWhiteClosestSolid:
-            actionsToDo.put(action, priority);
+        case CA_stopCrossDoubleWhiteClosestSolid://not simulated
             break;
-        case CA_stopCrossingHazardWarningLine:
-            actionsToDo.put(action, priority);
+        case CA_stopCrossingHazardWarningLine://not simulated
             break;
         case CA_stop_and_turn_engine_off:
+            setSpeed(0);
             actionsToDo.put(action, priority);
             break;
-        case CA_stop_at_crossing:
-            actionsToDo.put(action, priority);
+        case CA_stop_at_crossing: //not simulated
             break;
-        case CA_stop_at_crossing_patrol:
-            actionsToDo.put(action, priority);
+        case CA_stop_at_crossing_patrol://not simulated
             break;
-        case CA_stop_at_sign:
-            actionsToDo.put(action, priority);
+        case CA_stop_at_sign://not simulated
             break;
         case CA_stop_at_white_line: //TODO
+            setSpeed(0);
             actionsToDo.put(action, priority);
             break;
         case CA_switch_off_engine:
+            setSpeed(0);
             actionsToDo.put(action, priority);
             break;
-        case CA_travel_sign_direction:
+        case CA_travel_sign_direction://not simulated
+            break;
+        case CA_treat_as_roundabout://not simulated
+            break;
+        case CA_treat_as_traffic_light://not simulated
+            break;
+        case CA_turn_foglights_off://not simulated
+            break;
+        case CA_turn_into_skid://not simulated
+            break;
+        case CA_turn_sidelights_on://not simulated
+            break;
+        case CA_use_central_reservation://not simulated
+            break;
+        case CA_use_crawler_lane://not simulated
+            break;
+        case CA_use_demisters://not simulated
+            break;
+        case CA_use_hazard_lights://not simulated
+            break;
+        case CA_use_left_indicator://not simulated
+            break;
+        case CA_use_right_indicator://not simulated
+            break;
+        case CA_use_road://not simulated
+            break;
+        case CA_use_signals://not simulated
+            break;
+        case CA_use_tram_passing_lane://not simulated
+            break;
+        case CA_use_windscreen_wipers://not simulated
+            break;
+        case CA_wait_at_advanced_stop://not simulated
+            break;
+        case CA_wait_at_white_line:
+            setSpeed(0);
             actionsToDo.put(action, priority);
             break;
-        case CA_treat_as_roundabout:
-            actionsToDo.put(action, priority);
-            break;
-        case CA_treat_as_traffic_light:
-            actionsToDo.put(action, priority);
-            break;
-        case CA_turn_foglights_off:
-            actionsToDo.put(action, priority);
-            break;
-        case CA_turn_into_skid:
-            actionsToDo.put(action, priority);
-            break;
-        case CA_turn_sidelights_on:
-            actionsToDo.put(action, priority);
-            break;
-        case CA_use_central_reservation:
-            actionsToDo.put(action, priority);
-            break;
-        case CA_use_crawler_lane:
-            actionsToDo.put(action, priority);
-            break;
-        case CA_use_demisters:
-            actionsToDo.put(action, priority);
-            break;
-        case CA_use_hazard_lights:
-            actionsToDo.put(action, priority);
-            break;
-        case CA_use_left_indicator:
-            actionsToDo.put(action, priority);
-            break;
-        case CA_use_right_indicator:
-            actionsToDo.put(action, priority);
-            break;
-        case CA_use_road:
-            actionsToDo.put(action, priority);
-            break;
-        case CA_use_signals:
-            actionsToDo.put(action, priority);
-            break;
-        case CA_use_tram_passing_lane:
-            actionsToDo.put(action, priority);
-            break;
-        case CA_use_windscreen_wipers:
-            actionsToDo.put(action, priority);
-            break;
-        case CA_wait_at_advanced_stop:
-            actionsToDo.put(action, priority);
-            break;
-        case CA_wait_at_first_white_line:
-            actionsToDo.put(action, priority);
+        case CA_wait_at_first_white_line://not simulated
             break;
         case CA_wait_for_gap_before_moving_off: //TODO
             actionsToDo.put(action, priority);
             break;
-        case CA_wait_until_clear:
-            actionsToDo.put(action, priority);
+        case CA_wait_until_clear://not simulated
             break;
-        case CA_wait_until_route_clear:
-            actionsToDo.put(action, priority);
+        case CA_wait_until_route_clear://not simulated
             break;
         case CA_wait_until_safe_gap: //TODO
             actionsToDo.put(action, priority);
             break;
-        case CA_wheel_away_from_kerb:
-            actionsToDo.put(action, priority);
+        case CA_wheel_away_from_kerb://not simulated
             break;
-        case CA_wheel_toward_from_kerb:
-            actionsToDo.put(action, priority);
+        case CA_wheel_toward_from_kerb://not simulated
             break;
         }
     }
@@ -1024,106 +795,117 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                 {
                 case east:
                     wallAhead = visibleWorld.getCell(location.getX() + 1, location.getY()).getCellType() != CellType.ct_road;
-                    beliefs.put(cb, true);
                     break;
                 case north:
                     wallAhead = visibleWorld.getCell(location.getX(), location.getY()-1).getCellType() != CellType.ct_road;
-                    beliefs.put(cb, true);
                     break;
                 case south:
                     wallAhead = visibleWorld.getCell(location.getX(), location.getY()+1).getCellType() != CellType.ct_road;
-                    beliefs.put(cb, true);
                     break;
                 case west:
                     wallAhead = visibleWorld.getCell(location.getX() - 1, location.getY()).getCellType() != CellType.ct_road;
-                    beliefs.put(cb, true);
                     break;
                 }
+                beliefs.put(cb, wallAhead);
+                break;
             case CB_atTrafficLight://Only traffic lights simulated
-                 for (int y = 0; y < visibleWorld.getHeight(); y++){
-                        for (int x = 0; x < visibleWorld.getWidth(); x++){
-                            if (visibleWorld.getCell(x, y).getCellType() == CellType.ct_information){
-                                if (((AbstractInformationCell)visibleWorld.getCell(x, y)).getInformationType() == InformationCell.ic_trafficLight){
-                                    TrafficLightCell tlc = (TrafficLightCell)visibleWorld.getCell(x, y);
-                                    TrafficLightCellInformation tlci = ((TrafficLightCell)visibleWorld.getCell(x, y)).getInformation(); 
-                                    //faces list
-                                    ArrayList<Direction> faces = tlc.getFaces();
-                                    if(faces.size() != 0) {
-                                        // check for car going west
-                                        if(faces.get(0) == Direction.east) {
-                                            if (cmd == Direction.west) {
-                                                trafficLightRed = tlci.redOn;
-                                                Point visibleWorldStopPoint = new Point(x , y - 1);
-                                                //Car belief updates
-                                                if(visibleWorldStopPoint.equals(location)) {
-                                                    beliefs.put(cb, true);
-                                                    intentions.put(CarIntention.CI_approachingTrafficLight, true);
-                                                }
-                                                // TODO
-                                                atWhiteLine = visibleWorldStopPoint.equals(location);
-                                            }       
+                atWhiteLine = false;
+                beliefs.put(cb, false);
+                //at traffic light white line
+                for (int i = 0; i < visibleWorld.getWidth(); i++) {
+                    for(int j = 0; j < visibleWorld.getWidth();j++) {
+                        //check if the cell type is information cell
+                        if(visibleWorld.getCell(i, j).getCellType() == CellType.ct_information ) {
+                            //check if the information cell is traffic light
+                            AbstractInformationCell aic = (AbstractInformationCell)visibleWorld.getCell(i, j);
+                            if(aic.getInformationType() == InformationCell.ic_trafficLight) {
+                                
+                                TrafficLightCell tlc = (TrafficLightCell)aic;
+                                //the list of this traffic light cell faces 
+                                ArrayList<Direction> faces = tlc.getFaces();
+                                if(faces.size() != 0) {
+                                    if(faces.get(0) == Direction.north) {
+                                       //the point of the white line
+                                       Point visibleWorldStopPoint = new Point(i-1,j);
+                                       //the traffic light affects cell in the car's visible world
+                                       ArrayList<Point> affectedCells = new ArrayList<>();
+                                       for(int k = j; k >= 0; k--) {
+                                           affectedCells.add(new Point(visibleWorldStopPoint.getX(),k));
+                                       }
+                                       if(cmd == Direction.south && affectedCells.contains(location)) {
+                                           atWhiteLine = visibleWorldStopPoint.equals(location);
+                                           beliefs.put(cb, atWhiteLine);
+                                           if(atWhiteLine) {
+                                               intentions.put(CarIntention.CI_approachingTrafficLight, true);
+                                           }
+                                       }
+                                       
+                                    }
+                                    else if(faces.get(0) == Direction.south) {
+                                        //the point of the white line
+                                        Point visibleWorldStopPoint = new Point(i+1,j);
+                                        //the traffic light affects cells in the car's visible world
+                                        ArrayList<Point> affectedCells = new ArrayList<>();
+                                        for(int k = j ; k < visibleWorld.getHeight();k++) {
+                                            affectedCells.add(new Point(visibleWorldStopPoint.getX(),k));
                                         }
-                                        // check for car going east
-                                        else if(faces.get(0) == Direction.west) {
-                                            if(cmd == Direction.east) {
-                                                trafficLightRed = tlci.redOn;
-                                                Point visibleWorldStopPoint = new Point(x , y + 1);
-                                                // Car belief updates
-                                                if(visibleWorldStopPoint.equals(location)) {
-                                                    beliefs.put(cb, true);
-                                                    intentions.put(CarIntention.CI_approachingTrafficLight, true);
-                                                }
-                                                atWhiteLine = visibleWorldStopPoint.equals(location);
+                                        if(cmd == Direction.north && affectedCells.contains(location)) {
+                                            atWhiteLine = visibleWorldStopPoint.equals(location);
+                                            beliefs.put(cb, atWhiteLine);
+                                            if(atWhiteLine) {
+                                                intentions.put(CarIntention.CI_approachingTrafficLight, true);
+                                            }
+                                        }     
+                                    }
+                                    else if(faces.get(0) == Direction.east) {
+                                        //the point of the white line
+                                        Point visibleWorldStopPoint = new Point(i,j-1);
+                                        //the traffic light affects cells in the car's visible world
+                                        ArrayList<Point> affectedCells = new ArrayList<>();
+                                        for(int k = i;k < visibleWorld.getWidth();k++) {
+                                            affectedCells.add(new Point(k,visibleWorldStopPoint.getY()));
+                                        }
+                                        if(cmd == Direction.west && affectedCells.contains(location)) {
+                                            atWhiteLine = visibleWorldStopPoint.equals(location);
+                                            beliefs.put(cb, atWhiteLine);
+                                            if(atWhiteLine) {
+                                                intentions.put(CarIntention.CI_approachingTrafficLight, true);
                                             }
                                         }
-                                        // check for car going north
-                                        else if(faces.get(0) == Direction.south) {
-                                            if(cmd == Direction.north) {
-                                                trafficLightRed = tlci.redOn;
-                                                Point visibleWorldStopPoint = new Point(x + 1, y);
-                                                // Car belief updates
-                                                if(visibleWorldStopPoint.equals(location)) {
-                                                    beliefs.put(cb, true);
-                                                    intentions.put(CarIntention.CI_approachingTrafficLight, true);
-                                                }
-                                                atWhiteLine = visibleWorldStopPoint.equals(location);
+                                    }
+                                    else if(faces.get(0) == Direction.west) {
+                                        //the point of the white line
+                                        Point visibleWorldStopPoint = new Point(i,j+1);
+                                        //the traffic light affects cell in the car's visible world
+                                        ArrayList<Point> affectedCells = new ArrayList<>();
+                                        for(int k = i; k >= 0;k--) {
+                                            affectedCells.add(new Point(k,visibleWorldStopPoint.getY()));
+                                        }
+                                        if(cmd == Direction.east && affectedCells.contains(location)) {
+                                            atWhiteLine = visibleWorldStopPoint.equals(location);
+                                            beliefs.put(cb, atWhiteLine);
+                                            if(atWhiteLine) {
+                                                intentions.put(CarIntention.CI_approachingTrafficLight, true);
                                             }
                                         }
-                                        // check for car going south
-                                        else if(faces.get(0) == Direction.north) {
-                                            if(cmd == Direction.south) {
-                                                trafficLightRed = tlci.redOn;
-                                                Point visibleWorldStopPoint = new Point(x - 1, y );
-                                                // Car belief updates
-                                                if(visibleWorldStopPoint.equals(location)) {
-                                                    beliefs.put(cb, true);
-                                                    intentions.put(CarIntention.CI_approachingTrafficLight, true);
-                                                }
-                                                atWhiteLine = visibleWorldStopPoint.equals(location);
-                                            }
-                                        }
-                                        else {
-                                            //car belief update
-                                            beliefs.put(cb, false);
-                                        }
+                                        
                                     }
                                 }
                             }
                         }
-                 }
+                    }
+                }
                  break;
             case CB_behindWantToOvertake: //Only for north
-                beliefs.put(cb, visibleWorld.containsCar(location.getX(), location.getY() - 1));//Not car in front yet
-                intentions.put(CarIntention.CI_overtake, beliefs.get(cb));
+//                beliefs.put(cb, visibleWorld.containsCar(location.getX(), location.getY() - 1));//Not car in front yet
+//                intentions.put(CarIntention.CI_overtake, beliefs.get(cb));
                 break;
             case CB_bendInRoad://Not simulated
-                beliefs.put(cb, true);
                 break;
             case CB_brokendown://Car cannot break down.
                 beliefs.put(cb, false);
                 break;
-            case CB_canReadNumberPlate:
-                beliefs.put(cb, true);
+            case CB_canReadNumberPlate://not simulated
                 break;
             
             case CB_canStopBeforeCarInFrontStops:
@@ -1222,9 +1004,8 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
             
             // check whether there are cars will block current car's way 
             case CB_exitClear:
-                boolean exitIsClear = true;
-                //TODO
-                exitclear = true;
+                 exitIsClear = true;
+                
                 int espeed = 1;
                 //check car current moving direction
                 if(cmd == Direction.north) {
@@ -1270,7 +1051,6 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
 //     
                                    if(checkCommonPoint(pointPassing, pointPassing1)) {
                                        exitIsClear = false;
-                                       exitclear = false;
                                    }
                                }
                                else if(d1 == Direction.west) {
@@ -1288,7 +1068,6 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
 //                                   }
                                    if(checkCommonPoint(pointPassing, pointPassing1)) {
                                        exitIsClear = false;
-                                       exitclear = false;
                                    }
                                }
                            }
@@ -1327,7 +1106,6 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                                     }
                                     if(checkCommonPoint(pointPassing, pointPassing1)) {
                                         exitIsClear = false;
-                                        exitclear = false;
                                     }
                                 }
                                 else if(d1 == Direction.west) {
@@ -1341,7 +1119,6 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                                     }
                                     if(checkCommonPoint(pointPassing, pointPassing1)) {
                                         exitIsClear = false;
-                                        exitclear = false;
                                     }
                                 }
                             }
@@ -1377,7 +1154,6 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                                     // check if two ArrayLists conflict or not 
                                     if(checkCommonPoint(pointPassing, pointPassing1)) {
                                         exitIsClear = false;
-                                        exitclear = false;
                                     }
                                 }
                                 else if(d1 == Direction.north) {
@@ -1394,7 +1170,6 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                                     //  check if two ArrayLists conflict or not
                                     if(checkCommonPoint(pointPassing, pointPassing1)) {
                                         exitIsClear = false;
-                                        exitclear = false;
                                     }
                                 }
                             }
@@ -1431,7 +1206,6 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                                     // check if two ArrayLists conflict or not 
                                     if(checkCommonPoint(pointPassing, pointPassing1)) {
                                         exitIsClear = false;
-                                        exitclear = false;
                                     }
                                 }
                                 else if(d1 == Direction.north) {
@@ -1447,7 +1221,6 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                                     //  check if two ArrayLists conflict or not
                                     if(checkCommonPoint(pointPassing, pointPassing1)) {
                                         exitIsClear = false;
-                                        exitclear = false;
                                     }
                                 }
                             }
@@ -1494,65 +1267,82 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                 break;
             // simulated yellow light
             case CB_lightAmber:
-                beliefs.put(cb,false);
-                for (int y = 0; y < visibleWorld.getHeight(); y++){
-                    for (int x = 0; x < visibleWorld.getWidth(); x++){
-                        if (visibleWorld.getCell(x, y).getCellType() == CellType.ct_information){
-                            if (((AbstractInformationCell)visibleWorld.getCell(x, y)).getInformationType() == InformationCell.ic_trafficLight){
-                                TrafficLightCell tlc = (TrafficLightCell)visibleWorld.getCell(x, y);
-                                TrafficLightCellInformation tlci = ((TrafficLightCell)visibleWorld.getCell(x, y)).getInformation(); 
-                                //faces list
+                beliefs.put(cb, false);
+                boolean yellowLightOn = false;
+                //at traffic light white line
+                for (int i = 0; i < visibleWorld.getWidth(); i++) {
+                    for(int j = 0; j < visibleWorld.getWidth();j++) {
+                        //check if the cell type is information cell
+                        if(visibleWorld.getCell(i, j).getCellType() == CellType.ct_information ) {
+                            //check if the information cell is traffic light
+                            AbstractInformationCell aic = (AbstractInformationCell)visibleWorld.getCell(i, j);
+                            if(aic.getInformationType() == InformationCell.ic_trafficLight) {
+                                TrafficLightCell tlc = (TrafficLightCell)aic;
+                                TrafficLightCellInformation tlci = tlc.getInformation();
+                                //the list of this traffic light cell faces 
                                 ArrayList<Direction> faces = tlc.getFaces();
                                 if(faces.size() != 0) {
-                                    if(faces.get(0) == Direction.east) {
-                                        if (cmd == Direction.west) {
-                                            trafficLightRed = tlci.redOn;
-                                            Point visibleWorldStopPoint = new Point(x , y - 1);
-                                            //Car belief update
-                                            if(tlci.yellowOn) {
-                                                beliefs.put(cb, true); 
-                                            }
-                                            atWhiteLine = visibleWorldStopPoint.equals(location);
-                                        }       
-                                    }
-                                    else if(faces.get(0) == Direction.west) {
-                                        if(cmd == Direction.east) {
-                                            trafficLightRed = tlci.redOn;
-                                            Point visibleWorldStopPoint = new Point(x , y + 1);
-                                            //Car belief update
-                                            if(tlci.yellowOn) {
-                                                beliefs.put(cb, true);
-                                            }
-                                            atWhiteLine = visibleWorldStopPoint.equals(location);
-                                        }
+                                    if(faces.get(0) == Direction.north) {
+                                       //the point of the white line
+                                       Point visibleWorldStopPoint = new Point(i-1,j);
+                                       //the traffic light affects cell in the car's visible world
+                                       ArrayList<Point> affectedCells = new ArrayList<>();
+                                       for(int k = j; k >= 0; k--) {
+                                           affectedCells.add(new Point(visibleWorldStopPoint.getX(),k));
+                                       }
+                                       if(cmd == Direction.south && affectedCells.contains(location)) {
+                                          yellowLightOn = tlci.yellowOn;
+                                          beliefs.put(cb, yellowLightOn);
+                                       }
+                                      
                                     }
                                     else if(faces.get(0) == Direction.south) {
-                                        if(cmd == Direction.north) {
-                                            trafficLightRed = tlci.redOn;
-                                            Point visibleWorldStopPoint = new Point(x + 1, y);
-                                            // Car belief update
-                                            if(tlci.yellowOn) {
-                                                beliefs.put(cb, true);
-                                            }
-                                            atWhiteLine = visibleWorldStopPoint.equals(location);
+                                        //the point of the white line
+                                        Point visibleWorldStopPoint = new Point(i+1,j);
+                                        //the traffic light affects cells in the car's visible world
+                                        ArrayList<Point> affectedCells = new ArrayList<>();
+                                        for(int k = j ; k < visibleWorld.getHeight();k++) {
+                                            affectedCells.add(new Point(visibleWorldStopPoint.getX(),k));
                                         }
+                                        if(cmd == Direction.north && affectedCells.contains(location)) {
+                                           yellowLightOn = tlci.yellowOn;
+                                           beliefs.put(cb, yellowLightOn); 
+                                        }
+                                           
                                     }
-                                    else if(faces.get(0) == Direction.north) {
-                                        if(cmd == Direction.south) {
-                                            trafficLightRed = tlci.redOn;
-                                            Point visibleWorldStopPoint = new Point(x - 1, y );
-                                            // Car belief update
-                                            if(tlci.yellowOn) {
-                                                beliefs.put(cb,true);
-                                            }
-                                            atWhiteLine = visibleWorldStopPoint.equals(location);
+                                    else if(faces.get(0) == Direction.east) {
+                                        //the point of the white line
+                                        Point visibleWorldStopPoint = new Point(i,j-1);
+                                        //the traffic light affects cells in the car's visible world
+                                        ArrayList<Point> affectedCells = new ArrayList<>();
+                                        for(int k = i;k < visibleWorld.getWidth();k++) {
+                                            affectedCells.add(new Point(k,visibleWorldStopPoint.getY()));
                                         }
-                                    }   
+                                        if(cmd == Direction.west && affectedCells.contains(location)) {
+                                            yellowLightOn = tlci.yellowOn;
+                                            beliefs.put(cb, yellowLightOn);
+                                        }
+                                      
+                                    }
+                                    else if(faces.get(0) == Direction.west) {
+                                        //the point of the white line
+                                        Point visibleWorldStopPoint = new Point(i,j+1);
+                                        //the traffic light affects cell in the car's visible world
+                                        ArrayList<Point> affectedCells = new ArrayList<>();
+                                        for(int k = i; k >= 0;k--) {
+                                            affectedCells.add(new Point(k,visibleWorldStopPoint.getY()));
+                                        }
+                                        if(cmd == Direction.east && affectedCells.contains(location)) {
+                                            yellowLightOn = tlci.yellowOn;
+                                            beliefs.put(cb, yellowLightOn);
+                                        }
+                                       
+                                    }
                                 }
                             }
                         }
                     }
-             }
+                }
                 break;
             case CB_lightFlashingAmber: // not simulated
                 break;
@@ -1560,126 +1350,160 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
             // simulated green light
             case CB_lightGreen:
                 beliefs.put(cb, false);
-                 for (int y = 0; y < visibleWorld.getHeight(); y++){
-                        for (int x = 0; x < visibleWorld.getWidth(); x++){
-                            if (visibleWorld.getCell(x, y).getCellType() == CellType.ct_information){
-                                if (((AbstractInformationCell)visibleWorld.getCell(x, y)).getInformationType() == InformationCell.ic_trafficLight){
-                                    TrafficLightCell tlc = (TrafficLightCell)visibleWorld.getCell(x, y);
-                                    TrafficLightCellInformation tlci = ((TrafficLightCell)visibleWorld.getCell(x, y)).getInformation(); 
-                                    //faces list
-                                    ArrayList<Direction> faces = tlc.getFaces();
-                                    if(faces.size() != 0) {
-                                        if(faces.get(0) == Direction.east) {
-                                            if (cmd == Direction.west) {
-                                                trafficLightRed = tlci.redOn;
-                                                Point visibleWorldStopPoint = new Point(x , y - 1);
-                                                //Car belief update
-                                                if(tlci.greenOn) {
-                                                    beliefs.put(cb, true); 
-                                                }
-                                                atWhiteLine = visibleWorldStopPoint.equals(location);
-                                            }       
+                boolean greenLightOn = false;
+                //at traffic light white line
+                for (int i = 0; i < visibleWorld.getWidth(); i++) {
+                    for(int j = 0; j < visibleWorld.getWidth();j++) {
+                        //check if the cell type is information cell
+                        if(visibleWorld.getCell(i, j).getCellType() == CellType.ct_information ) {
+                            //check if the information cell is traffic light
+                            AbstractInformationCell aic = (AbstractInformationCell)visibleWorld.getCell(i, j);
+                            if(aic.getInformationType() == InformationCell.ic_trafficLight) {
+                                TrafficLightCell tlc = (TrafficLightCell)aic;
+                                TrafficLightCellInformation tlci = tlc.getInformation();
+                                //the list of this traffic light cell faces 
+                                ArrayList<Direction> faces = tlc.getFaces();
+                                if(faces.size() != 0) {
+                                    if(faces.get(0) == Direction.north) {
+                                       //the point of the white line
+                                       Point visibleWorldStopPoint = new Point(i-1,j);
+                                       //the traffic light affects cell in the car's visible world
+                                       ArrayList<Point> affectedCells = new ArrayList<>();
+                                       for(int k = j; k>= 0; k--) {
+                                           affectedCells.add(new Point(visibleWorldStopPoint.getX(),k));
+                                       }
+                                       if(cmd == Direction.south && affectedCells.contains(location)) {
+                                          greenLightOn = tlci.greenOn;
+                                          beliefs.put(cb, greenLightOn);
+                                       }
+                                      
+                                    }
+                                    else if(faces.get(0) == Direction.south) {
+                                        //the point of the white line
+                                        Point visibleWorldStopPoint = new Point(i+1,j);
+                                        //the traffic light affects cells in the car's visible world
+                                        ArrayList<Point> affectedCells = new ArrayList<>();
+                                        for(int k = j ; k < visibleWorld.getHeight();k++) {
+                                            affectedCells.add(new Point(visibleWorldStopPoint.getX(),k));
                                         }
-                                        else if(faces.get(0) == Direction.west) {
-                                            if(cmd == Direction.east) {
-                                                trafficLightRed = tlci.redOn;
-                                                Point visibleWorldStopPoint = new Point(x , y + 1);
-                                                //Car belief update
-                                                if(tlci.greenOn) {
-                                                    beliefs.put(cb, true);
-                                                }
-                                                atWhiteLine = visibleWorldStopPoint.equals(location);
-                                            }
+                                        if(cmd == Direction.north && affectedCells.contains(location)) {
+                                           greenLightOn = tlci.greenOn;
+                                           beliefs.put(cb, greenLightOn); 
                                         }
-                                        else if(faces.get(0) == Direction.south) {
-                                            if(cmd == Direction.north) {
-                                                trafficLightRed = tlci.redOn;
-                                                Point visibleWorldStopPoint = new Point(x + 1, y);
-                                                // Car belief update
-                                                if(tlci.greenOn) {
-                                                    beliefs.put(cb, true);
-                                                }
-                                                atWhiteLine = visibleWorldStopPoint.equals(location);
-                                            }
+                                           
+                                    }
+                                    else if(faces.get(0) == Direction.east) {
+                                        //the point of the white line
+                                        Point visibleWorldStopPoint = new Point(i,j-1);
+                                        //the traffic light affects cells in the car's visible world
+                                        ArrayList<Point> affectedCells = new ArrayList<>();
+                                        for(int k = i;k < visibleWorld.getWidth();k++) {
+                                            affectedCells.add(new Point(k,visibleWorldStopPoint.getY()));
                                         }
-                                        else if(faces.get(0) == Direction.north) {
-                                            if(cmd == Direction.south) {
-                                                trafficLightRed = tlci.redOn;
-                                                Point visibleWorldStopPoint = new Point(x - 1, y );
-                                                // Car belief update
-                                                if(tlci.greenOn) {
-                                                    beliefs.put(cb,true);
-                                                }
-                                                atWhiteLine = visibleWorldStopPoint.equals(location);
-                                            }
-                                        }   
+                                        if(cmd == Direction.west && affectedCells.contains(location)) {
+                                           greenLightOn = tlci.greenOn;
+                                           beliefs.put(cb, greenLightOn);
+                                        }
+                                       
+                                    }
+                                    else if(faces.get(0) == Direction.west) {
+                                        //the point of the white line
+                                        Point visibleWorldStopPoint = new Point(i,j+1);
+                                        //the traffic light affects cell in the car's visible world
+                                        ArrayList<Point> affectedCells = new ArrayList<>();
+                                        for(int k = i; k >= 0;k--) {
+                                            affectedCells.add(new Point(k,visibleWorldStopPoint.getY()));
+                                        }
+                                        if(cmd == Direction.east && affectedCells.contains(location)) {
+                                           greenLightOn = tlci.greenOn;
+                                           beliefs.put(cb,greenLightOn);
+                                        }
+                                       
                                     }
                                 }
                             }
                         }
-                 }
+                    }
+                }
                  break;
             //simulate red light
             case CB_lightRed:
                 beliefs.put(cb, false);
-                 for (int y = 0; y < visibleWorld.getHeight(); y++){
-                        for (int x = 0; x < visibleWorld.getWidth(); x++){
-                            if (visibleWorld.getCell(x, y).getCellType() == CellType.ct_information){
-                                if (((AbstractInformationCell)visibleWorld.getCell(x, y)).getInformationType() == InformationCell.ic_trafficLight){
-                                    TrafficLightCell tlc = (TrafficLightCell)visibleWorld.getCell(x, y);
-                                    TrafficLightCellInformation tlci = ((TrafficLightCell)visibleWorld.getCell(x, y)).getInformation(); 
-                                    //faces list
-                                    ArrayList<Direction> faces = tlc.getFaces();
-                                    if(faces.size() != 0) {
-                                        if(faces.get(0) == Direction.east) {
-                                            if (cmd == Direction.west) {
-                                                trafficLightRed = tlci.redOn;
-                                                Point visibleWorldStopPoint = new Point(x , y - 1);
-                                                //Car belief update
-                                                if(tlci.redOn) {
-                                                    beliefs.put(cb, true); 
-                                                }
-                                                atWhiteLine = visibleWorldStopPoint.equals(location);
-                                            }       
+                boolean redLightOn = false;
+                //at traffic light white line
+                for (int i = 0; i < visibleWorld.getWidth(); i++) {
+                    for(int j = 0; j < visibleWorld.getWidth();j++) {
+                        //check if the cell type is information cell
+                        if(visibleWorld.getCell(i, j).getCellType() == CellType.ct_information ) {
+                            //check if the information cell is traffic light
+                            AbstractInformationCell aic = (AbstractInformationCell)visibleWorld.getCell(i, j);
+                            if(aic.getInformationType() == InformationCell.ic_trafficLight) {
+                                TrafficLightCell tlc = (TrafficLightCell)aic;
+                                TrafficLightCellInformation tlci = tlc.getInformation();
+                                //the list of this traffic light cell faces 
+                                ArrayList<Direction> faces = tlc.getFaces();
+                                if(faces.size() != 0) {
+                                    if(faces.get(0) == Direction.north) {
+                                       //the point of the white line
+                                       Point visibleWorldStopPoint = new Point(i-1,j);
+                                       //the traffic light affects cell in the car's visible world
+                                       ArrayList<Point> affectedCells = new ArrayList<>();
+                                       for(int k = j; k >= 0; k--) {
+                                           affectedCells.add(new Point(visibleWorldStopPoint.getX(),k));
+                                       }
+                                       if(cmd == Direction.south && affectedCells.contains(location)) {
+                                          redLightOn = tlci.redOn;
+                                          beliefs.put(cb, redLightOn);
+                                       }
+                                       
+                                    }
+                                    else if(faces.get(0) == Direction.south) {
+                                        //the point of the white line
+                                        Point visibleWorldStopPoint = new Point(i+1,j);
+                                        //the traffic light affects cells in the car's visible world
+                                        ArrayList<Point> affectedCells = new ArrayList<>();
+                                        for(int k = j ; k < visibleWorld.getHeight();k++) {
+                                            affectedCells.add(new Point(visibleWorldStopPoint.getX(),k));
                                         }
-                                        else if(faces.get(0) == Direction.west) {
-                                            if(cmd == Direction.east) {
-                                                trafficLightRed = tlci.redOn;
-                                                Point visibleWorldStopPoint = new Point(x , y + 1);
-                                                //Car belief update
-                                                if(tlci.redOn) {
-                                                    beliefs.put(cb, true);
-                                                }
-                                                atWhiteLine = visibleWorldStopPoint.equals(location);
-                                            }
+                                        if(cmd == Direction.north && affectedCells.contains(location)) {
+                                           redLightOn = tlci.redOn;
+                                           beliefs.put(cb, redLightOn);
                                         }
-                                        else if(faces.get(0) == Direction.south) {
-                                            if(cmd == Direction.north) {
-                                                trafficLightRed = tlci.redOn;
-                                                Point visibleWorldStopPoint = new Point(x + 1, y);
-                                                // Car belief update
-                                                if(tlci.redOn) {
-                                                    beliefs.put(cb, true);
-                                                }
-                                                atWhiteLine = visibleWorldStopPoint.equals(location);
-                                            }
+                                            
+                                    }
+                                    else if(faces.get(0) == Direction.east) {
+                                        //the point of the white line
+                                        Point visibleWorldStopPoint = new Point(i,j-1);
+                                        //the traffic light affects cells in the car's visible world
+                                        ArrayList<Point> affectedCells = new ArrayList<>();
+                                        for(int k = i;k < visibleWorld.getWidth();k++) {
+                                            affectedCells.add(new Point(k,visibleWorldStopPoint.getY()));
                                         }
-                                        else if(faces.get(0) == Direction.north) {
-                                            if(cmd == Direction.south) {
-                                                trafficLightRed = tlci.redOn;
-                                                Point visibleWorldStopPoint = new Point(x - 1, y );
-                                                // Car belief update
-                                                if(tlci.redOn) {
-                                                    beliefs.put(cb,true);
-                                                }
-                                                atWhiteLine = visibleWorldStopPoint.equals(location);
-                                            }
-                                        }   
+                                        if(cmd == Direction.west && affectedCells.contains(location)) {
+                                            redLightOn = tlci.redOn;
+                                            beliefs.put(cb, redLightOn);
+                                        }
+                                     
+                                    }
+                                    else if(faces.get(0) == Direction.west) {
+                                        //the point of the white line
+                                        Point visibleWorldStopPoint = new Point(i,j+1);
+                                        //the traffic light affects cell in the car's visible world
+                                        ArrayList<Point> affectedCells = new ArrayList<>();
+                                        for(int k = i; k >= 0;k--) {
+                                            affectedCells.add(new Point(k,visibleWorldStopPoint.getY()));
+                                        }
+                                        if(cmd == Direction.east && affectedCells.contains(location)) {
+                                            redLightOn = tlci.redOn;
+                                            beliefs.put(cb, redLightOn);
+                                        }
+                                   
                                     }
                                 }
                             }
                         }
-                 }
+                    }
+                }
                 break;
             case CB_mainRoadNextRoad: // not simulated
                 break;
@@ -1741,7 +1565,9 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                 break;
             case CB_turning: //not simulated 
                 break;
-            case CB_unableToStopByWhiteLine: //not simulated 
+            //TODO
+            case CB_unableToStopByWhiteLine: // car is always about to stop by the white line
+                beliefs.put(cb, false);
                 break;
             case CB_vehicleSafe: //not simulated 
                 break;
@@ -1943,7 +1769,6 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                 break;
             case CB_nearLevelCrossing: //not simulated 
                 break;
-              
             case CB_nearPedistrianCrossing: //not simulated
                 break;
             case CB_nearSchool: //not simulated 
@@ -1984,10 +1809,123 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                 break;
             case CB_pavement: //not simulated 
                 break;
-            case CB_pedestrianCrossing: //not simulated 
+            case CB_pedestrianCrossing: //TODO
+                boolean pedestraincrossing = false;
+                
+               
+//                espeed = 1;
+//                //check car current moving direction
+//                if(cmd == Direction.north) {         
+//                 for(int i = 0; i < visibleWorld.getWidth(); i++) {
+//                       for(int j = location.getY() - 1; j >= location.getY() - espeed;j--) {
+//                           if(visibleWorld.containsPedestrain(i,j)) { 
+//                               
+//                               Pedestrian p1 = visibleWorld.getPedestrainAtPosition(i, j);
+//                               //get pedestrian moving direction
+//                               Direction d1 = p1.getMovingDirection(); 
+//                               
+//                               pedestraincrossing = true;
+//                               beliefs.put(cb,  pedestraincrossing);
+//                           }
+//                       }
+//                   }
+//                }
+//                else if(cmd == Direction.south) { 
+//                    for(int i = 0; i < visibleWorld.getWidth(); i++) {
+//                        for(int j = location.getY() + 1; j <= location.getY() + espeed; j++) {
+//                            if(visibleWorld.containsPedestrain(i,j)) {
+//                                pedestraincrossing = true;
+//                                beliefs.put(cb,  pedestraincrossing);
+//                            }
+//                         }
+//                    }
+//                               
+//                }
+//                else if(cmd == Direction.east) {
+//                    for(int i = location.getX() + 1; i <= location.getX() + espeed; i++) {
+//                        for(int j = 0; j < visibleWorld.getHeight(); j++) {
+//                            if(visibleWorld.containsPedestrain(i,j)) {
+//                                pedestraincrossing = true;
+//                                beliefs.put(cb,  pedestraincrossing);
+//                            }
+//                           }
+//                        }
+//                    } 
+//                
+//                
+//                else if(cmd == Direction.west) {
+//                    for(int i = location.getX() - 1; i >= location.getX() - espeed; i--) {
+//                        for(int j = 0; j < visibleWorld.getHeight(); j++) {
+//                            if(visibleWorld.containsPedestrain(i,j)) {
+//                                pedestraincrossing = true;
+//                                beliefs.put(cb,  pedestraincrossing);
+//                            }
+//                        }
+//                    } 
+//                }
                 break;
-            case CB_pedestriansInRoad: //not simulated 
-                break; 
+            case CB_pedestriansInRoad:
+                boolean pedestrainInRoad = false;
+                
+                espeed = 1;
+                //check car current moving direction
+                if(cmd == Direction.north) {         
+                 for(int i = 0; i < visibleWorld.getWidth(); i++) {
+                       for(int j = location.getY() - 1; j >= location.getY() - espeed;j--) {
+                           if(visibleWorld.containsPedestrain(i,j)) { 
+                               if(j == location.getY() - 1 && i == location.getX()) {
+                                   System.out.println(i + " " +j);
+                                   Pedestrian p1 = visibleWorld.getPedestrainAtPosition(i, j);
+                                   pedestrainInRoad = true;
+                                   beliefs.put(cb,  pedestrainInRoad );
+                               }
+                              
+                           }
+                       }
+                   }
+                }
+                else if(cmd == Direction.south) { 
+                    for(int i = 0; i < visibleWorld.getWidth(); i++) {
+                        for(int j = location.getY() + 1; j <= location.getY() + espeed; j++) {
+                            if(visibleWorld.containsPedestrain(i,j)) {
+                                if(j == location.getY() + 1 && i == location.getX()) {
+                                    pedestrainInRoad = true;
+                                    beliefs.put(cb, pedestrainInRoad );
+                                }
+                               
+                            }
+                         }
+                    }
+                               
+                }
+                else if(cmd == Direction.east) {
+                    for(int i = location.getX() + 1; i <= location.getX() + espeed; i++) {
+                        for(int j = 0; j < visibleWorld.getHeight(); j++) {
+                            if(visibleWorld.containsPedestrain(i,j)) {
+                                if(i == location.getX() + 1 && j == location.getY()) {
+                                    pedestrainInRoad = true;
+                                    beliefs.put(cb, pedestrainInRoad );
+                                }
+                               
+                            }
+                           }
+                        }
+                    } 
+                
+                
+                else if(cmd == Direction.west) {
+                    for(int i = location.getX() - 1; i >= location.getX() - espeed; i--) {
+                        for(int j = 0; j < visibleWorld.getHeight(); j++) {
+                            if(visibleWorld.containsPedestrain(i,j)) {
+                               if(i == location.getX() - 1 && j == location.getY()) {
+                                   pedestrainInRoad = true;
+                                   beliefs.put(cb, pedestrainInRoad );
+                               }
+                            }
+                        }
+                    } 
+                }
+                break;
             case CB_pelicanCrossing: //not simulated 
                 break;
             case CB_policeDirectingLeft: //not simulated 
@@ -2002,126 +1940,89 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                 break;
             case CB_prohibitedToStopPark: //not simulated 
                 break;
-            case CB_propertyEntrance: //not simulated 
-                
+            case CB_propertyEntrance: //not simulated          
                 break;
             case CB_publicTransport: //not simulated 
                break;
             case CB_puffinCrossing: //not simulated  
                 break;
-            case CB_pulledOver: //not simulated 
-               
+            case CB_pulledOver: //not simulated         
                 break;
-            case CB_quietlane: //not simulated 
-                
+            case CB_quietlane: //not simulated      
                 break;
             case CB_reachedRoundabout: //not simulated 
-               
                 break;
             case CB_rearfacingbabyseatinfrontpassengerseat: //not simulated 
-                
                 break;
             case CB_redRoute: //not simulated 
-               
                 break;
-            case CB_redlines: //not simulated 
-              
+            case CB_redlines: //not simulated   
                 break;
-            case CB_reversing: //not simulated 
-               
+            case CB_reversing: //not simulated   
                 break;
-            case CB_roadMarkingKeepLeftOverride: //not simulated 
-                 
-            case CB_roadNarrows: //not simulated 
-              
+            case CB_roadMarkingKeepLeftOverride: //not simulated
                 break;
-            case CB_roadPresentsHazards: //not simulated 
-                
+            case CB_roadNarrows: //not simulated         
                 break;
-            case CB_roadSignKeepLeftOverride: //not simulated 
-           
+            case CB_roadPresentsHazards: //not simulated    
                 break;
-            case CB_roadWorks: //not simulated 
-               
+            case CB_roadSignKeepLeftOverride: //not simulated     
+                break;
+            case CB_roadWorks: //not simulated              
                 break;
             case CB_roadWorksAhead: //not simulated 
-               
                 break;
-            case CB_ruralRoad:
-                beliefs.put(cb, false);//Not simulated
+            case CB_ruralRoad://not simulated
                 break;
-            case CB_schoolEntrance:
-                beliefs.put(cb, false);//Not simulated
+            case CB_schoolEntrance://not simulated
                 break;
-            case CB_schoolEntranceMarkings:
-                beliefs.put(cb, false);//Not simulated
+            case CB_schoolEntranceMarkings://not simulated
                 break;
-            case CB_seenSign:
-                beliefs.put(cb, false);//Not simulated
+            case CB_seenSign://not simulated
                 break;
-            case CB_seenSignalByAuthorisedPerson:
-                beliefs.put(cb, false);//Not simulated
+            case CB_seenSignalByAuthorisedPerson://not simulated
                 break;
             case CB_sideroad: //not simulated 
                 break;
-            case CB_signConfictsWithAuthorisedPersonDirection:
-                beliefs.put(cb, false);//Not simulated
+            case CB_signConfictsWithAuthorisedPersonDirection://not simulated
                 break;
-            case CB_signFlashingAmber:
-                beliefs.put(cb, false);//Not simulated
+            case CB_signFlashingAmber://not simulated
                 break;
-            case CB_signFlashingRedX:
-                beliefs.put(cb, false);//Not simulated
+            case CB_signFlashingRedX://not simulated
                 break;
-            case CB_emergencyStopSign:
-                beliefs.put(cb, false);//Not simulated
+            case CB_emergencyStopSign://not simulated
                 break;
-            case CB_signalledRoundabout:
-                beliefs.put(cb, false);//Not simulated
+            case CB_signalledRoundabout://not simulated
                 break;
-            case CB_signsAdviseRestrictions:
-                beliefs.put(cb, false);//Not simulated
+            case CB_signsAdviseRestrictions://not simulated
                 break;
-            case CB_skidding:
-                beliefs.put(cb, false);//Not simulated
+            case CB_skidding://not simulated
                 break;
-            case CB_sliproad:
-                beliefs.put(cb, false);//Not simulated
+            case CB_sliproad://not simulated
                 break;
-            case CB_slowMovingTraffic:
-                beliefs.put(cb, false);//Not simulated
+            case CB_slowMovingTraffic://not simulated
                 break;
-            case CB_slowMovingVehicle:
-                beliefs.put(cb, false);//Not simulated
+            case CB_slowMovingVehicle://not simulated
                 break;
-            case CB_slowMovingVehicleInfront:
-                beliefs.put(cb, false);//Not simulated
+            case CB_slowMovingVehicleInfront://not simulated
                 break;
-            case CB_speedlimitForHardShoulder:
-                beliefs.put(cb, false);//Not simulated
+            case CB_speedlimitForHardShoulder://not simulated
                 break;
             case CB_stationaryVehicleInFront: // not simulated
                 break;
-            case CB_stopForChildrenSign:
-                beliefs.put(cb, false);//Not simulated
+            case CB_stopForChildrenSign://not simulated
                 break;
-            case CB_stopSign:
-                beliefs.put(cb, false);//Not simulated
+            case CB_stopSign://not simulated
                 break;
-            case CB_stopSignCrossing:
-                beliefs.put(cb, false);//Not simulated
+            case CB_stopSignCrossing://not simulated
                 break;
-            case CB_taxibay:
-                beliefs.put(cb, false);//Not simulated
+            case CB_taxibay://not simulated
                 break;
-            case CB_tempObstructingTraffic:
-                beliefs.put(cb, false);//Not simulated
+            case CB_tempObstructingTraffic://not simulated
                 break;
-            case CB_toucanCrossing:
-                beliefs.put(cb, false);//Not simulated
+            case CB_toucanCrossing://not simulated
                 break;
-            case CB_trafficCalming:
-                beliefs.put(cb, false);//Not simulated
+            case CB_trafficCalming://not simulated
                 break;
             case CB_trafficCongested: // not simulated 
                 break;
@@ -2129,112 +2030,167 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                 break;
             case CB_trafficSlow: // not simulated
                 break;
-            case CB_tram:
-                beliefs.put(cb, false);//Not simulated
+            case CB_tram://not simulated
                 break;
-            case CB_tramPassingLane:
-                beliefs.put(cb, false);//Not simulated
+            case CB_tramPassingLane://not simulated
                 break;
-            case CB_tramStop:
-                beliefs.put(cb, false);//Not simulated
+            case CB_tramStop://not simulated
                 break;
-            case CB_tramlines:
-                beliefs.put(cb, false);//Not simulated
+            case CB_tramlines://not simulated
                 break;
-            case CB_tramlinesCrossingApproach:
-                beliefs.put(cb, false);//Not simulated
+            case CB_tramlinesCrossingApproach://not simulated
                 break;
-            case CB_unncessaryObstruction:
-                beliefs.put(cb, false);//Not simulated
+            case CB_unncessaryObstruction://not simulated
                 break;
-            case CB_uphill:
-                beliefs.put(cb, false);//Not simulated
+            case CB_uphill://not simulated
                 break;
-            case CB_urbanClearway:
-                beliefs.put(cb, false);//Not simulated
+            case CB_urbanClearway://not simulated
                 break;
-            case CB_vehicleDoesntFitsInCentralReservation:
-                beliefs.put(cb, true);//Not simulated
+            case CB_vehicleDoesntFitsInCentralReservation://not simulated
                 break;
-            case CB_vehicleFitsInCentralReservation:
-                beliefs.put(cb, false);//Not simulated
+            case CB_vehicleFitsInCentralReservation://not simulated
                 break;
-            case CB_vehiclesWishToOvertake:
-                beliefs.put(cb, false);//Not simulated
+            case CB_vehiclesWishToOvertake://TODO
                 break;
-            case CB_visibilityReduced:
-                beliefs.put(cb, false);//Not simulated
+            case CB_visibilityReduced://not simulated
                 break;
-            case CB_wetWeather:
-                beliefs.put(cb, false);//Not simulated
+            case CB_wetWeather://not simulated
                 break;
-            case CB_whiteDiagonalStripeWhiteBrokenBorder:
-                beliefs.put(cb, false);//Not simulated
+            case CB_whiteDiagonalStripeWhiteBrokenBorder://not simulated
                 break;
-            case CB_whiteDiagonalStripeWhiteSolidBorder:
-                beliefs.put(cb, false);//Not simulated
+            case CB_whiteDiagonalStripeWhiteSolidBorder://not simulated
                 break;
-            case CB_windy:
-                beliefs.put(cb, false);//Not simulated
+            case CB_windy://not simulated
                 break;
-            case CB_withinCyclelaneOpteration:
-                beliefs.put(cb, false);//Not simulated
+            case CB_withinCyclelaneOpteration://not simulated
                 break;
-            case CB_withinTimePlateTimes:
-                beliefs.put(cb, false);//Not simulated
+            case CB_withinTimePlateTimes://not simulated
                 break;
-            case CB_withinUrbanClearwayHours:
-                beliefs.put(cb, false);//Not simulated
+            case CB_withinUrbanClearwayHours://not simulated
                 break;
-            case CB_workVehicleSign:
-                beliefs.put(cb, false);//Not simulated
+            case CB_workVehicleSign://not simulated
                 break;
-            case CB_yellowLine:
-                beliefs.put(cb, false);//Not simulated
+            case CB_yellowLine://not simulated
                 break;
-            case CB_yellowMarkingsOnKerb:
-                beliefs.put(cb, false);//Not simulated
+            case CB_yellowMarkingsOnKerb://not simulated
                 break;
             case CB_zebraCrossing:
                 boolean approaching_zebra_crossing = false;
-                
-               
+                beliefs.put(cb, false);
                 for(int x = 0 ; x < visibleWorld.getWidth(); x++) {
                     for(int y = 0; y < visibleWorld.getHeight(); y++) {
                         if(visibleWorld.getCell(x, y).getCellType() == CellType.ct_road) {     
                             RoadCell rc = (RoadCell)visibleWorld.getCell(x, y);
                             for(RoadMarking rm : rc.getRoadMarkings()) {
                                 if(rm == RoadMarking.rm_Zebra_Horizontal) {
-                                    if(y == location.getY()){
-                                        if(cmd == Direction.east) {
-                                            if(x == location.getX() + 1) {
-                                                approaching_horizontal_zebra = true;
-                                                beliefs.put(cb,true);
-                                            }
-                                        }
-                                        else if(cmd == Direction.west) {
-                                            if(x == location.getX() - 1) {
-                                                approaching_horizontal_zebra = true;
-                                                beliefs.put(cb,true);
-                                            }
+                                    if(x == location.getX()){
+                                       if(cmd == Direction.north && y == location.getY() - 1) {
+                                           approaching_zebra_crossing = true;
+                                           beliefs.put(cb, approaching_zebra_crossing);
+                                       }
+                                       else if(cmd == Direction.south && y == location.getY() + 1) {
+                                            approaching_zebra_crossing = true;
+                                            beliefs.put(cb, approaching_zebra_crossing);
                                         }
                                     }
                                 }
                                 else if(rm == RoadMarking.rm_Zebra_Vertical) {  
                                     //check the car's current position
-                                    if(x == location.getX()) {
-                                        if(cmd == Direction.north) {
-                                            if(y == location.getY() + 1){
-                                                approaching_vertical_zebra = true;
-                                                beliefs.put(cb,true);
-                                            }
+                                    if(y == location.getY()) {
+                                        if(cmd == Direction.east && x == location.getX() + 1) {
+                                            approaching_zebra_crossing = true;
+                                            beliefs.put(cb, approaching_zebra_crossing);
                                         }
-                                        else if(cmd == Direction.south) {
-                                            if(y == location.getY() - 1) {
-                                                approaching_vertical_zebra = true;
-                                                beliefs.put(cb ,true);
-                                            }
+                                        else if(cmd == Direction.south && x == location.getX() - 1) {
+                                            approaching_zebra_crossing = true;
+                                            beliefs.put(cb, approaching_zebra_crossing);
                                         }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+            //added
+            case CB_ableToStopByWhiteLine: //car is always able to stop at white line
+                beliefs.put(cb, true);
+                break;
+            case CB_exitNotClear:
+                if(!exitIsClear) {
+                    beliefs.put(cb,true);
+                }
+                else {
+                    beliefs.put(cb, false);
+                }
+                break;
+            case CB_lightNotGreen:
+                beliefs.put(cb, false);
+                boolean greenLightNotOn = false;
+                //at traffic light white line
+                for (int i = 0; i < visibleWorld.getWidth(); i++) {
+                    for(int j = 0; j < visibleWorld.getWidth();j++) {
+                        //check if the cell type is information cell
+                        if(visibleWorld.getCell(i, j).getCellType() == CellType.ct_information ) {
+                            //check if the information cell is traffic light
+                            AbstractInformationCell aic = (AbstractInformationCell)visibleWorld.getCell(i, j);
+                            if(aic.getInformationType() == InformationCell.ic_trafficLight) {
+                                TrafficLightCell tlc = (TrafficLightCell)aic;
+                                TrafficLightCellInformation tlci = tlc.getInformation();
+                                //the list of this traffic light cell faces 
+                                ArrayList<Direction> faces = tlc.getFaces();
+                                if(faces.size() != 0) {
+                                    if(faces.get(0) == Direction.north) {
+                                       //the point of the white line
+                                       Point visibleWorldStopPoint = new Point(i-1,j);
+                                       //the traffic light affects cell in the car's visible world
+                                       ArrayList<Point> affectedCells = new ArrayList<>();
+                                       for(int k = j; k>= 0; k--) {
+                                           affectedCells.add(new Point(visibleWorldStopPoint.getX(),k));
+                                       }
+                                       if(cmd == Direction.south && affectedCells.contains(location)) {
+                                          greenLightNotOn = !tlci.greenOn;
+                                          beliefs.put(cb, greenLightNotOn);
+                                       }                     
+                                    }
+                                    else if(faces.get(0) == Direction.south) {
+                                        //the point of the white line
+                                        Point visibleWorldStopPoint = new Point(i+1,j);
+                                        //the traffic light affects cells in the car's visible world
+                                        ArrayList<Point> affectedCells = new ArrayList<>();
+                                        for(int k = j ; k < visibleWorld.getHeight();k++) {
+                                            affectedCells.add(new Point(visibleWorldStopPoint.getX(),k));
+                                        }
+                                        if(cmd == Direction.north && affectedCells.contains(location)) {
+                                           greenLightNotOn = !tlci.greenOn;
+                                           beliefs.put(cb, greenLightNotOn);
+                                        }               
+                                    }
+                                    else if(faces.get(0) == Direction.east) {
+                                        //the point of the white line
+                                        Point visibleWorldStopPoint = new Point(i,j-1);
+                                        //the traffic light affects cells in the car's visible world
+                                        ArrayList<Point> affectedCells = new ArrayList<>();
+                                        for(int k = i;k < visibleWorld.getWidth();k++) {
+                                            affectedCells.add(new Point(k,visibleWorldStopPoint.getY()));
+                                        }
+                                        if(cmd == Direction.west && affectedCells.contains(location)) {
+                                            greenLightNotOn = !tlci.greenOn;
+                                            beliefs.put(cb, greenLightNotOn);
+                                        }         
+                                    }
+                                    else if(faces.get(0) == Direction.west) {
+                                        //the point of the white line
+                                        Point visibleWorldStopPoint = new Point(i,j+1);
+                                        //the traffic light affects cell in the car's visible world
+                                        ArrayList<Point> affectedCells = new ArrayList<>();
+                                        for(int k = i; k >= 0;k--) {
+                                            affectedCells.add(new Point(k,visibleWorldStopPoint.getY()));
+                                        }
+                                        if(cmd == Direction.east && affectedCells.contains(location)) {
+                                            greenLightNotOn = !tlci.greenOn;
+                                            beliefs.put(cb, greenLightNotOn);
+                                        }      
                                     }
                                 }
                             }
@@ -2246,5 +2202,38 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                 break;
             }
         }
+    }
+
+    
+    
+    // check if there are same points between two ArrayList
+    public Boolean checkCommonPoint(ArrayList<Point> l1, ArrayList<Point> l2) {
+        l1.retainAll(l2);
+        if(l1.isEmpty()) {
+            return false;
+        }
+        else {
+            return true;
+        }        
+    }
+    
+    public HashMap<CarAction, CarPriority> getActionsList(){
+       return this.actionsToDo;
+    }
+    
+    public HashMap<CarAction,CarPriority> getActionsRecommendation() {
+        return actionsRecommendation;
+    }
+    
+    public HashMap<CarBelief, Boolean> getBeliefsList(){
+        return this.beliefs;
+    }
+    
+    public HashMap<CarIntention, Boolean> getIntentionsList(){
+        return this.intentions;
+    }
+    // reset the action list
+    public void resetActions() { 
+        actionsToDo.clear();
     }
 }

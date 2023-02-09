@@ -96,6 +96,8 @@ public abstract class AbstractROTRCar extends AbstractCar
         CB_essentialTravel("essentialTravel"),
         CB_exceedingSpeedLimit("exceedingSpeedLimit"),
         CB_exitClear("exitClear"),
+        //added
+        CB_exitNotClear("exitNotClear"),
         CB_finishedManoeuvre("finishedManoeuvre"),
         CB_flashingAmber("flashingAmber"),
         CB_flashingAmberBeacon("flashingAmberBeacon"),
@@ -139,6 +141,8 @@ public abstract class AbstractROTRCar extends AbstractCar
         CB_lightAmber("lightAmber"),
         CB_lightFlashingAmber("lightFlashingAmber"),
         CB_lightGreen("lightGreen"),
+        //added
+        CB_lightNotGreen("lightNotGreen"),
         CB_lightRed("lightRed"),
         CB_lightsCausingDiscomfortToOthers("lightsCausingDiscomfortToOthers"),
         CB_litStreetLightingRoad("litStreetLightingRoad"),
@@ -268,6 +272,8 @@ public abstract class AbstractROTRCar extends AbstractCar
         CB_tramlinesCrossingApproach("tramlinesCrossingApproach"),
         CB_turning("turning"),
         CB_unableToStopByWhiteLine("unableToStopByWhiteLine"),
+        //added
+        CB_ableToStopByWhiteLine("ableToStopByWhiteLine"),
         CB_unncessaryObstruction("unncessaryObstruction"),
         CB_uphill("uphill"),
         CB_urbanClearway("urbanClearway"),
@@ -595,6 +601,8 @@ public abstract class AbstractROTRCar extends AbstractCar
         CA_use_signals("use_signals"),
         CA_use_tram_passing_lane("use_tram_passing_lane"),
         CA_use_windscreen_wipers("use_windscreen_wipers"),
+        //added
+        CA_wait_at_white_line("wait_at_white_line"),
         CA_wait_at_advanced_stop("wait_at_advanced_stop"),
         CA_wait_at_first_white_line("wait_at_first_white_line"),
         CA_wait_for_gap_before_moving_off("wait_for_gap_before_moving_off"),
@@ -669,6 +677,9 @@ public abstract class AbstractROTRCar extends AbstractCar
         // generate the recommendations using RoTra
         rulesOfTheRoad = RulesOfTheRoad.getROTRViolations(beliefs, intentions);
 
+//        for(ROTROutcome rotr : rulesOfTheRoad) {
+//            System.out.println(rotr.action);
+//        }
         // the rotra will convey the recommendations to the car
         // reactivate car will follow all recommendations
         // rude car will only follow legal actions
