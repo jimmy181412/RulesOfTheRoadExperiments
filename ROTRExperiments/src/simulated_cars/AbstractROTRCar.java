@@ -701,7 +701,7 @@ public abstract class AbstractROTRCar extends AbstractCar
         }
     }
     
-    protected void clearBeliefs()
+    public void clearBeliefs()
     {
         for (CarBelief cb : CarBelief.values())
         {
@@ -709,7 +709,7 @@ public abstract class AbstractROTRCar extends AbstractCar
         }
     }
     
-    protected void clearIntentions()
+    public void clearIntentions()
     {
         for (CarIntention cb : CarIntention.values())
         {

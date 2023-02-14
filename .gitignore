@@ -29,3 +29,6 @@ hs_err_pid*
 *.fls
 *.pdf
 *.synctex.gz
+/ROTRExperiments/nbproject/private/
+/ROTRExperiments/build/
+/ROTRExperiments/dist/

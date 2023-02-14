@@ -2,6 +2,7 @@ package simulated_cars;
 
 import java.util.ArrayDeque;
 
+
 import core_car_sim.AbstractCar;
 import core_car_sim.Direction;
 import core_car_sim.Point;

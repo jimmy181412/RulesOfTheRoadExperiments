@@ -1,8 +1,11 @@
 package experiment_files;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -10,32 +13,48 @@ import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
+
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 
 import core_car_sim.AbstractCar;
 import core_car_sim.CarAddedListener;
 import core_car_sim.Direction;
 import core_car_sim.LoadWorld;
+import core_car_sim.NonDrivingCell;
+import core_car_sim.PavementCell;
 import core_car_sim.Pedestrian;
 import core_car_sim.PedestrianAddedListener;
 import core_car_sim.Point;
+import core_car_sim.RoadCell;
+import core_car_sim.TrafficLightCell;
 import core_car_sim.WorldSim;
+import simulated_cars.AbstractROTRCar.CarAction;
+import simulated_cars.AbstractROTRCar.CarPriority;
 import simulated_cars.BasicAICar;
 import simulated_cars.ReactiveCar;
 import simulated_cars.RudeCar;
 
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 
@@ -57,7 +76,7 @@ public class RunExperiment{
 			int i = 0;
 			
 			while (!finished){
-			    updateGUIWorld();
+			  
 				simworld.simulate(1);
 				try{
 					Thread.sleep(delay);
@@ -65,8 +84,7 @@ public class RunExperiment{
 				catch (InterruptedException e){
 					e.printStackTrace();
 				}
-				
-				lblNewLabel.setText("Steps simulated: " + ++stepsSimulated);
+				updateGUIWorld();
 				if (!finished){
 					finished = until == 0 ? simworld.allFinished() : until == ++i;
 				}
@@ -76,15 +94,23 @@ public class RunExperiment{
 	};
 	
 	private JFrame frame;
-	private JLabel lblNewLabel;
+	private JMenuBar menuBar = new JMenuBar();
 	private WorldSim simworld;
+	
+	private JPanel panel = new JPanel();
 	private JPanel pnlWorld = new JPanel();
-	private JPanel logs = new JPanel(); 
+	private JPanel logs = new JPanel();
+	
 	private JComboBox<String> cbAI = new JComboBox<String>();
+	
+	private JLabel recommendations;
+	private JLabel actionsPerformed;
 	private Executor simulationThread = Executors.newSingleThreadExecutor();
 	private CarAddedListener cal;
 	private PedestrianAddedListener pal;
 	private Simulate currentlyRunning = null;
+	
+	private boolean raVisible= false;
 
 	/**
 	 * Launch the application.
@@ -93,6 +119,9 @@ public class RunExperiment{
 		EventQueue.invokeLater(new Runnable(){
 			public void run() {
 				try {
+				    //static
+				    UIManager.setLookAndFeel(new FlatMacDarkLaf());
+			
 					RunExperiment window = new RunExperiment();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
@@ -106,6 +135,7 @@ public class RunExperiment{
 	 * Create the application.
 	 */
 	public RunExperiment() {
+
 		initialize();
 		cal = new CarAddedListener() {
 			@Override
@@ -142,7 +172,6 @@ public class RunExperiment{
 		pal = new PedestrianAddedListener() {
             @Override
             public Pedestrian createPedestrians(String name,Point startingLoca,Point endingLoca,Point referenceLoca, Direction d) {
-                // TODO Auto-generated method stub
                 if(d == Direction.east) {
                     return new Pedestrian(startingLoca, endingLoca, referenceLoca,d,System.getProperty("user.dir") + "/resources/pedestrian1.png");
                 }
@@ -166,121 +195,378 @@ public class RunExperiment{
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize(){
+	    // initialize the frame
 		frame = new JFrame();
-		frame.setBounds(100, 100, 966, 615);
+		frame.setBounds(100, 100, 1200, 900);
+		frame.setTitle("Third Year Project");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setJMenuBar(menuBar);
 		
-		JPanel panel = new JPanel();
-		FlowLayout flowLayout = (FlowLayout) panel.getLayout();
-		flowLayout.setAlignment(FlowLayout.LEFT);
-		frame.getContentPane().add(panel, BorderLayout.NORTH);
-		
-		
-		// button1
-		JButton btnNewButton = new JButton("Load example1");
-		btnNewButton.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent e){
-                try{
+		JMenu scenarios = new JMenu("Scenarios");
+		JMenu preferences = new JMenu("Windows");
+		JMenu edit = new JMenu("Edit");
+		JMenu run = new JMenu("Run");
+		menuBar.add(scenarios);
+		menuBar.add(edit);
+		menuBar.add(preferences);
+		menuBar.add(run);
+
+		JMenuItem scenario1 = new JMenuItem("Scenario 1");
+		scenario1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
                     BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/src/simulated_cars/example1.txt"));
                     simworld = LoadWorld.loadWorldFromFile(br, cal, pal);
                     pnlWorld.setLayout(new GridLayout(simworld.getHeight(), simworld.getWidth(), 1, 1));
                     updateGUIWorld();   
-                } 
+                }
                 catch (IOException e1){
-                    // TODO Auto-generated catch block
                     e1.printStackTrace();
+                }        
+            }	    
+		});
+		
+		JMenuItem scenario2 = new JMenuItem("Scenario 2");
+		scenario2.addActionListener(new ActionListener(){
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try{
+                    BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/src/simulated_cars/example2.txt"));
+                    simworld = LoadWorld.loadWorldFromFile(br, cal, pal);
+                    pnlWorld.setLayout(new GridLayout(simworld.getHeight(), simworld.getWidth(), 1, 1));
+                    updateGUIWorld();
+                
+                }
+                catch (IOException e1){
+                    e1.printStackTrace();
+                }   
+            }   
+		});
+		
+		JMenuItem scenario3 = new JMenuItem("Scenario 3");
+		scenario3.addActionListener(new ActionListener(){
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try{
+                    BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/src/simulated_cars/example3.txt"));
+                    simworld = LoadWorld.loadWorldFromFile(br, cal,pal);
+                    pnlWorld.setLayout(new GridLayout(simworld.getHeight(), simworld.getWidth(), 1, 1));
+                    updateGUIWorld();   
+                } 
+                catch(IOException e1){   
+                    e1.printStackTrace();
+                }          
+            }    
+		});
+		
+		JMenuItem showVisibleWorld = new JMenuItem("Show visible world");
+		showVisibleWorld.addActionListener(new ActionListener(){
+	            @Override
+	            public void actionPerformed(ActionEvent e) { 
+	                int width = simworld.getWidth();
+	                int height = simworld.getHeight();
+	                int visibility = simworld.getVisibility();
+	                
+	                for(AbstractCar car: simworld.getCars()) {
+	                    if(car.getClass() == ReactiveCar.class) {
+	                        Point carPosition = simworld.getCarPosition(car);
+	                        //get the car visible world
+	                        ArrayList<Point> visibleCells = new ArrayList<>();
+	                        for(int i = carPosition.getX() - visibility; i <= carPosition.getX() + visibility;i++) {
+	                            for(int j = carPosition.getY() - visibility; j <= carPosition.getY() + visibility; j++) {
+	                                // for the cell out of boundary
+	                                if( (i < 0) || (i >= width) || (j < 0) || ( j >= height)) {
+	                                   //do nothing
+	                                }
+	                                else {
+	                                   visibleCells.add(new Point(i,j));
+	                                }
+	                            }
+	                        }
+	                        
+	                        for(int m = 0; m < width; m++) {
+	                            for(int n = 0; n < height;n++) {
+	                                if(visibleCells.contains(new Point(m,n))) {
+	                                    simworld.getCell(m, n).setVisible(true);
+	                                }
+	                                else {
+	                                   if(simworld.getCell(m, n).getClass() == NonDrivingCell.class) {
+	                                       NonDrivingCell ndc =  (NonDrivingCell)simworld.getCell(m, n);
+	                                       ndc.setTransparency((float) 0.5);     
+	                                   }
+	                                   else if(simworld.getCell(m, n).getClass() == RoadCell.class) {
+	                                       RoadCell rc = (RoadCell)simworld.getCell(m, n);
+	                                       rc.setTransparency((float) 0.5);
+	                                   }
+	                                   else if(simworld.getCell(m, n).getClass() == TrafficLightCell.class) {
+	                                       TrafficLightCell tlc = (TrafficLightCell)simworld.getCell(m, n);
+	                                       tlc.setTransparency((float)0.5);
+	                                   }
+	                                   else if(simworld.getCell(m, n).getClass() == PavementCell.class) {
+	                                       PavementCell pc = (PavementCell)simworld.getCell(m,n);
+	                                       pc.setTransparency((float)0.5);
+	                                   }            
+	                                }
+	                            }
+	                        }
+	                  }
+	              }
+	                pnlWorld.repaint();
+	          }    
+	        });
+		
+		JMenuItem showRoute = new JMenuItem("Show car route");
+		showRoute.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // TODO Auto-generated method stub
+                
+            } 
+		});
+		
+		JMenuItem showRecommendationsAndActionPerformed = new JMenuItem("Show recommendations and action performed");
+		showRecommendationsAndActionPerformed.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                raVisible = !raVisible;
+                if(raVisible) {
+                    logs.setVisible(true);
+                }
+                else {
+                    logs.setVisible(false);
+                }   
+            }
+		    
+		});
+		
+		JMenuItem removeAll = new JMenuItem("remove all");
+		removeAll.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               pnlWorld.removeAll();
+               pnlWorld.repaint();
+            }
+		    
+		});
+		
+	
+		JMenuItem runSimulation1 = new JMenuItem("run 1 step");
+		runSimulation1.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                if (currentlyRunning == null){       
+                    currentlyRunning = new Simulate(50, 1); 
+                    simulationThread.execute(currentlyRunning);
+                }
+                else{
+                    currentlyRunning.finished = true;
+                    currentlyRunning = null;
                 }
             }
         });
-		panel.add(btnNewButton);
+		JMenuItem runSimulation2 = new JMenuItem("run 3 steps");
+	    runSimulation2.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                if (currentlyRunning == null){       
+                    currentlyRunning = new Simulate(50, 3); 
+                    simulationThread.execute(currentlyRunning);
+                }
+                else{
+                    currentlyRunning.finished = true;
+                    currentlyRunning = null;
+                }
+            }
+        });
+		JMenuItem runSimulation3 = new JMenuItem("run 5 steps");
+	    runSimulation3.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                if (currentlyRunning == null){       
+                    currentlyRunning = new Simulate(50, 5); 
+                    simulationThread.execute(currentlyRunning);
+                }
+                else{
+                    currentlyRunning.finished = true;
+                    currentlyRunning = null;
+                }
+            }
+        });
+		JMenuItem runSimulation4 = new JMenuItem("run util finished");
+		runSimulation4.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                if (currentlyRunning == null){       
+                    currentlyRunning = new Simulate(50, 0); 
+                    simulationThread.execute(currentlyRunning);
+                }
+                else{
+                    currentlyRunning.finished = true;
+                    currentlyRunning = null;
+                }
+            }
+        });
 		
-		//button2
-		JButton btnNewButton_2 = new JButton("Load example2");
-		btnNewButton_2.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				try{
-					BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/src/simulated_cars/example2.txt"));
-					simworld = LoadWorld.loadWorldFromFile(br, cal, pal);
-					pnlWorld.setLayout(new GridLayout(simworld.getHeight(), simworld.getWidth(), 1, 1));
-					updateGUIWorld();
-				
-				}
-				catch (IOException e1){
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			}
-		});
-		panel.add(btnNewButton_2);
+		scenarios.add(scenario1);
+		scenarios.add(scenario2);
+		scenarios.add(scenario3);
 		
-		// button3
-		JButton btnNewButton_3 = new JButton("Load example3");
-		btnNewButton_3.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				try{
-					BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/src/simulated_cars/example3.txt"));
-					simworld = LoadWorld.loadWorldFromFile(br, cal,pal);
-					pnlWorld.setLayout(new GridLayout(simworld.getHeight(), simworld.getWidth(), 1, 1));
-					updateGUIWorld();	
-				} 
-				catch(IOException e1){
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			}
-		});
-		panel.add(btnNewButton_3);
+		preferences.add(showVisibleWorld);
+		preferences.add(showRoute);
+		preferences.add(showRecommendationsAndActionPerformed);
 		
+		edit.add(removeAll);
+		
+		run.add(runSimulation1);
+		run.add(runSimulation2);
+		run.add(runSimulation3);
+        run.add(runSimulation4);
+	
+		//  initialize the control panel and add the panel to the frame
+		FlowLayout flowLayout = (FlowLayout) panel.getLayout();
+		flowLayout.setAlignment(FlowLayout.LEFT);
+		frame.getContentPane().add(panel, BorderLayout.NORTH);
+		panel.setBackground(Color.darkGray.darker());
+		
+		// initialize the scenario panel and add the panel to the frame
+		frame.getContentPane().add(pnlWorld, BorderLayout.CENTER);
+        pnlWorld.setLayout(new GridLayout(3, 3, 0, 0));
+        pnlWorld.setBackground(new Color(66,66,66).darker().darker());
+        
+        // initialize the log panel and add the panel to the frame
+        frame.getContentPane().add(logs, BorderLayout.EAST);
+        logs.setLayout(new FlowLayout());
+        logs.setPreferredSize(new Dimension(280, 800));
+        logs.setBackground(Color.darkGray);
+		
+        
+        // -----------------------------components in control panel--------------------------------------------
+        JLabel label1 = new JLabel("Scenario:");
+        JLabel label2 = new JLabel("Vehicle:");
+        JLabel label3 = new JLabel("numOfSteps:");
+                 
+       
 		cbAI.setModel(new DefaultComboBoxModel<String>(new String[] {"Reactive", "Must Only"}));
 		cbAI.setSelectedIndex(0);
-		panel.add(cbAI);
 		
-		JButton btnNewButton_1 = new JButton("Run Simulation");
-		panel.add(btnNewButton_1);
-		
-		ButtonGroup bg = new ButtonGroup();
-		
-		JRadioButton rdbtnNewRadioButton = new JRadioButton("until finished");
-		rdbtnNewRadioButton.setSelected(true);
-		panel.add(rdbtnNewRadioButton);
-		bg.add(rdbtnNewRadioButton);
-		
-		JRadioButton rdbtnNewRadioButton_1 = new JRadioButton("set number");
-		panel.add(rdbtnNewRadioButton_1);
-		bg.add(rdbtnNewRadioButton_1);
-		
-		JSpinner spinner = new JSpinner(new SpinnerNumberModel(1, 1, 10000, 1));
-		panel.add(spinner);
-		
-		lblNewLabel = new JLabel("New label");
-		panel.add(lblNewLabel);
-	
-		frame.getContentPane().add(pnlWorld, BorderLayout.CENTER);
-		pnlWorld.setLayout(new GridLayout(3, 3, 0, 0));
-		
-	
-		frame.getContentPane().add(logs, BorderLayout.EAST);
-	
-		btnNewButton_1.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				if (currentlyRunning == null){
-					if (rdbtnNewRadioButton.isSelected()){
-						currentlyRunning = new Simulate(250, 0);	
-					}
-					else{
-						currentlyRunning = new Simulate(250, (Integer)spinner.getValue());
-					}
-					simulationThread.execute(currentlyRunning);
-				}
-				else{
-					currentlyRunning.finished = true;
-					currentlyRunning = null;
-				}
-			}
+		JComboBox<String> cbScenarios = new JComboBox<String>();
+		cbScenarios.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    if(cbScenarios.getSelectedItem() == "Scenario 1") {
+                        BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/src/simulated_cars/example1.txt"));
+                        simworld = LoadWorld.loadWorldFromFile(br, cal, pal);
+                        pnlWorld.setLayout(new GridLayout(simworld.getHeight(), simworld.getWidth(), 1, 1));
+                        updateGUIWorld();  
+                    }  
+                    else if(cbScenarios.getSelectedItem() == "Scenario 2") {
+                        BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/src/simulated_cars/example2.txt"));
+                        simworld = LoadWorld.loadWorldFromFile(br, cal, pal);
+                        pnlWorld.setLayout(new GridLayout(simworld.getHeight(), simworld.getWidth(), 1, 1));
+                        updateGUIWorld();  
+                    }
+                    else if(cbScenarios.getSelectedItem() == "Scenario 3") {
+                        BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/src/simulated_cars/example3.txt"));
+                        simworld = LoadWorld.loadWorldFromFile(br, cal, pal);
+                        pnlWorld.setLayout(new GridLayout(simworld.getHeight(), simworld.getWidth(), 1, 1));
+                        updateGUIWorld();  
+                    }
+                    else {
+                        //do nothing
+                    }
+                }
+                catch (IOException e1){
+                    e1.printStackTrace();
+                }       
+            }
+		    
 		});
-	}
+		cbScenarios.setModel(new DefaultComboBoxModel<String>(new String[] {"select scenario","Scenario 1", "Scenario 2", "Scenario 3"}));
+		cbScenarios.setSelectedIndex(0);
+		
+		
+		JComboBox<String> cbStepsSimulate = new JComboBox<String>();
+		cbStepsSimulate.setModel(new DefaultComboBoxModel<String>(new String[] {"select steps","1 step", "3 steps", "5 steps", "until finished"}));
+		cbStepsSimulate.setSelectedIndex(0);
+		
+		JButton btnNewButton = new JButton("Run");
+        btnNewButton.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (currentlyRunning == null){
+                    if (cbStepsSimulate.getSelectedItem() == "1 step"){
+                        currentlyRunning = new Simulate(50, 1); 
+                    }
+                    else if(cbStepsSimulate.getSelectedItem() == "3 steps") {
+                        currentlyRunning = new Simulate(50, 3); 
+                    }
+                    else if(cbStepsSimulate.getSelectedItem() == "5 steps"){
+                        currentlyRunning = new Simulate(50, 5);
+                    }
+                    else if(cbStepsSimulate.getSelectedItem() == "until finished") {
+                        currentlyRunning = new Simulate(50, 0);
+                    }
+                    else {
+                        
+                    }
+                    simulationThread.execute(currentlyRunning);
+                }
+                else{
+                    currentlyRunning.finished = true;
+                    currentlyRunning = null;
+                }       
+            }
+        });
 	
-	private void updateGUIWorld(){
+	    // add components to control panel
+		panel.add(label1);
+		panel.add(cbScenarios);
+		panel.add(label2);
+        panel.add(cbAI);
+        panel.add(label3);
+        panel.add(cbStepsSimulate);
+      
+        panel.add(btnNewButton);
+       
+		// ----------------------------------------------------------------------------------------------------
+		
+		// ---------------components in log panel--------------------------------------------------------------
+        JLabel NewLabel1  = new JLabel("Recommendations from RoTRA");
+        NewLabel1.setPreferredSize(new Dimension(250,30));
+        NewLabel1.setFont(new Font("Cascadia Mono", Font.BOLD, 16));
+     
+        NewLabel1.setHorizontalAlignment(SwingConstants.CENTER);
+        //the recommendations generated by rotra
+        recommendations = new JLabel("");
+        recommendations.setPreferredSize(new Dimension(250, 200));
+        recommendations.setHorizontalAlignment(SwingConstants.CENTER);
+        recommendations.setVerticalAlignment(SwingConstants.TOP);
+        recommendations.setFont(new Font("Cascadia Mono", Font.PLAIN, 16));
+        recommendations.setForeground(Color.white);
+        JLabel NewLabel2 = new JLabel("Action performed by the car");
+        NewLabel2.setPreferredSize(new Dimension(250, 30));
+        NewLabel2.setHorizontalAlignment(SwingConstants.CENTER);
+        NewLabel2.setFont(new Font("Cascadia Mono", Font.BOLD, 16));
+        //the actions that the self-driving car performed
+        actionsPerformed = new JLabel("");
+        actionsPerformed.setPreferredSize(new Dimension(250, 200));
+        actionsPerformed.setHorizontalAlignment(SwingConstants.CENTER);
+        actionsPerformed.setVerticalAlignment(SwingConstants.TOP);
+        actionsPerformed.setFont(new Font("Cascadia Mono", Font.PLAIN, 16));
+        actionsPerformed.setForeground(Color.white);
+        
+
+        // add components to logs panel
+        logs.add(NewLabel1);
+        logs.add(recommendations);
+        logs.add(NewLabel2);
+        logs.add(actionsPerformed);
+        logs.setVisible(false);
+        // ----------------------------------------------------------------------------------------------------
+	}
+
+    private void updateGUIWorld(){
 	    pnlWorld.removeAll();
         
         // get pnl's height and weight in pxis
@@ -306,18 +592,7 @@ public class RunExperiment{
                 pnlWorld.add(simworld.getCell(x, y));
             }
         }
-        //update cars
-        for (AbstractCar car : simworld.getCars()){
-            Point p = simworld.getCarPosition(car);
-            ImageIcon iicon1 = car.getCarIcon();
-            Image img1 = iicon1.getImage();
-            //adjust size
-            Image newimg1 = img1.getScaledInstance(iconWidth,iconHeight,java.awt.Image.SCALE_SMOOTH);
-            iicon1 = new ImageIcon(newimg1);
-            JLabel icon1 = new JLabel(iicon1);
-            simworld.getCell(p.getX(), p.getY()).add(icon1);
-            
-        }
+        
         //update pedestrians
         for(Pedestrian p : simworld.getPedestrian()) {
             Point point = simworld.getPedestrianPosition(p);
@@ -329,7 +604,72 @@ public class RunExperiment{
             simworld.getCell(point.getX(), point.getY()).add(icon2);
             }
         
+        //update cars
+        for (AbstractCar car : simworld.getCars()){
+            Point p = simworld.getCarPosition(car);
+            ImageIcon iicon1 = car.getCarIcon();
+
+            Image img1 = iicon1.getImage();
+            //adjust size
+            Image newimg1 = img1.getScaledInstance(iconWidth,iconHeight,java.awt.Image.SCALE_SMOOTH);
+            iicon1 = new ImageIcon(newimg1);
+            JLabel icon1 = new JLabel(iicon1);
+            simworld.getCell(p.getX(), p.getY()).add(icon1);
+            
+            if(car.getClass() == ReactiveCar.class) {
+              
+                ReactiveCar rCar = (ReactiveCar) car;
+                HashMap<CarAction, CarPriority> actionsDone = rCar.getActionsPerformed();
+                HashMap<CarAction, CarPriority> actionsRecommended = rCar.getRecommendedActions();
+                
+                StringBuilder sb1 = new StringBuilder();
+                int counter1 = 1;
+                for(Entry<CarAction, CarPriority> entry1 : actionsDone.entrySet()) {
+                    String tmp_action = entry1.getKey().toString();
+                   
+                    sb1.append("[");
+                    sb1.append(counter1);
+                    sb1.append("]: ");
+                    sb1.append(tmp_action);
+                    if(counter1 != actionsDone.size()) {
+                        sb1.append("\n");
+                    }
+                    counter1++;
+                }
+                String sActionsDone = sb1.toString();
+                sActionsDone = sActionsDone.replace("\n", "<br>");
+                
+                
+                StringBuilder sb2 = new StringBuilder();
+                int counter2 = 1; 
+                for(Entry<CarAction, CarPriority> entry2: actionsRecommended.entrySet()) {
+                    String tmp_action = entry2.getKey().toString();
+                    sb2.append("[");
+                    sb2.append(counter2);
+                    sb2.append("]: ");
+                    sb2.append(tmp_action);
+                    if(counter2 != actionsRecommended.size()) {
+                        sb2.append("\n");
+                    }
+                    counter2++;
+                }
+                
+                String sActionsRecommended = sb2.toString();
+                sActionsRecommended = sActionsRecommended.replace("\n", "<br>");
+                actionsPerformed.setText("<html>" + sActionsDone + "</html>");
+                recommendations.setText("<html>" + sActionsRecommended + "</html>");
+                
+                rCar.clearBeliefs();
+                rCar.clearIntentions();
+                rCar.resetActions();
+                rCar.resetRecommendations();
+            }
+            
+            
+        }
+
         pnlWorld.revalidate();
         pnlWorld.repaint();
+     
 	}
 }

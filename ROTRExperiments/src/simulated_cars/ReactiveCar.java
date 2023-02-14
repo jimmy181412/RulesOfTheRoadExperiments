@@ -32,7 +32,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
   
 
     ArrayDeque<Direction> directions = new ArrayDeque<Direction>();
-    private HashMap<CarAction,CarPriority> actionsRecommendation = new HashMap<>();
+    private HashMap<CarAction,CarPriority> actionsRecommended = new HashMap<>();
     private HashMap<CarAction,CarPriority> actionsToDo = new HashMap<CarAction,CarPriority>();
    
     public ReactiveCar(Point startPos, Point endPos, int startingSpeed){
@@ -52,35 +52,32 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
         }
 
         
-        System.out.println("----------------------------------------------------------------------");
-        // print out the car action list
-        System.out.println("action list:");
-        for(Entry<CarAction, CarPriority> ca1 : actionsToDo.entrySet()){
-            System.out.print(ca1.getKey().toString() + " ");
-            System.out.println(ca1.getValue());
-        }
-        System.out.println("----------------------------------------------------------------------");
-        System.out.println("intention list: "); 
-        for(Entry<CarIntention, Boolean> i : intentions.entrySet()){
-            if(i.getValue()) {
-               System.out.println(i.getKey().toString());
-            }        
-        }
-        System.out.println("----------------------------------------------------------------------");
-        //print out the car belief list
-        System.out.println("belief list");
-        for(Entry<CarBelief,Boolean> k : beliefs.entrySet()){
-            if(k.getValue()){
-                System.out.println(k.getKey().toString());
-               
-            }
-        }
-        System.out.println("----------------------------------------------------------------------");
+//        System.out.println("----------------------------------------------------------------------");
+//        // print out the car action list
+//        System.out.println("action list:");
+//        for(Entry<CarAction, CarPriority> ca1 : actionsToDo.entrySet()){
+//            System.out.print(ca1.getKey().toString() + " ");
+//            System.out.println(ca1.getValue());
+//        }
+//        System.out.println("----------------------------------------------------------------------");
+//        System.out.println("intention list: "); 
+//        for(Entry<CarIntention, Boolean> i : intentions.entrySet()){
+//            if(i.getValue()) {
+//               System.out.println(i.getKey().toString());
+//            }        
+//        }
+//        System.out.println("----------------------------------------------------------------------");
+//        //print out the car belief list
+//        System.out.println("belief list");
+//        for(Entry<CarBelief,Boolean> k : beliefs.entrySet()){
+//            if(k.getValue()){
+//                System.out.println(k.getKey().toString());
+//               
+//            }
+//        }
+//        System.out.println("----------------------------------------------------------------------");
 
-        //clear beliefs,intentions,actions after we get the moving directions
-        clearBeliefs();
-        clearIntentions();
-        resetActions();
+        
         return directions;
     }
 
@@ -106,6 +103,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
     @Override
     public void actionUpdate(CarAction action, CarPriority priority) 
     {
+        actionsRecommended.put(action, priority);
         switch(action)
         {
         //TODO
@@ -2217,12 +2215,12 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
         }        
     }
     
-    public HashMap<CarAction, CarPriority> getActionsList(){
+    public HashMap<CarAction, CarPriority> getActionsPerformed(){
        return this.actionsToDo;
     }
     
-    public HashMap<CarAction,CarPriority> getActionsRecommendation() {
-        return actionsRecommendation;
+    public HashMap<CarAction,CarPriority> getRecommendedActions() {
+        return this.actionsRecommended;
     }
     
     public HashMap<CarBelief, Boolean> getBeliefsList(){
@@ -2234,6 +2232,11 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
     }
     // reset the action list
     public void resetActions() { 
-        actionsToDo.clear();
+        this.actionsToDo.clear();
+    }
+    
+    // reset the recommendation list
+    public void resetRecommendations() {
+        this.actionsRecommended.clear();
     }
 }
