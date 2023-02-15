@@ -1,22 +1,22 @@
 package simulated_cars;
 
-import java.util.ArrayDeque;
-import java.util.HashSet;
-
 import core_car_sim.Direction;
 import core_car_sim.Point;
 import prologfiles.RulesOfTheRoad.ROTROutcome;
 
+import java.util.ArrayDeque;
+import java.util.HashSet;
+
 public class PlannedCar extends AbstractROTRCar
 {
 	private boolean haveMoved = false;
-	ArrayDeque<Direction> movement = new ArrayDeque<Direction>();
+	ArrayDeque<Direction> movement = new ArrayDeque<>();
 	
 	
 	
 	public PlannedCar(Point startPos,Point endPos, int startingSpeed)
 	{
-		super(startPos, endPos,startingSpeed, System.getProperty("user.dir") + "/resources/redcar.png");
+		super(startPos, endPos,startingSpeed, System.getProperty("user.dir") + "/RoTRExperiments/resources/redcar.png");
 		// TODO Auto-generated constructor stub
 	}
 
@@ -24,10 +24,10 @@ public class PlannedCar extends AbstractROTRCar
 	protected ArrayDeque<Direction> getSimulationRoute()
 	{
 		updateOutcomes();
-		HashSet<ROTROutcome> currentIssues = new HashSet<ROTROutcome>(rulesOfTheRoad);
+		HashSet<ROTROutcome> currentIssues = new HashSet<>(rulesOfTheRoad);
 		//Update beliefs for future
 		updateOutcomes(); //get future rules of the road
-		HashSet<ROTROutcome> futureIssues = new HashSet<ROTROutcome>(rulesOfTheRoad);
+		HashSet<ROTROutcome> futureIssues = new HashSet<>(rulesOfTheRoad);
 		futureIssues.removeAll(currentIssues);
 		
 		//Is there any current issue to deal with

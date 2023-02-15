@@ -1,5 +1,8 @@
 package prologfiles;
 
+import simulated_cars.AbstractROTRCar.CarBelief;
+import simulated_cars.AbstractROTRCar.CarIntention;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -7,9 +10,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
-
-import simulated_cars.AbstractROTRCar.CarBelief;
-import simulated_cars.AbstractROTRCar.CarIntention;
 
 public class RulesOfTheRoad
 {
@@ -34,8 +34,8 @@ public class RulesOfTheRoad
 	
 	public static ArrayList<ROTROutcome> getROTRViolations(HashMap<CarBelief, Boolean> beliefs, HashMap<CarIntention, Boolean> intentions)
 	{
-		ArrayList<ROTROutcome> toreturn = new ArrayList<ROTROutcome>();
-		String fileLocation = System.getProperty("user.dir") + "/src/prologfiles/runrotr.pl";
+		ArrayList<ROTROutcome> toreturn = new ArrayList<>();
+		String fileLocation = System.getProperty("user.dir") + "/RoTRExperiments/src/prologfiles/runrotr.pl";
 		StringBuilder bai = new StringBuilder();
 		bai.append("[");
 		boolean start = true;
@@ -72,10 +72,10 @@ public class RulesOfTheRoad
 		bai.append("]");
 		toWrite = toWrite.replace("INTENTIONS", bai.toString());
 //		System.out.println(toWrite);
-		//$PATH of pb does not resolve properly on MacOS
-		// for mac os user
-		String path1 =  "/Applications/SWI-Prolog.app/Contents/MacOS/swipl";
-		// for windows user
+		//$PATH of pb does not resolve properly on macOS
+		// for macOS user
+//		String path1 =  "/Applications/SWI-Prolog.app/Contents/MacOS/swipl";
+		// for Windows user
 		String path2 = "C:\\Program Files\\swipl\\bin\\swipl";
 		ProcessBuilder pb = new ProcessBuilder(path2, fileLocation);
 		try {
@@ -90,10 +90,9 @@ public class RulesOfTheRoad
 //			System.out.println("\n" + line);
 			String[] s = line.substring(1, line.length() - 1).split(",");
 			String[] item;
-			for (int i = 0; i < s.length; i++)
-			{
-				item = s[i].split("-");
-				toreturn.add(new ROTROutcome(item[1],item[0]));
+			for (String value : s) {
+				item = value.split("-");
+				toreturn.add(new ROTROutcome(item[1], item[0]));
 			}
 			
 		} catch (IOException e) {

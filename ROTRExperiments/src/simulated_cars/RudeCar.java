@@ -1,25 +1,16 @@
 package simulated_cars;
 
 
-import java.util.ArrayDeque;
-
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map.Entry;
-
-import core_car_sim.AbstractCar;
+import core_car_sim.*;
 import core_car_sim.AbstractCell.CellType;
 import core_car_sim.AbstractInformationCell.InformationCell;
 import core_car_sim.RoadCell.RoadMarking;
 import core_car_sim.TrafficLightCell.TrafficLightCellInformation;
-import core_car_sim.AbstractInformationCell;
-import core_car_sim.Direction;
-import core_car_sim.Pedestrian;
-import core_car_sim.Point;
-import core_car_sim.RoadCell;
-import core_car_sim.TrafficLightCell;
-import core_car_sim.WorldSim;
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 // reactive car: the car will follow all the recommendations from RoTRA
 public class RudeCar extends AbstractROTRCar implements CarEvents{
@@ -30,11 +21,11 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
     private boolean exitIsClear;
   
 
-    ArrayDeque<Direction> directions = new ArrayDeque<Direction>();
+    ArrayDeque<Direction> directions = new ArrayDeque<>();
     private HashMap<CarAction,CarPriority> actionsToDo = new HashMap<CarAction,CarPriority>();
    
     public RudeCar(Point startPos, Point endPos, int startingSpeed){
-        super(startPos,endPos, startingSpeed, System.getProperty("user.dir") + "/resources/bluecar.png");
+        super(startPos,endPos, startingSpeed, System.getProperty("user.dir") + "/RoTRExperiments/resources/bluecar.png");
         addCarEventListener(this);
     }
     
@@ -1889,9 +1880,9 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
                 if(cmd == Direction.north) {         
                  for(int i = 0; i < visibleWorld.getWidth(); i++) {
                        for(int j = location.getY() - 1; j >= location.getY() - espeed;j--) {
-                           if(visibleWorld.containsPedestrain(i,j)) { 
+                           if(visibleWorld.containsPedestrian(i,j)) {
                                if(j == location.getY() - 1) {
-                                   Pedestrian p1 = visibleWorld.getPedestrainAtPosition(i, j);
+                                   Pedestrian p1 = visibleWorld.getPedestrianAtPosition(i, j);
                                    pedestrainInRoad = true;
                                    beliefs.put(cb,  pedestrainInRoad );
                                }
@@ -1903,7 +1894,7 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
                 else if(cmd == Direction.south) { 
                     for(int i = 0; i < visibleWorld.getWidth(); i++) {
                         for(int j = location.getY() + 1; j <= location.getY() + espeed; j++) {
-                            if(visibleWorld.containsPedestrain(i,j)) {
+                            if(visibleWorld.containsPedestrian(i,j)) {
                                 if(j == location.getY() + 1) {
                                     pedestrainInRoad = true;
                                     beliefs.put(cb, pedestrainInRoad );
@@ -1917,7 +1908,7 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
                 else if(cmd == Direction.east) {
                     for(int i = location.getX() + 1; i <= location.getX() + espeed; i++) {
                         for(int j = 0; j < visibleWorld.getHeight(); j++) {
-                            if(visibleWorld.containsPedestrain(i,j)) {
+                            if(visibleWorld.containsPedestrian(i,j)) {
                                 if(i == location.getX() + 1) {
                                     pedestrainInRoad = true;
                                     beliefs.put(cb, pedestrainInRoad );
@@ -1932,7 +1923,7 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
                 else if(cmd == Direction.west) {
                     for(int i = location.getX() - 1; i >= location.getX() - espeed; i--) {
                         for(int j = 0; j < visibleWorld.getHeight(); j++) {
-                            if(visibleWorld.containsPedestrain(i,j)) {
+                            if(visibleWorld.containsPedestrian(i,j)) {
                                if(i == location.getX() - 1) {
                                    pedestrainInRoad = true;
                                    beliefs.put(cb, pedestrainInRoad );

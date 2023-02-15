@@ -1,20 +1,17 @@
 package simulated_cars;
 
-import java.util.ArrayList;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import core_car_sim.AbstractCar;
 import core_car_sim.Point;
 import core_car_sim.WorldSim;
 import prologfiles.RulesOfTheRoad;
 import prologfiles.RulesOfTheRoad.ROTROutcome;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public abstract class AbstractROTRCar extends AbstractCar
 {
-    ArrayList<CarEvents> cel = new ArrayList<CarEvents>();
+    ArrayList<CarEvents> cel = new ArrayList<>();
     
     public enum CarBelief {
         CB_accessProperty("accessProperty"),
@@ -296,7 +293,7 @@ public abstract class AbstractROTRCar extends AbstractCar
         CB_zebraCrossing("zebraCrossing");
         
         public final String fileValue;
-        private static final HashMap<String, CarBelief> lookup = new HashMap<String, CarBelief>();
+        private static final HashMap<String, CarBelief> lookup = new HashMap<>();
         static {
             for (CarBelief d : CarBelief.values()) {
                 lookup.put(d.fileValue, d);
@@ -316,7 +313,7 @@ public abstract class AbstractROTRCar extends AbstractCar
         {
             fileValue = beliefValue;
         }
-    };
+    }
     
     public enum CarIntention {
         CI_approachingTrafficLight("approachingTrafficLight"),
@@ -365,7 +362,7 @@ public abstract class AbstractROTRCar extends AbstractCar
         CI_uturn("uturn");
         public final String fileValue;
         
-        private static final HashMap<String, CarIntention> lookup = new HashMap<String, CarIntention>();
+        private static final HashMap<String, CarIntention> lookup = new HashMap<>();
         static {
             for (CarIntention d : CarIntention.values()) {
                 lookup.put(d.fileValue, d);
@@ -385,7 +382,7 @@ public abstract class AbstractROTRCar extends AbstractCar
         {
             return fileValue;
         }
-    };
+    }
     
     public enum CarAction {
         CA_adjust_speed("adjust_speed"),
@@ -614,7 +611,7 @@ public abstract class AbstractROTRCar extends AbstractCar
         
         public final String fileValue;
         
-        private static final HashMap<String, CarAction> lookup = new HashMap<String, CarAction>();
+        private static final HashMap<String, CarAction> lookup = new HashMap<>();
         static {
             for (CarAction d : CarAction.values()) {
                 lookup.put(d.fileValue, d);
@@ -636,15 +633,14 @@ public abstract class AbstractROTRCar extends AbstractCar
         }
     }
     
-    public enum CarPriority {CP_MUST, CP_SHOULD};
+    public enum CarPriority {CP_MUST, CP_SHOULD}
     
     
   //------------------------------------------------------------------------------------
-    ArrayList<ROTROutcome> rulesOfTheRoad = new ArrayList<ROTROutcome>();
-    HashMap<CarBelief, Boolean> beliefs = new HashMap<CarBelief, Boolean>();
-    HashMap<CarIntention, Boolean> intentions = new HashMap<CarIntention, Boolean>();
-    
-      
+    ArrayList<ROTROutcome> rulesOfTheRoad = new ArrayList<>();
+    HashMap<CarBelief, Boolean> beliefs = new HashMap<>();
+    HashMap<CarIntention, Boolean> intentions = new HashMap<>();
+
     public AbstractROTRCar(Point startPos, Point endPos, int startingSpeed, String fileImage)
     {
         super(startPos,endPos, startingSpeed,fileImage);
@@ -677,10 +673,7 @@ public abstract class AbstractROTRCar extends AbstractCar
         // generate the recommendations using RoTra
         rulesOfTheRoad = RulesOfTheRoad.getROTRViolations(beliefs, intentions);
 
-//        for(ROTROutcome rotr : rulesOfTheRoad) {
-//            System.out.println(rotr.action);
-//        }
-        // the rotra will convey the recommendations to the car
+        // the RoTrA will convey the recommendations to the car
         // reactivate car will follow all recommendations
         // rude car will only follow legal actions
         for (ROTROutcome rotr : rulesOfTheRoad)

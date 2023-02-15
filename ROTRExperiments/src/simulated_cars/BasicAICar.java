@@ -1,17 +1,16 @@
 package simulated_cars;
 
-import java.util.ArrayDeque;
-
-
 import core_car_sim.AbstractCar;
 import core_car_sim.Direction;
 import core_car_sim.Point;
 import core_car_sim.WorldSim;
 
+import java.util.ArrayDeque;
+
 public class BasicAICar extends AbstractCar {
 
 	Direction toDrive;
-	ArrayDeque<Direction> movement = new ArrayDeque<Direction>();
+	ArrayDeque<Direction> movement = new ArrayDeque<>();
 	// Basic AI car has 4 attributes
 	// 1. Start Position
 	// 2. end Position
@@ -19,21 +18,13 @@ public class BasicAICar extends AbstractCar {
 	// 4. its driving direction
 	public BasicAICar(Point startPos, Point endPos,int startingSpeed, Direction directionToDrive) 
 	{
-		super(startPos, endPos, startingSpeed, System.getProperty("user.dir") + "/resources/redcar.png");
+		super(startPos, endPos, startingSpeed, System.getProperty("user.dir") + "/RoTRExperiments/resources/redcar.png");
 		toDrive = directionToDrive;
 	}
 
 	@Override
 	protected ArrayDeque<Direction> getSimulationRoute() 
 	{
-//		for (int i = 0; i < getSpeed(); i++)
-//		{
-//			movement.add(cmd);
-//		}
-//		
-//		System.out.println(getSpeed());
-//	    System.out.println(cmd.toString());
-	
 	    movement.add(cmd);
 		return movement;
 	}
@@ -41,13 +32,8 @@ public class BasicAICar extends AbstractCar {
 	@Override
 	protected boolean isFinished(Point arg0) 
 	{
-	    boolean isFinished = false;
-	    if(currentPosition.equals(endPosition)) {
-            isFinished = true;
-        }
-        else {
-            isFinished = false;
-        }
+	    boolean isFinished;
+		isFinished = currentPosition.equals(endPosition);
         return isFinished;
 	}
 

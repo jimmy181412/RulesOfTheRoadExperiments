@@ -1,26 +1,16 @@
 package simulated_cars;
 
 
-import java.util.ArrayDeque;
-
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map.Entry;
-
-import core_car_sim.AbstractCar;
+import core_car_sim.*;
 import core_car_sim.AbstractCell.CellType;
 import core_car_sim.AbstractInformationCell.InformationCell;
 import core_car_sim.RoadCell.RoadMarking;
 import core_car_sim.TrafficLightCell.TrafficLightCellInformation;
-import core_car_sim.AbstractInformationCell;
-import core_car_sim.Direction;
-import core_car_sim.Pedestrian;
-import core_car_sim.Point;
-import core_car_sim.RoadCell;
-import core_car_sim.TrafficLightCell;
-import core_car_sim.WorldSim;
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 // reactive car: the car will follow all the recommendations from RoTRA
 public class ReactiveCar extends AbstractROTRCar implements CarEvents{
@@ -31,12 +21,12 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
     private boolean exitIsClear;
   
 
-    ArrayDeque<Direction> directions = new ArrayDeque<Direction>();
+    ArrayDeque<Direction> directions = new ArrayDeque<>();
     private HashMap<CarAction,CarPriority> actionsRecommended = new HashMap<>();
-    private HashMap<CarAction,CarPriority> actionsToDo = new HashMap<CarAction,CarPriority>();
+    private HashMap<CarAction,CarPriority> actionsToDo = new HashMap<>();
    
     public ReactiveCar(Point startPos, Point endPos, int startingSpeed){
-        super(startPos,endPos, startingSpeed, System.getProperty("user.dir") + "/resources/bluecar.png");
+        super(startPos,endPos, startingSpeed, System.getProperty("user.dir") + "/RoTRExperiments/resources/bluecar.png");
         addCarEventListener(this);
     }
    
@@ -84,12 +74,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
     @Override
     protected boolean isFinished(Point arg0)
     {
-        if(currentPosition.equals(endPosition)) {
-            isFinished = true;
-        }
-        else {
-            isFinished = false;
-        }
+        isFinished = currentPosition.equals(endPosition);
         return isFinished;
     }
 
@@ -392,7 +377,6 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
             break;
         //TODO
         case CA_keep_left:
-            
             actionsToDo.put(action, priority);
             break;
         //TODO
@@ -654,6 +638,8 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
             break;
         case CA_wheel_toward_from_kerb://not simulated
             break;
+
+            default:break;
         }
     }
     
@@ -789,20 +775,15 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
             case CB_allPassengersWearingSeatBeltsAsRequired: // not simulated
                 break;
             case CB_approachingCorner:
-                switch (cmd)
-                {
-                case east:
-                    wallAhead = visibleWorld.getCell(location.getX() + 1, location.getY()).getCellType() != CellType.ct_road;
-                    break;
-                case north:
-                    wallAhead = visibleWorld.getCell(location.getX(), location.getY()-1).getCellType() != CellType.ct_road;
-                    break;
-                case south:
-                    wallAhead = visibleWorld.getCell(location.getX(), location.getY()+1).getCellType() != CellType.ct_road;
-                    break;
-                case west:
-                    wallAhead = visibleWorld.getCell(location.getX() - 1, location.getY()).getCellType() != CellType.ct_road;
-                    break;
+                switch (cmd) {
+                    case east ->
+                            wallAhead = visibleWorld.getCell(location.getX() + 1, location.getY()).getCellType() != CellType.ct_road;
+                    case north ->
+                            wallAhead = visibleWorld.getCell(location.getX(), location.getY() - 1).getCellType() != CellType.ct_road;
+                    case south ->
+                            wallAhead = visibleWorld.getCell(location.getX(), location.getY() + 1).getCellType() != CellType.ct_road;
+                    case west ->
+                            wallAhead = visibleWorld.getCell(location.getX() - 1, location.getY()).getCellType() != CellType.ct_road;
                 }
                 beliefs.put(cb, wallAhead);
                 break;
@@ -1266,7 +1247,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
             // simulated yellow light
             case CB_lightAmber:
                 beliefs.put(cb, false);
-                boolean yellowLightOn = false;
+                boolean yellowLightOn;
                 //at traffic light white line
                 for (int i = 0; i < visibleWorld.getWidth(); i++) {
                     for(int j = 0; j < visibleWorld.getWidth();j++) {
@@ -1348,7 +1329,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
             // simulated green light
             case CB_lightGreen:
                 beliefs.put(cb, false);
-                boolean greenLightOn = false;
+                boolean greenLightOn;
                 //at traffic light white line
                 for (int i = 0; i < visibleWorld.getWidth(); i++) {
                     for(int j = 0; j < visibleWorld.getWidth();j++) {
@@ -1427,7 +1408,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
             //simulate red light
             case CB_lightRed:
                 beliefs.put(cb, false);
-                boolean redLightOn = false;
+                boolean redLightOn;
                 //at traffic light white line
                 for (int i = 0; i < visibleWorld.getWidth(); i++) {
                     for(int j = 0; j < visibleWorld.getWidth();j++) {
@@ -1700,8 +1681,9 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                 if(visibleWorld.getCell(location.getX(),location.getY()).getCellType() == CellType.ct_road) {
                     RoadCell rc = (RoadCell)visibleWorld.getCell(location.getX(),location.getY());
                     for(RoadMarking rm : rc.getRoadMarkings()) {
-                        if(rm == RoadMarking.rm_hard_shoulder) {
+                        if (rm == RoadMarking.rm_hard_shoulder) {
                             atHardShoulder = true;
+                            break;
                         }
                     }
                 }
@@ -1756,8 +1738,8 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
             case CB_misleadingSignal: //not simulated 
                 break;
             case CB_motorcyclistAhead: //not simulated 
-                break; 
-            case CB_motorcyclistInFront: //not simulated 
+                break;
+            case CB_motorcyclistInFront:
                 break;
             case CB_motorway: //TODO
                 break;
@@ -1870,12 +1852,12 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                 if(cmd == Direction.north) {         
                  for(int i = 0; i < visibleWorld.getWidth(); i++) {
                        for(int j = location.getY() - 1; j >= location.getY() - espeed;j--) {
-                           if(visibleWorld.containsPedestrain(i,j)) { 
+                           if(visibleWorld.containsPedestrian(i,j)) {
                                if(j == location.getY() - 1 && i == location.getX()) {
                                    System.out.println(i + " " +j);
-                                   Pedestrian p1 = visibleWorld.getPedestrainAtPosition(i, j);
+                                   Pedestrian p1 = visibleWorld.getPedestrianAtPosition(i,j);
                                    pedestrainInRoad = true;
-                                   beliefs.put(cb,  pedestrainInRoad );
+                                   beliefs.put(cb, true);
                                }
                               
                            }
@@ -1885,7 +1867,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                 else if(cmd == Direction.south) { 
                     for(int i = 0; i < visibleWorld.getWidth(); i++) {
                         for(int j = location.getY() + 1; j <= location.getY() + espeed; j++) {
-                            if(visibleWorld.containsPedestrain(i,j)) {
+                            if(visibleWorld.containsPedestrian(i,j)) {
                                 if(j == location.getY() + 1 && i == location.getX()) {
                                     pedestrainInRoad = true;
                                     beliefs.put(cb, pedestrainInRoad );
@@ -1899,7 +1881,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                 else if(cmd == Direction.east) {
                     for(int i = location.getX() + 1; i <= location.getX() + espeed; i++) {
                         for(int j = 0; j < visibleWorld.getHeight(); j++) {
-                            if(visibleWorld.containsPedestrain(i,j)) {
+                            if(visibleWorld.containsPedestrian(i,j)) {
                                 if(i == location.getX() + 1 && j == location.getY()) {
                                     pedestrainInRoad = true;
                                     beliefs.put(cb, pedestrainInRoad );
@@ -1914,7 +1896,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                 else if(cmd == Direction.west) {
                     for(int i = location.getX() - 1; i >= location.getX() - espeed; i--) {
                         for(int j = 0; j < visibleWorld.getHeight(); j++) {
-                            if(visibleWorld.containsPedestrain(i,j)) {
+                            if(visibleWorld.containsPedestrian(i,j)) {
                                if(i == location.getX() - 1 && j == location.getY()) {
                                    pedestrainInRoad = true;
                                    beliefs.put(cb, pedestrainInRoad );
@@ -2073,7 +2055,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
             case CB_yellowMarkingsOnKerb://not simulated
                 break;
             case CB_zebraCrossing:
-                boolean approaching_zebra_crossing = false;
+                boolean approaching_zebra_crossing;
                 beliefs.put(cb, false);
                 for(int x = 0 ; x < visibleWorld.getWidth(); x++) {
                     for(int y = 0; y < visibleWorld.getHeight(); y++) {
@@ -2124,7 +2106,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                 break;
             case CB_lightNotGreen:
                 beliefs.put(cb, false);
-                boolean greenLightNotOn = false;
+                boolean greenLightNotOn;
                 //at traffic light white line
                 for (int i = 0; i < visibleWorld.getWidth(); i++) {
                     for(int j = 0; j < visibleWorld.getWidth();j++) {
@@ -2201,18 +2183,10 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
             }
         }
     }
-
-    
-    
     // check if there are same points between two ArrayList
     public Boolean checkCommonPoint(ArrayList<Point> l1, ArrayList<Point> l2) {
         l1.retainAll(l2);
-        if(l1.isEmpty()) {
-            return false;
-        }
-        else {
-            return true;
-        }        
+        return !l1.isEmpty();
     }
     
     public HashMap<CarAction, CarPriority> getActionsPerformed(){
