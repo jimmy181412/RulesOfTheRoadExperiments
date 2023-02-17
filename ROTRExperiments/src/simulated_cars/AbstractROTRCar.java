@@ -641,9 +641,9 @@ public abstract class AbstractROTRCar extends AbstractCar
     HashMap<CarBelief, Boolean> beliefs = new HashMap<>();
     HashMap<CarIntention, Boolean> intentions = new HashMap<>();
 
-    public AbstractROTRCar(Point startPos, Point endPos, int startingSpeed, String fileImage)
+    public AbstractROTRCar(Point startPos, Point endPos, int startingSpeed, String fileImage,CarType ct)
     {
-        super(startPos,endPos, startingSpeed,fileImage);
+        super(startPos,endPos, startingSpeed,fileImage,ct);
         clearBeliefs();
         clearIntentions();
     }

@@ -7,7 +7,7 @@ import core_car_sim.WorldSim;
 
 import java.util.ArrayDeque;
 
-public class BasicAICar extends AbstractCar {
+public class SmallAICar extends AbstractCar {
 
 	Direction toDrive;
 	ArrayDeque<Direction> movement = new ArrayDeque<>();
@@ -16,9 +16,9 @@ public class BasicAICar extends AbstractCar {
 	// 2. end Position
 	// 3. starting speed
 	// 4. its driving direction
-	public BasicAICar(Point startPos, Point endPos,int startingSpeed, Direction directionToDrive) 
+	public SmallAICar(Point startPos, Point endPos, int startingSpeed, Direction directionToDrive)
 	{
-		super(startPos, endPos, startingSpeed, System.getProperty("user.dir") + "/RoTRExperiments/resources/redcar.png");
+		super(startPos, endPos, startingSpeed, System.getProperty("user.dir") + "/RoTRExperiments/resources/redcar.png", CarType.car_small);
 		toDrive = directionToDrive;
 	}
 

@@ -7,16 +7,14 @@ import prologfiles.RulesOfTheRoad.ROTROutcome;
 import java.util.ArrayDeque;
 import java.util.HashSet;
 
-public class PlannedCar extends AbstractROTRCar
+public class LargeAICar extends AbstractROTRCar
 {
 	private boolean haveMoved = false;
 	ArrayDeque<Direction> movement = new ArrayDeque<>();
-	
-	
-	
-	public PlannedCar(Point startPos,Point endPos, int startingSpeed)
+
+	public LargeAICar(Point startPos, Point endPos, int startingSpeed)
 	{
-		super(startPos, endPos,startingSpeed, System.getProperty("user.dir") + "/RoTRExperiments/resources/redcar.png");
+		super(startPos, endPos,startingSpeed, System.getProperty("user.dir") + "/RoTRExperiments/resources/redcar.png",CarType.car_large);
 		// TODO Auto-generated constructor stub
 	}
 

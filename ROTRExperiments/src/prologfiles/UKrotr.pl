@@ -237,7 +237,7 @@ rule(r164, standard, [largeVehicleInFront], [overtake], [should-drop_back]).
 %Rule Description: Must not overtake
 rule(r165a, standard, [noOvertakingSign], [overtake], [must-cancel_overtaking]).
 rule(r165b, standard, [enterRestrictedLane], [overtake], [must-cancel_overtaking]).
-rule(r165c, standard, [nearPedistrianCrossing], [overtake], [must-cancel_overtaking]).
+rule(r165c, standard, [nearPedestrianCrossing], [overtake], [must-cancel_overtaking]).
 rule(r165d, standard, [], [overtake, crossDoubleWhiteClosestSolid], [must-cancel_overtaking]).
 rule(r165e, standard, [], [overtake, enterAreaWithSolidWhiteBorder], [must-cancel_overtaking]).
 

@@ -5,7 +5,7 @@ import core_car_sim.Point;
 import core_car_sim.*;
 import simulated_cars.AbstractROTRCar.CarAction;
 import simulated_cars.AbstractROTRCar.CarPriority;
-import simulated_cars.BasicAICar;
+import simulated_cars.SmallAICar;
 import simulated_cars.ReactiveCar;
 import simulated_cars.RudeCar;
 
@@ -98,7 +98,7 @@ public class RunExperiment{
 			@Override
 			public AbstractCar createCar(String name, Point startingLoca, Point endingLoca){
 				if(name.equalsIgnoreCase("slow")){
-					return new BasicAICar(startingLoca, endingLoca, 2, Direction.west);
+					return new SmallAICar(startingLoca, endingLoca, 2, Direction.west);
 				}
 				else{
 					if (cbAI.getSelectedItem() == "Reactive"){
@@ -113,7 +113,7 @@ public class RunExperiment{
 			@Override
 			public AbstractCar createCar(String name, Point startingLoca, Point endingLoca, String av){
 				if(name.equalsIgnoreCase("slow")){
-					return new BasicAICar(startingLoca, endingLoca, 2, Direction.north);
+					return new SmallAICar(startingLoca, endingLoca, 2, Direction.north);
 				}
 				else{
 					if (cbAI.getSelectedItem() == "Reactive"){

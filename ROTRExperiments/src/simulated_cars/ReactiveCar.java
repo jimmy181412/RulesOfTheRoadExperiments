@@ -24,16 +24,19 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
     ArrayDeque<Direction> directions = new ArrayDeque<>();
     private HashMap<CarAction,CarPriority> actionsRecommended = new HashMap<>();
     private HashMap<CarAction,CarPriority> actionsToDo = new HashMap<>();
-   
+
+
     public ReactiveCar(Point startPos, Point endPos, int startingSpeed){
-        super(startPos,endPos, startingSpeed, System.getProperty("user.dir") + "/RoTRExperiments/resources/bluecar.png");
+        super(startPos,endPos, startingSpeed, System.getProperty("user.dir") + "/RoTRExperiments/resources/bluecar.png",CarType.car_AI);
         addCarEventListener(this);
     }
    
-    // car decision making system, make use of the received observations to decide what
+    // car decision-making system, make use of the received observations to decide what
     // should be the current moving direction 
     @Override
     protected ArrayDeque<Direction> getSimulationRoute(){
+
+        directions = currentMovingDirectionList;
         setSpeed(1);
         directions.push(cmd);
         updateOutcomes();
@@ -82,7 +85,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
     public void worldUpdate(WorldSim visibleWorld, Point location) 
     {
         updateBeliefs(visibleWorld, location); 
-        updateIntentions(cmd,pmd);
+        updateIntentions(visibleWorld, location, cmd,pmd);
     }
 
     @Override
@@ -221,13 +224,11 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
             break;
         case CA_buildup_speed_on_motorway://not simulated
             break;
-        //TODO
         case CA_cancel_overtaking:
+            intentions.put(CarIntention.CI_overtake, false);
             actionsToDo.put(action, priority);
             break;
-        //TODO
         case CA_cancel_reverse:
-            actionsToDo.put(action, priority);
             break;
         case CA_cancel_signals://not simulated
             break;
@@ -421,10 +422,12 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
             break;
         case CA_move_adjacent_lane://not simulated
             break;
-        case CA_move_left: //TODO
+        case CA_move_left: // move left after overtaking
+
             actionsToDo.put(action, priority);
             break;
-        case CA_move_quickly_past: // TODO
+        case CA_move_quickly_past:
+            setSpeed(2);
             actionsToDo.put(action, priority);
             break;
         case CA_move_to_left_hand_lane: //TODO
@@ -643,7 +646,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
         }
     }
     
-    public void updateIntentions(Direction cmd, Direction pmd) {
+    public void updateIntentions(WorldSim visibleWorld, Point location,Direction cmd, Direction pmd) {
         for (CarIntention ci : CarIntention.values()) {
             switch(ci) {
                 case CI_approachingTrafficLight:
@@ -696,9 +699,54 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                     break;
                 case CI_otherRoundabout:
                     break;
+                // car intends to overtake other car if there are cars towards it, and the speed of other car is slow
                 case CI_overtake:
+                    //driving direction is north
+                    if(cmd == Direction.north){
+                        for(int i = location.getY() - 1; i >= 0; i--){
+                            if(visibleWorld.containsCar(location.getX(), i)){
+                                AbstractCar car1 = visibleWorld.getCarAtPosition(location.getX(), i);
+                                if(car1.getSpeed() == 1 && car1.getCMD() == cmd){
+                                    intentions.put(ci,true);
+                                }
+                            }
+                        }
+                    }
+                    //driving direction is south
+                    else if(cmd == Direction.south){
+                        for(int i = location.getY() + 1; i < visibleWorld.getHeight(); i++){
+                            if(visibleWorld.containsCar(location.getX(), i)){
+                                AbstractCar car1 = visibleWorld.getCarAtPosition(location.getX(), i);
+                                if(car1.getSpeed() == 1 && car1.getCMD() == cmd){
+                                    intentions.put(ci,true);
+                                }
+                            }
+                        }
+                    }
+                    //driving direction is east
+                    else if(cmd == Direction.east){
+                        for(int i = location.getX() + 1; i < visibleWorld.getWidth(); i++){
+                            if(visibleWorld.containsCar(i, location.getY())){
+                                AbstractCar car1 = visibleWorld.getCarAtPosition(i, location.getY());
+                                if(car1.getSpeed() == 1 && car1.getCMD() == cmd){
+                                    intentions.put(ci,true);
+                                }
+                            }
+                        }
+                    }
+                    //driving direction is west
+                    else if(cmd == Direction.west){
+                        for(int i = location.getX() - 1; i >= 0; i--){
+                            if(visibleWorld.containsCar(i, location.getY())){
+                                AbstractCar car1 = visibleWorld.getCarAtPosition(i, location.getY());
+                                if(car1.getSpeed() == 1 && car1.getCMD() == cmd){
+                                    intentions.put(ci,true);
+                                }
+                            }
+                        }
+                    }
                     break;
-                case CI_overtakeSnowplow:
+                case CI_overtakeSnowplow: //not simulated
                     break;
                 case CI_park:
                     break;
@@ -875,9 +923,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                     }
                 }
                  break;
-            case CB_behindWantToOvertake: //Only for north
-//                beliefs.put(cb, visibleWorld.containsCar(location.getX(), location.getY() - 1));//Not car in front yet
-//                intentions.put(CarIntention.CI_overtake, beliefs.get(cb));
+            case CB_behindWantToOvertake: // not simulated
                 break;
             case CB_bendInRoad://Not simulated
                 break;
@@ -886,7 +932,6 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                 break;
             case CB_canReadNumberPlate://not simulated
                 break;
-            
             case CB_canStopBeforeCarInFrontStops:
                 if(cmd == Direction.north) {
                     if(visibleWorld.containsCar(location.getX(), location.getY() -1)) {
