@@ -1,7 +1,8 @@
 14
-11
-1
+12
+3
 -----^^^^-----
+|    ^^^^    |
 |    ^^^^    |
 |    ^^^^    |
 |    ^^^^    |
@@ -75,17 +76,8 @@ solidline > 8 2
 solidline > 8 1
 solidline > 8 0
 
-hardshoulder 5 10
-hardshoulder 5 9
-hardshoulder 5 8
-hardshoulder 5 7
-hardshoulder 5 6
-hardshoulder 5 5
-hardshoulder 5 4
-hardshoulder 5 3
-hardshoulder 5 2
-hardshoulder 5 1
-hardshoulder 5 0
 
-Car testingCar 5 8 8 2 jim
+
+Car testingCar 5 11 5 0 jim
+Car slow 5 10 5 2
 

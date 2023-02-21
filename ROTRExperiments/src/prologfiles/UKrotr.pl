@@ -634,7 +634,6 @@ rule(r286, standard, [inIncident, damagedOrInjury], [], [must-stop]).
 %Rule Description: Must produce insurance
 %Rule Description: Road Works Ahead
 rule(r288, standard, [roadWorksAhead], [], [must-dontExceedTempSpeedLimit, should-keep_safe_distance,should-get_into_lane, should-avoid_lane_switching, should-merge_in_turn, must-avoid_coned_off_area, should-allow_extra_space_for_works_vehicles]).
-
 %Rule Description: Take special care on motorways
 rule(r289, standard, [motorway, workVehicleSign], [], [must-obey_work_vehicle_sign]).
 rule(r289, standard, [dualCarriageWay, workVehicleSign], [], [must-obey_work_vehicle_sign]).

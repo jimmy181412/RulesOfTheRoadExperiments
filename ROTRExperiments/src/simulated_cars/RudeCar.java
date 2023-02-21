@@ -25,7 +25,7 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
     private HashMap<CarAction,CarPriority> actionsToDo = new HashMap<CarAction,CarPriority>();
    
     public RudeCar(Point startPos, Point endPos, int startingSpeed){
-        super(startPos,endPos, startingSpeed, System.getProperty("user.dir") + "/RoTRExperiments/resources/bluecar.png");
+        super(startPos,endPos, startingSpeed, System.getProperty("user.dir") + "/RoTRExperiments/resources/bluecar.png", CarType.car_AI);
         addCarEventListener(this);
     }
     

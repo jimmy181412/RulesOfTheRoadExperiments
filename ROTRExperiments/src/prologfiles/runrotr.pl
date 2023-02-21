@@ -1,4 +1,4 @@
 :- include('findactions').
 :- initialization(main).
 
-main :- getRecommendedActions(standard,[exitClear,ableToStopByWhiteLine],[],Actions), write(Actions), halt(0).
+main :- getRecommendedActions(standard,[ableToStopByWhiteLine,exitClear],[],Actions), write(Actions), halt(0).
