@@ -16,9 +16,9 @@ public class SmallAICar extends AbstractCar {
 	// 2. end Position
 	// 3. starting speed
 	// 4. its driving direction
-	public SmallAICar(Point startPos, Point endPos, int startingSpeed, Direction directionToDrive)
+	public SmallAICar(Point startPos, Point endPos, Point referencePos,int startingSpeed, Direction directionToDrive)
 	{
-		super(startPos, endPos, startingSpeed, System.getProperty("user.dir") + "/RoTRExperiments/resources/redcar.png", CarType.car_small);
+		super(startPos, endPos, referencePos,startingSpeed,System.getProperty("user.dir") + "/RoTRExperiments/resources/redcar.png", CarType.car_small);
 		toDrive = directionToDrive;
 	}
 
@@ -33,14 +33,14 @@ public class SmallAICar extends AbstractCar {
 	protected boolean isFinished(Point arg0) 
 	{
 	    boolean isFinished;
-		isFinished = currentPosition.equals(endPosition);
+		isFinished = getCurrentPosition().equals(getEndPosition());
         return isFinished;
 	}
 
 	@Override
 	protected void visibleWorldUpdate(WorldSim arg0, Point arg1) 
 	{
-		
+
 	}
 
 }

@@ -1,83 +1,81 @@
-14
 12
+15
 3
------^^^^-----
-|    ^^^^    |
-|    ^^^^    |
-|    ^^^^    |
-|    ^^^^    |
-|    ^^^^    |
-|    ^^^^    |
-|    ^^^^    |
-|    ^^^^    |
-|    ^^^^    |
-|    ^^^^    |
-|    ^^^^    |
------^^^^-----
+|----^^----|
+|----^^----|
+|----^^----|
+|<<<<^^----|
+|----^^----|
+|----^^----|
+|----^^----|
+|----^^----|
+|----^^----|
+|----^^----|
+|----^^----|
+|----^^----|
+|----^^----|
+|----^^----|
+|----^^----|
+|----^^----|
+
+edgeline < 5 14
+edgeline < 5 13
+edgeline < 5 12
+edgeline < 5 11
+edgeline < 5 10
+edgeline < 5 9
+edgeline < 5 8
+edgeline < 5 7
+edgeline < 5 5
+edgeline < 5 6
+edgeline < 5 4
+edgeline < 5 2
+edgeline < 5 1
+edgeline < 5 0
+
+edgeline > 6 14
+edgeline > 6 13
+edgeline > 6 12
+edgeline > 6 11
+edgeline > 6 10
+edgeline > 6 9
+edgeline > 6 8
+edgeline > 6 7
+edgeline > 6 6
+edgeline > 6 5
+edgeline > 6 4
+edgeline > 6 3
+edgeline > 6 2
+edgeline > 6 1
+edgeline > 6 0
+
+laneline < 6 14
+laneline < 6 13
+laneline < 6 12
+laneline < 6 11
+laneline < 6 10
+laneline < 6 9
+laneline < 6 8
+laneline < 6 7
+laneline < 6 6
+laneline < 6 5
+laneline < 6 4
+laneline < 6 3
+laneline < 6 2
+laneline < 6 1
+laneline < 6 0
 
 
-solidline < 5 10
-solidline < 5 9
-solidline < 5 8
-solidline < 5 7
-solidline < 5 6
-solidline < 5 5
-solidline < 5 4
-solidline < 5 3
-solidline < 5 2
-solidline < 5 1
-solidline < 5 0
-
-solidwhiteline < 6 10
-solidwhiteline < 6 9
-solidwhiteline < 6 8
-solidwhiteline < 6 7
-solidwhiteline < 6 6
-solidwhiteline < 6 5
-solidwhiteline < 6 4
-solidwhiteline < 6 3
-solidwhiteline < 6 2
-solidwhiteline < 6 1
-solidwhiteline < 6 0
-
-dottedline < 7 10
-dottedline < 7 9
-dottedline < 7 8
-dottedline < 7 7
-dottedline < 7 6
-dottedline < 7 5
-dottedline < 7 4
-dottedline < 7 3
-dottedline < 7 2
-dottedline < 7 1
-dottedline < 7 0
-
-dottedline < 8 10
-dottedline < 8 9
-dottedline < 8 8
-dottedline < 8 7
-dottedline < 8 6
-dottedline < 8 5
-dottedline < 8 4
-dottedline < 8 3
-dottedline < 8 2
-dottedline < 8 1
-dottedline < 8 0
-
-solidline > 8 10
-solidline > 8 9
-solidline > 8 8
-solidline > 8 7
-solidline > 8 6
-solidline > 8 5
-solidline > 8 4
-solidline > 8 3
-solidline > 8 2
-solidline > 8 1
-solidline > 8 0
+edgeline ^ 1 3
+edgeline ^ 2 3
+edgeline ^ 3 3
+edgeline ^ 4 3
+edgeline V 1 3
+edgeline V 2 3
+edgeline V 3 3
+edgeline V 4 3
 
 
-
-Car testingCar 5 11 5 0 jim
-Car slow 5 10 5 2
+Car testingCar 5 14 1 3 5 11 jim
+Car slow 5 13 5 2 5 10
 

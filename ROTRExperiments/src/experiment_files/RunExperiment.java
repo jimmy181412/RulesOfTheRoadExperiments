@@ -3,6 +3,7 @@ package experiment_files;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import core_car_sim.Point;
 import core_car_sim.*;
+import simulated_cars.AbstractROTRCar;
 import simulated_cars.AbstractROTRCar.CarAction;
 import simulated_cars.AbstractROTRCar.CarPriority;
 import simulated_cars.ReactiveCar;
@@ -35,7 +36,6 @@ public class RunExperiment{
 			int i = 0;
 			
 			while (!finished){
-			  
 				simworld.simulate(1);
 				try{
 					Thread.sleep(delay);
@@ -51,7 +51,6 @@ public class RunExperiment{
 		}
 		
 	}
-	
 	private JFrame frame;
 	private JMenuBar menuBar = new JMenuBar();
 	private WorldSim simworld;
@@ -64,13 +63,14 @@ public class RunExperiment{
 	
 	private JLabel recommendations;
 	private JLabel actionsPerformed;
+    private JLabel beliefs;
+    private JLabel intentions;
 	private Executor simulationThread = Executors.newSingleThreadExecutor();
 	private CarAddedListener cal;
 	private PedestrianAddedListener pal;
 	private Simulate currentlyRunning = null;
 	
 	private boolean raVisible= false;
-
 	/**
 	 * Launch the application.
 	 */
@@ -79,7 +79,6 @@ public class RunExperiment{
             try {
                 //static
                 UIManager.setLookAndFeel(new FlatMacDarkLaf());
-
                 RunExperiment window = new RunExperiment();
                 window.frame.setVisible(true);
             } catch (Exception e) {
@@ -92,35 +91,34 @@ public class RunExperiment{
 	 * Create the application.
 	 */
 	public RunExperiment() {
-
 		initialize();
 		cal = new CarAddedListener() {
 			@Override
-			public AbstractCar createCar(String name, Point startingLoca, Point endingLoca){
+			public AbstractCar createCar(String name, Point startingLoca, Point endingLoca, Point referenceLoca){
 				if(name.equalsIgnoreCase("slow")){
-					return new SmallAICar(startingLoca, endingLoca, 1, Direction.west);
+					return new SmallAICar(startingLoca, endingLoca, referenceLoca,1, Direction.west);
 				}
 				else{
 					if (cbAI.getSelectedItem() == "Reactive"){
-						return new ReactiveCar(startingLoca, endingLoca,1);
+						return new ReactiveCar(startingLoca, endingLoca, referenceLoca,1);
 					}
 					else{
-						return new RudeCar(startingLoca, endingLoca, 1);
+						return new RudeCar(startingLoca, endingLoca, referenceLoca, 1);
 					}
 				}
 			}
 	
 			@Override
-			public AbstractCar createCar(String name, Point startingLoca, Point endingLoca, String av){
+			public AbstractCar createCar(String name, Point startingLoca, Point endingLoca, Point referenceLoca, String av){
 				if(name.equalsIgnoreCase("slow")){
-					return new SmallAICar(startingLoca, endingLoca, 1, Direction.north);
+					return new SmallAICar(startingLoca, endingLoca, referenceLoca,1, Direction.north);
 				}
 				else{
 					if (cbAI.getSelectedItem() == "Reactive"){
-						return new ReactiveCar(startingLoca, endingLoca, 1);
+						return new ReactiveCar(startingLoca, endingLoca, referenceLoca, 1);
 					}
 					else{
-						return new RudeCar(startingLoca, endingLoca, 1);
+						return new RudeCar(startingLoca, endingLoca, referenceLoca,1);
 					}
 				}
 			}
@@ -150,7 +148,7 @@ public class RunExperiment{
 	private void initialize(){
 	    // initialize the frame
 		frame = new JFrame();
-		frame.setBounds(100, 100, 1200, 900);
+		frame.setBounds(100, 100, 1300, 1000);
 		frame.setTitle("Third Year Project");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setJMenuBar(menuBar);
@@ -257,11 +255,7 @@ public class RunExperiment{
             pnlWorld.repaint();
       });
 		
-		JMenuItem showRoute = new JMenuItem("Show car route");
-		showRoute.addActionListener(e -> {
-            // TODO Auto-generated method stub
 
-        });
 		
 		JMenuItem showRecommendationsAndActionPerformed = new JMenuItem("Show recommendations and action performed");
 		showRecommendationsAndActionPerformed.addActionListener(e -> {
@@ -326,7 +320,6 @@ public class RunExperiment{
 		scenarios.add(scenario3);
 		
 		preferences.add(showVisibleWorld);
-		preferences.add(showRoute);
 		preferences.add(showRecommendationsAndActionPerformed);
 		
 		edit.add(removeAll);
@@ -350,10 +343,8 @@ public class RunExperiment{
         // initialize the log panel and add the panel to the frame
         frame.getContentPane().add(logs, BorderLayout.EAST);
         logs.setLayout(new FlowLayout());
-        logs.setPreferredSize(new Dimension(280, 800));
+        logs.setPreferredSize(new Dimension(350, 1000));
         logs.setBackground(Color.darkGray);
-		
-        
         // -----------------------------components in control panel--------------------------------------------
         JLabel label1 = new JLabel("Scenario:");
         JLabel label2 = new JLabel("Vehicle:");
@@ -369,19 +360,19 @@ public class RunExperiment{
                 if(cbScenarios.getSelectedItem() == "Scenario 1") {
                     BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/RoTRExperiments/src/simulated_cars/example1.txt"));
                     simworld = LoadWorld.loadWorldFromFile(br, cal, pal);
-                    pnlWorld.setLayout(new GridLayout(simworld.getHeight(), simworld.getWidth(), 1, 1));
+                    pnlWorld.setLayout(new GridLayout(simworld.getHeight(), simworld.getWidth(), 0, 0));
                     updateGUIWorld();
                 }
                 else if(cbScenarios.getSelectedItem() == "Scenario 2") {
                     BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/RoTRExperiments/src/simulated_cars/example2.txt"));
                     simworld = LoadWorld.loadWorldFromFile(br, cal, pal);
-                    pnlWorld.setLayout(new GridLayout(simworld.getHeight(), simworld.getWidth(), 1, 1));
+                    pnlWorld.setLayout(new GridLayout(simworld.getHeight(), simworld.getWidth(), 0, 0));
                     updateGUIWorld();
                 }
                 else if(cbScenarios.getSelectedItem() == "Scenario 3") {
                     BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/RoTRExperiments/src/simulated_cars/example3.txt"));
                     simworld = LoadWorld.loadWorldFromFile(br, cal, pal);
-                    pnlWorld.setLayout(new GridLayout(simworld.getHeight(), simworld.getWidth(), 1, 1));
+                    pnlWorld.setLayout(new GridLayout(simworld.getHeight(), simworld.getWidth(), 0, 0));
                     updateGUIWorld();
                 }
             }
@@ -435,37 +426,59 @@ public class RunExperiment{
 		
 		// ---------------components in log panel--------------------------------------------------------------
         JLabel NewLabel1  = new JLabel("Recommendations from RoTRA");
-        NewLabel1.setPreferredSize(new Dimension(250,30));
+        NewLabel1.setPreferredSize(new Dimension(280,30));
         NewLabel1.setFont(new Font("Cascadia Mono", Font.BOLD, 16));
-     
         NewLabel1.setHorizontalAlignment(SwingConstants.CENTER);
         //the recommendations generated by rotra
-        recommendations = new JLabel("");
-        recommendations.setPreferredSize(new Dimension(250, 200));
+        recommendations = new JLabel(" ");
+        recommendations.setPreferredSize(new Dimension(280, 200));
         recommendations.setHorizontalAlignment(SwingConstants.CENTER);
         recommendations.setVerticalAlignment(SwingConstants.TOP);
         recommendations.setFont(new Font("Cascadia Mono", Font.PLAIN, 16));
         recommendations.setForeground(Color.white);
         JLabel NewLabel2 = new JLabel("Action performed by the car");
-        NewLabel2.setPreferredSize(new Dimension(250, 30));
+        NewLabel2.setPreferredSize(new Dimension(280, 30));
         NewLabel2.setHorizontalAlignment(SwingConstants.CENTER);
         NewLabel2.setFont(new Font("Cascadia Mono", Font.BOLD, 16));
         //the actions that the self-driving car performed
-        actionsPerformed = new JLabel("");
-        actionsPerformed.setPreferredSize(new Dimension(250, 200));
+        actionsPerformed = new JLabel(" ");
+        actionsPerformed.setPreferredSize(new Dimension(280, 200));
         actionsPerformed.setHorizontalAlignment(SwingConstants.CENTER);
         actionsPerformed.setVerticalAlignment(SwingConstants.TOP);
         actionsPerformed.setFont(new Font("Cascadia Mono", Font.PLAIN, 16));
         actionsPerformed.setForeground(Color.white);
-        
-
+        JLabel NewLabel3 = new JLabel("Beliefs");
+        NewLabel3.setPreferredSize(new Dimension(280,30));
+        NewLabel3.setFont(new Font("Cascadia Mono", Font.BOLD, 16));
+        NewLabel3.setHorizontalAlignment(SwingConstants.CENTER);
+        beliefs = new JLabel("...");
+        beliefs.setPreferredSize(new Dimension(280, 200));
+        beliefs.setHorizontalAlignment(SwingConstants.CENTER);
+        beliefs.setVerticalAlignment(SwingConstants.TOP);
+        beliefs.setFont(new Font("Cascadia Mono", Font.PLAIN, 16));
+        beliefs.setForeground(Color.white);
+        JLabel NewLabel4 = new JLabel("Intentions");
+        NewLabel4.setPreferredSize(new Dimension(250, 30));
+        NewLabel4.setHorizontalAlignment(SwingConstants.CENTER);
+        NewLabel4.setFont(new Font("Cascadia Mono", Font.BOLD, 16));
+        intentions = new JLabel("");
+        intentions.setPreferredSize(new Dimension(250, 200));
+        intentions.setHorizontalAlignment(SwingConstants.CENTER);
+        intentions.setVerticalAlignment(SwingConstants.TOP);
+        intentions.setFont(new Font("Cascadia Mono", Font.PLAIN, 12));
+        intentions.setForeground(Color.white);
         // add components to logs panel
         logs.add(NewLabel1);
         logs.add(recommendations);
         logs.add(NewLabel2);
         logs.add(actionsPerformed);
+        logs.add(NewLabel3);
+        logs.add(beliefs);
+        logs.add(NewLabel4);
+        logs.add(intentions);
         logs.setVisible(false);
         // ----------------------------------------------------------------------------------------------------
+
 	}
 
     private void updateGUIWorld(){
@@ -523,6 +536,9 @@ public class RunExperiment{
                 ReactiveCar rCar = (ReactiveCar) car;
                 HashMap<CarAction, CarPriority> actionsDone = rCar.getActionsPerformed();
                 HashMap<CarAction, CarPriority> actionsRecommended = rCar.getRecommendedActions();
+                HashMap<AbstractROTRCar.CarBelief, Boolean> beliefsList = rCar.getBeliefsList();
+                HashMap<AbstractROTRCar.CarIntention, Boolean> intentionsList = rCar.getIntentionsList();
+
                 
                 StringBuilder sb1 = new StringBuilder();
                 int counter1 = 1;
@@ -554,22 +570,143 @@ public class RunExperiment{
                     }
                     counter2++;
                 }
-                
                 String sActionsRecommended = sb2.toString();
                 sActionsRecommended = sActionsRecommended.replace("\n", "<br>");
                 actionsPerformed.setText("<html>" + sActionsDone + "</html>");
                 recommendations.setText("<html>" + sActionsRecommended + "</html>");
-                
+
+
+                StringBuilder sb3 = new StringBuilder();
+                int counter3 = 1;
+                for(Entry<AbstractROTRCar.CarBelief, Boolean> entry3 : beliefsList.entrySet()){
+                    if(entry3.getValue()){
+                        String tmp_belief = entry3.getKey().toString();
+                        sb3.append("[");
+                        sb3.append(counter3);
+                        sb3.append("]: ");
+                        sb3.append(tmp_belief);
+                        if(counter3 != beliefsList.size()){
+                            sb3.append("\n");
+                        }
+                        counter3++;
+                    }
+                }
+
+                String sbeliefs = sb3.toString();
+                sbeliefs = sbeliefs.replace("\n", "<br>");
+                beliefs.setText("<html>" + sbeliefs + "</html>");
+                StringBuilder sb4 = new StringBuilder();
+                int counter4 = 1;
+                for(Entry<AbstractROTRCar.CarIntention, Boolean> entry4 : intentionsList.entrySet()){
+                    if(entry4.getValue()){
+                        String tmp_intention = entry4.getKey().toString();
+                        sb4.append("[");
+                        sb4.append(counter4);
+                        sb4.append("]: ");
+                        sb4.append(tmp_intention);
+                        if(counter4 != intentionsList.size()){
+                            sb4.append("\n");
+                        }
+                        counter4++;
+                    }
+                }
+
+                String sintentions = sb4.toString();
+                sintentions.replace("\n", "<br>");
+                intentions.setText("<html>" + sintentions + "</html>");
                 rCar.clearBeliefs();
                 rCar.clearIntentions();
                 rCar.resetActions();
                 rCar.resetRecommendations();
             }
-            
-            
+            else if(car.getClass() == RudeCar.class) {
+                RudeCar rCar = (RudeCar) car;
+                HashMap<CarAction, CarPriority> actionsDone = rCar.getActionsPerformed();
+                HashMap<CarAction, CarPriority> actionsRecommended = rCar.getRecommendedActions();
+                HashMap<AbstractROTRCar.CarBelief, Boolean> beliefsList = rCar.getBeliefsList();
+                HashMap<AbstractROTRCar.CarIntention, Boolean> intentionsList = rCar.getIntentionsList();
+
+                StringBuilder sb1 = new StringBuilder();
+                int counter1 = 1;
+                for (Entry<CarAction, CarPriority> entry1 : actionsDone.entrySet()) {
+                    String tmp_action = entry1.getKey().toString();
+
+                    sb1.append("[");
+                    sb1.append(counter1);
+                    sb1.append("]: ");
+                    sb1.append(tmp_action);
+                    if (counter1 != actionsDone.size()) {
+                        sb1.append("\n");
+                    }
+                    counter1++;
+                }
+                String sActionsDone = sb1.toString();
+                sActionsDone = sActionsDone.replace("\n", "<br>");
+
+                StringBuilder sb2 = new StringBuilder();
+                int counter2 = 1;
+                for (Entry<CarAction, CarPriority> entry2 : actionsRecommended.entrySet()) {
+                    String tmp_action = entry2.getKey().toString();
+                    sb2.append("[");
+                    sb2.append(counter2);
+                    sb2.append("]: ");
+                    sb2.append(tmp_action);
+                    if (counter2 != actionsRecommended.size()) {
+                        sb2.append("\n");
+                    }
+                    counter2++;
+                }
+                String sActionsRecommended = sb2.toString();
+                sActionsRecommended = sActionsRecommended.replace("\n", "<br>");
+                actionsPerformed.setText("<html>" + sActionsDone + "</html>");
+                recommendations.setText("<html>" + sActionsRecommended + "</html>");
+
+
+                StringBuilder sb3 = new StringBuilder();
+                int counter3 = 1;
+                for (Entry<AbstractROTRCar.CarBelief, Boolean> entry3 : beliefsList.entrySet()) {
+                    if (entry3.getValue()) {
+                        String tmp_belief = entry3.getKey().toString();
+                        sb3.append("[");
+                        sb3.append(counter3);
+                        sb3.append("]: ");
+                        sb3.append(tmp_belief);
+                        if (counter3 != beliefsList.size()) {
+                            sb3.append("\n");
+                        }
+                        counter3++;
+                    }
+                }
+
+                String sbeliefs = sb3.toString();
+                sbeliefs = sbeliefs.replace("\n", "<br>");
+                beliefs.setText("<html>" + sbeliefs + "</html>");
+                StringBuilder sb4 = new StringBuilder();
+                int counter4 = 1;
+                for (Entry<AbstractROTRCar.CarIntention, Boolean> entry4 : intentionsList.entrySet()) {
+                    if (entry4.getValue()) {
+                        String tmp_intention = entry4.getKey().toString();
+                        sb4.append("[");
+                        sb4.append(counter4);
+                        sb4.append("]: ");
+                        sb4.append(tmp_intention);
+                        if (counter4 != intentionsList.size()) {
+                            sb4.append("\n");
+                        }
+                        counter4++;
+                    }
+                }
+
+                String sintentions = sb4.toString();
+                sintentions.replace("\n", "<br>");
+                intentions.setText("<html>" + sintentions + "</html>");
+                rCar.clearBeliefs();
+                rCar.clearIntentions();
+                rCar.resetActions();
+                rCar.resetRecommendations();
+            }
         }
         pnlWorld.revalidate();
         pnlWorld.repaint();
-     
 	}
 }

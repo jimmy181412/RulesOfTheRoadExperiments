@@ -13,61 +13,61 @@
 
 trafficlight < 5 3 5 4 
 
-solidline < 1 8
-solidline < 1 7
-solidline < 1 6
-solidline < 1 5
-solidline < 1 4
-solidline < 1 3 
-solidline < 1 2
-solidline < 1 1
-solidline < 1 0 
+edgeline < 1 8
+edgeline < 1 7
+edgeline < 1 6
+edgeline < 1 5
+edgeline < 1 4
+edgeline < 1 3
+edgeline < 1 2
+edgeline < 1 1
+edgeline < 1 0
 
-dottedline < 3 8
-dottedline < 3 7
-dottedline < 3 6
-dottedline < 3 5
-dottedline < 3 4
-dottedline < 3 3
-dottedline < 3 2
-dottedline < 3 1
-dottedline < 3 0
+laneline < 2 8
+laneline < 2 7
+laneline < 2 6
+laneline < 2 5
+laneline < 2 4
+laneline < 2 3
+laneline < 2 2
+laneline < 2 1
+laneline < 2 0
 
-dottedline < 2 8
-dottedline < 2 7
-dottedline < 2 6
-dottedline < 2 5
-dottedline < 2 4
-dottedline < 2 3
-dottedline < 2 2
-dottedline < 2 1
-dottedline < 2 0
+centreline < 3 8
+centreline < 3 7
+centreline < 3 6
+centreline < 3 5
+centreline < 3 4
+centreline < 3 3
+centreline < 3 2
+centreline < 3 1
+centreline < 3 0
 
-dottedline < 4 8
-dottedline < 4 7
-dottedline < 4 6
-dottedline < 4 5
-dottedline < 4 4
-dottedline < 4 3
-dottedline < 4 2
-dottedline < 4 1
-dottedline < 4 0
+laneline < 4 8
+laneline < 4 7
+laneline < 4 6
+laneline < 4 5
+laneline < 4 4
+laneline < 4 3
+laneline < 4 2
+laneline < 4 1
+laneline < 4 0
 
-solidline > 4 8
-solidline > 4 7
-solidline > 4 6
-solidline > 4 5
-solidline > 4 3
-solidline > 4 2
-solidline > 4 1
-solidline > 4 0
+edgeline > 4 8
+edgeline > 4 7
+edgeline > 4 6
+edgeline > 4 5
+edgeline > 4 3
+edgeline > 4 2
+edgeline > 4 1
+edgeline > 4 0
 
-solidline ^ 5 4
-solidline ^ 6 4
-solidline ^ 7 4
-solidline V 5 4
-solidline V 6 4
-solidline V 7 4
+edgeline ^ 5 4
+edgeline ^ 6 4
+edgeline ^ 7 4
+edgeline V 5 4
+edgeline V 6 4
+edgeline V 7 4
 
 Car Test 1 8 7 4 jim
-Car Test 2 8 2 1 
+Car slow 3 8 3 1

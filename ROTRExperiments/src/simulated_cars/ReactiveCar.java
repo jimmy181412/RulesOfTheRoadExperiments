@@ -22,14 +22,13 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
     private boolean startOvertaking;
     private boolean overtaking;
     private boolean finished_overtaking;
+    private boolean safe_gap;
 
     ArrayDeque<Direction> directions = new ArrayDeque<>();
     private HashMap<CarAction,CarPriority> actionsRecommended = new HashMap<>();
     private HashMap<CarAction,CarPriority> actionsToDo = new HashMap<>();
-
-
-    public ReactiveCar(Point startPos, Point endPos, int startingSpeed){
-        super(startPos,endPos, startingSpeed, System.getProperty("user.dir") + "/RoTRExperiments/resources/bluecar.png",CarType.car_AI);
+    public ReactiveCar(Point startPos, Point endPos,Point referencePos, int startingSpeed){
+        super(startPos,endPos, referencePos,startingSpeed, System.getProperty("user.dir") + "/RoTRExperiments/resources/bluecar.png",CarType.car_AI);
         addCarEventListener(this);
     }
    
@@ -37,10 +36,12 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
     // should be the current moving direction 
     @Override
     protected ArrayDeque<Direction> getSimulationRoute(){
-
-        setSpeed(1);
         directions = getCurrentMovingDirectionList();
         updateOutcomes();
+
+        if(exitIsClear){
+            setSpeed(1);
+        }
 
         if(overtaking){
             actionsToDo.put(CarAction.CA_move_quickly_past, CarPriority.CP_SHOULD);
@@ -57,11 +58,8 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                 case CA_adjust_speed:
                     setSpeed(1);
                     break;
-                case CA_avoid_overtaking:
+                case CA_avoid_overtaking, CA_cancel_overtaking:
                     intentions.put(CarIntention.CI_overtake,false);
-                    break;
-                case CA_cancel_overtaking:
-                    intentions.put(CarIntention.CI_overtake, false);
                     break;
                 case CA_avoid_hard_shoulder: //not simulated //TODO
                     break;
@@ -154,10 +152,12 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                     break;
                 case CA_wait_until_safe_gap: //TODO
                     //r180
+                    if(!safe_gap){
+                        setSpeed(0);
+                    }
                     break;
             }
         }
-
         if(startOvertaking){
             if(cmd == Direction.north){
                 directions.push(Direction.east);
@@ -180,45 +180,20 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                 overtaking = true;
             }
         }
-
-        System.out.println(startOvertaking);
-        System.out.println(overtaking);
-        System.out.println(finished_overtaking);
-
         //According to the speed, get the direction list
         ArrayDeque<Direction> currentDirection = new ArrayDeque<>();
         for(int i = 0; i < getSpeed(); i++){
             if(!directions.isEmpty()){
                 currentDirection.add(directions.pop());
             }
-
         }
-
-        System.out.println("current speed is: " + getSpeed());
-        System.out.println("----------------------------------------------------------------------");
-        System.out.println("intention list: ");
-        for(Entry<CarIntention, Boolean> i : intentions.entrySet()){
-            if(i.getValue()) {
-               System.out.println(i.getKey().toString());
-            }
-        }
-        System.out.println("----------------------------------------------------------------------");
-        //print out the car belief list
-        System.out.println("belief list");
-        for(Entry<CarBelief,Boolean> k : beliefs.entrySet()){
-            if(k.getValue()){
-                System.out.println(k.getKey().toString());
-
-            }
-        }
-        System.out.println("----------------------------------------------------------------------");
         return currentDirection;
     }
 
     @Override
     protected boolean isFinished(Point arg0)
     {
-        isFinished = currentPosition.equals(endPosition);
+        isFinished = getCurrentPosition().equals(getEndPosition());
         return isFinished;
     }
 
@@ -250,6 +225,65 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                 overtaking = false;
             }
 
+        safe_gap = true;
+        //check if safe gap for turning right
+        if(cmd == Direction.east || cmd == Direction.west) {
+            for (int y3 = 0; y3 < visibleWorld.getHeight(); y3++) {
+                if (cmd == Direction.east && pmd == Direction.north) {
+                    if (visibleWorld.containsCar(location.getX() + 1, y3)) {
+                        //check the car current direction
+                        AbstractCar car1 = visibleWorld.getCarAtPosition(location.getX() + 1, y3);
+                        if (y3 < (visibleWorld.getHeight() / 2)) {
+                            if (car1.getCMD() == Direction.south) {
+                                safe_gap = false;
+                            }
+                        } else if (y3 > (visibleWorld.getHeight() / 2)) {
+                            if (car1.getCMD() == Direction.north) {
+                                safe_gap = false;
+                            }
+                        }
+                    }
+                } else if (cmd == Direction.west && pmd == Direction.south) {
+                    if (visibleWorld.containsCar(location.getX() - 1, y3)) {
+                        //check the car current direction
+                        AbstractCar car1 = visibleWorld.getCarAtPosition(location.getX() - 1, y3);
+                        if (y3 < visibleWorld.getHeight() / 2) {
+                            if (car1.getCMD() == Direction.south) {
+                                safe_gap = false;
+                            }
+                        } else if (y3 > visibleWorld.getHeight() / 2) {
+                            if (car1.getCMD() == Direction.north) {
+                                safe_gap = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else if(cmd == Direction.north || cmd == Direction.south){
+            for(int x3 = 0 ; x3 < visibleWorld.getWidth(); x3++){
+                if(cmd == Direction.north && pmd == Direction.west){
+
+                }
+                else if(cmd == Direction.south && pmd ==  Direction.east){
+                    if(visibleWorld.containsCar(x3, location.getY() + 1)){
+                        AbstractCar car1 = visibleWorld.getCarAtPosition(x3, location.getY() + 1);
+                        if(x3 < (visibleWorld.getWidth() / 2)){
+                            if(car1.getCMD() == Direction.east){
+                                safe_gap = false;
+                            }
+                        }
+                        else if(x3 > (visibleWorld.getWidth() / 2)){
+                            if(car1.getCMD() == Direction.west){
+                                safe_gap = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        System.out.println("current we got safe gap: " + safe_gap);
         }
     }
 
@@ -1994,19 +2028,8 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
             case CB_greenFilterLightForExit://not simulated
                 beliefs.put(CarBelief.CB_greenFilterLightForExit,false);
                 break;
-            case CB_hardshoulder: //TODO
-                boolean atHardShoulder = false;
-               
-                if(visibleWorld.getCell(location.getX(),location.getY()).getCellType() == CellType.ct_road) {
-                    RoadCell rc = (RoadCell)visibleWorld.getCell(location.getX(),location.getY());
-                    for(RoadMarking rm : rc.getRoadMarkings()) {
-                        if (rm == RoadMarking.rm_hard_shoulder) {
-                            atHardShoulder = true;
-                            break;
-                        }
-                    }
-                }
-                beliefs.put(cb, atHardShoulder);  
+            case CB_hardshoulder: //not simulated
+                beliefs.put(CarBelief.CB_hardshoulder, false);
                 break;
             case CB_hasAdvancedStop: //not simulated
                 beliefs.put(CarBelief.CB_hasAdvancedStop,false);

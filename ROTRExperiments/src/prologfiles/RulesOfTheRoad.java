@@ -74,10 +74,10 @@ public class RulesOfTheRoad
 //		System.out.println(toWrite);
 		//$PATH of pb does not resolve properly on macOS
 		// for macOS user
-//		String path1 =  "/Applications/SWI-Prolog.app/Contents/MacOS/swipl";
+		String path1 =  "/Applications/SWI-Prolog.app/Contents/MacOS/swipl";
 		// for Windows user
 		String path2 = "C:\\Program Files\\swipl\\bin\\swipl";
-		ProcessBuilder pb = new ProcessBuilder(path2, fileLocation);
+		ProcessBuilder pb = new ProcessBuilder(path1, fileLocation);
 		try {
 			PrintWriter out = new PrintWriter(fileLocation);
 			out.print(toWrite);
