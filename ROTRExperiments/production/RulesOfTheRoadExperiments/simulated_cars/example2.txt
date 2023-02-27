@@ -1,0 +1,81 @@
+12
+15
+3
+|----^^----|
+|----^^----|
+|----^^----|
+|<<<<^^----|
+|----^^----|
+|----^^----|
+|----^^----|
+|----^^----|
+|----^^----|
+|----^^----|
+|----^^----|
+|----^^----|
+|----^^----|
+|----^^----|
+|----^^----|
+|----^^----|
+
+edgeline < 5 14
+edgeline < 5 13
+edgeline < 5 12
+edgeline < 5 11
+edgeline < 5 10
+edgeline < 5 9
+edgeline < 5 8
+edgeline < 5 7
+edgeline < 5 5
+edgeline < 5 6
+edgeline < 5 4
+edgeline < 5 2
+edgeline < 5 1
+edgeline < 5 0
+
+edgeline > 6 14
+edgeline > 6 13
+edgeline > 6 12
+edgeline > 6 11
+edgeline > 6 10
+edgeline > 6 9
+edgeline > 6 8
+edgeline > 6 7
+edgeline > 6 6
+edgeline > 6 5
+edgeline > 6 4
+edgeline > 6 3
+edgeline > 6 2
+edgeline > 6 1
+edgeline > 6 0
+
+laneline < 6 14
+laneline < 6 13
+laneline < 6 12
+laneline < 6 11
+laneline < 6 10
+laneline < 6 9
+laneline < 6 8
+laneline < 6 7
+laneline < 6 6
+laneline < 6 5
+laneline < 6 4
+laneline < 6 3
+laneline < 6 2
+laneline < 6 1
+laneline < 6 0
+
+
+edgeline ^ 1 3
+edgeline ^ 2 3
+edgeline ^ 3 3
+edgeline ^ 4 3
+edgeline V 1 3
+edgeline V 2 3
+edgeline V 3 3
+edgeline V 4 3
+
+
+Car testingCar 5 14 1 3 5 11 jim
+Car slow 5 13 5 2 5 10
+
