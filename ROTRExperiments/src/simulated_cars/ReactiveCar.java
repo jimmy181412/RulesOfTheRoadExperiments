@@ -35,7 +35,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
     // car decision-making system, make use of the received observations to decide what
     // should be the current moving direction 
     @Override
-    protected ArrayDeque<Direction> getSimulationRoute(){
+    protected ArrayDeque<Direction> getSimulationRoute(WorldSim world){
         directions = getCurrentMovingDirectionList();
         updateOutcomes();
 
@@ -55,30 +55,16 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
             CarAction ca = entry.getKey();
             CarPriority pr = entry.getValue();
             switch(ca){
-                case CA_adjust_speed:
-                    setSpeed(1);
-                    break;
                 case CA_avoid_overtaking, CA_cancel_overtaking:
                     intentions.put(CarIntention.CI_overtake,false);
                     break;
-                case CA_avoid_hard_shoulder: //not simulated //TODO
-                    break;
-                case CA_avoid_motorway://not simulated
-                    break;
                 case CA_consideration_others://not simulated actually //TODO
-                    break;
-                case CA_do_not_overtake: //TODO
-                    break;
-                case CA_dontExceedTempSpeedLimit: //TODO
-                    // adjust speed according to the world speed limit
                     break;
                 case CA_dont_cross_solid_white: //TODO
                     break;
                 case CA_drive_care_attention://TODO
                     break;
                 case CA_drive_slowly: //TODO
-                    break;
-                case CA_drive_very_slowly: //TODO
                     break;
                 case CA_drop_back://TODO
                     break;
@@ -87,12 +73,6 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                 case CA_increase_distance_to_car_infront:
                     //should increase the distance to infront car
                     // r126
-                    break;
-                case CA_keep_safe_distance: //TODO
-                    //Keep a safe distance from the vehicle in front
-                    break;
-                case CA_keep_under_speed_limit: //TODO
-                    //r261
                     break;
                 case CA_move_left: //TODO
                     //after finishing overtaking, the AI car should go to its original line
@@ -125,12 +105,6 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                     break;
                 case CA_not_overtaken: //TODO
                     break;
-                case CA_overtake_on_right: //TODO
-                    break;
-                case CA_prepare_drop_back://TODO
-                    break;
-                case CA_reduce_distance_between_front_vehicle: //TODO
-                    break;
                 case CA_reduce_overall_speed, CA_reduce_speed: //TODO
                     if(getSpeed() > 1){
                         setSpeed(getSpeed() - 1);
@@ -138,13 +112,11 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                     break;
                 case CA_reduce_speed_if_pedestrians://TODO
                     break;
-                case CA_safe_distance: //TODO
-                    break;
                 case CA_space_for_vehicle:
                     //overtaking,should not get too close to the vehicle you intend to overtake
                     startOvertaking = true;
                     break;
-                case CA_stop_at_white_line, CA_wait_at_white_line, CA_switch_off_engine, CA_stop, CA_stop_and_turn_engine_off: //TODO
+                case CA_stop_at_white_line, CA_wait_at_white_line: //TODO
                     setSpeed(0);
                     break;
                 case CA_wait_for_gap_before_moving_off: //TODO
@@ -1155,7 +1127,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                 beliefs.put(CarBelief.CB_essentialTravel,false);
                 break;
             case CB_exceedingSpeedLimit: 
-                beliefs.put(cb, visibleWorld.speedLimit(location.getX(), location.getY()) < getSpeed());
+                beliefs.put(cb, visibleWorld.getSpeedLimit(location.getX(), location.getY()) < getSpeed());
                 break;
             // check whether there are cars will block current car's way 
             case CB_exitClear:

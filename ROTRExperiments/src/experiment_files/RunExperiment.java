@@ -3,12 +3,9 @@ package experiment_files;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import core_car_sim.Point;
 import core_car_sim.*;
-import simulated_cars.AbstractROTRCar;
+import simulated_cars.*;
 import simulated_cars.AbstractROTRCar.CarAction;
 import simulated_cars.AbstractROTRCar.CarPriority;
-import simulated_cars.ReactiveCar;
-import simulated_cars.RudeCar;
-import simulated_cars.SmallAICar;
 
 import javax.swing.*;
 import java.awt.*;
@@ -102,9 +99,12 @@ public class RunExperiment{
 					if (cbAI.getSelectedItem() == "Reactive"){
 						return new ReactiveCar(startingLoca, endingLoca, referenceLoca,1);
 					}
-					else{
+					else if(cbAI.getSelectedItem() == "Must Only"){
 						return new RudeCar(startingLoca, endingLoca, referenceLoca, 1);
 					}
+                    else{
+                        return new CleverCar(startingLoca, endingLoca, referenceLoca, 1);
+                    }
 				}
 			}
 	
@@ -117,9 +117,12 @@ public class RunExperiment{
 					if (cbAI.getSelectedItem() == "Reactive"){
 						return new ReactiveCar(startingLoca, endingLoca, referenceLoca, 1);
 					}
-					else{
-						return new RudeCar(startingLoca, endingLoca, referenceLoca,1);
-					}
+                    else if(cbAI.getSelectedItem() == "Must Only"){
+                        return new RudeCar(startingLoca, endingLoca, referenceLoca, 1);
+                    }
+                    else{
+                        return new CleverCar(startingLoca, endingLoca, referenceLoca, 1);
+                    }
 				}
 			}
 		};
@@ -209,7 +212,7 @@ public class RunExperiment{
             int visibility = simworld.getVisibility();
 
             for(AbstractCar car: simworld.getCars()) {
-                if(car.getClass() == ReactiveCar.class) {
+                if(car.getClass() == ReactiveCar.class || car.getClass() == RudeCar.class || car.getClass() == CleverCar.class) {
                     Point carPosition = simworld.getCarPosition(car);
                     //get the car visible world
                     ArrayList<Point> visibleCells = new ArrayList<>();
@@ -351,7 +354,7 @@ public class RunExperiment{
         JLabel label3 = new JLabel("numOfSteps:");
                  
        
-		cbAI.setModel(new DefaultComboBoxModel<>(new String[]{"Reactive", "Must Only"}));
+		cbAI.setModel(new DefaultComboBoxModel<>(new String[]{"Reactive", "Must Only", "AI"}));
 		cbAI.setSelectedIndex(0);
 		
 		JComboBox<String> cbScenarios = new JComboBox<>();
@@ -705,7 +708,96 @@ public class RunExperiment{
                 rCar.resetActions();
                 rCar.resetRecommendations();
             }
+            else if(car.getClass() == CleverCar.class) {
+
+                CleverCar rCar = (CleverCar)car;
+                HashMap<CarAction, CarPriority> actionsDone = rCar.getActionsPerformed();
+                HashMap<CarAction, CarPriority> actionsRecommended = rCar.getRecommendedActions();
+                HashMap<AbstractROTRCar.CarBelief, Boolean> beliefsList = rCar.getBeliefsList();
+                HashMap<AbstractROTRCar.CarIntention, Boolean> intentionsList = rCar.getIntentionsList();
+
+
+                StringBuilder sb1 = new StringBuilder();
+                int counter1 = 1;
+                for(Entry<CarAction, CarPriority> entry1 : actionsDone.entrySet()) {
+                    String tmp_action = entry1.getKey().toString();
+
+                    sb1.append("[");
+                    sb1.append(counter1);
+                    sb1.append("]: ");
+                    sb1.append(tmp_action);
+                    if(counter1 != actionsDone.size()) {
+                        sb1.append("\n");
+                    }
+                    counter1++;
+                }
+                String sActionsDone = sb1.toString();
+                sActionsDone = sActionsDone.replace("\n", "<br>");
+
+                StringBuilder sb2 = new StringBuilder();
+                int counter2 = 1;
+                for(Entry<CarAction, CarPriority> entry2: actionsRecommended.entrySet()) {
+                    String tmp_action = entry2.getKey().toString();
+                    sb2.append("[");
+                    sb2.append(counter2);
+                    sb2.append("]: ");
+                    sb2.append(tmp_action);
+                    if(counter2 != actionsRecommended.size()) {
+                        sb2.append("\n");
+                    }
+                    counter2++;
+                }
+                String sActionsRecommended = sb2.toString();
+                sActionsRecommended = sActionsRecommended.replace("\n", "<br>");
+                actionsPerformed.setText("<html>" + sActionsDone + "</html>");
+                recommendations.setText("<html>" + sActionsRecommended + "</html>");
+
+
+                StringBuilder sb3 = new StringBuilder();
+                int counter3 = 1;
+                for(Entry<AbstractROTRCar.CarBelief, Boolean> entry3 : beliefsList.entrySet()){
+                    if(entry3.getValue()){
+                        String tmp_belief = entry3.getKey().toString();
+                        sb3.append("[");
+                        sb3.append(counter3);
+                        sb3.append("]: ");
+                        sb3.append(tmp_belief);
+                        if(counter3 != beliefsList.size()){
+                            sb3.append("\n");
+                        }
+                        counter3++;
+                    }
+                }
+
+                String sbeliefs = sb3.toString();
+                sbeliefs = sbeliefs.replace("\n", "<br>");
+                beliefs.setText("<html>" + sbeliefs + "</html>");
+                StringBuilder sb4 = new StringBuilder();
+                int counter4 = 1;
+                for(Entry<AbstractROTRCar.CarIntention, Boolean> entry4 : intentionsList.entrySet()){
+                    if(entry4.getValue()){
+                        String tmp_intention = entry4.getKey().toString();
+                        sb4.append("[");
+                        sb4.append(counter4);
+                        sb4.append("]: ");
+                        sb4.append(tmp_intention);
+                        if(counter4 != intentionsList.size()){
+                            sb4.append("\n");
+                        }
+                        counter4++;
+                    }
+                }
+
+                String sintentions = sb4.toString();
+                sintentions.replace("\n", "<br>");
+                intentions.setText("<html>" + sintentions + "</html>");
+                rCar.clearBeliefs();
+                rCar.clearIntentions();
+                rCar.resetActions();
+                rCar.resetRecommendations();
+            }
         }
+
         pnlWorld.revalidate();
         pnlWorld.repaint();
 	}

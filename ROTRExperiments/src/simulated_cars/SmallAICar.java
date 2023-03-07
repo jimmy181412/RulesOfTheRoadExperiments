@@ -23,7 +23,7 @@ public class SmallAICar extends AbstractCar {
 	}
 
 	@Override
-	protected ArrayDeque<Direction> getSimulationRoute() 
+	protected ArrayDeque<Direction> getSimulationRoute(WorldSim world)
 	{
 	    movement.add(cmd);
 		return movement;

@@ -2,6 +2,7 @@ package simulated_cars;
 
 import core_car_sim.Direction;
 import core_car_sim.Point;
+import core_car_sim.WorldSim;
 import prologfiles.RulesOfTheRoad.ROTROutcome;
 
 import java.util.ArrayDeque;
@@ -19,7 +20,7 @@ public class LargeAICar extends AbstractROTRCar
 	}
 
 	@Override
-	protected ArrayDeque<Direction> getSimulationRoute()
+	protected ArrayDeque<Direction> getSimulationRoute(WorldSim world)
 	{
 		updateOutcomes();
 		HashSet<ROTROutcome> currentIssues = new HashSet<>(rulesOfTheRoad);
