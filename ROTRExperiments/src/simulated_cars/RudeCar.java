@@ -42,6 +42,9 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
         if(exitIsClear){
             setSpeed(1);
         }
+        else{
+            setSpeed(0);
+        }
 
         //after update the outcome, we get the actionsToDo list which indicates what
         // the car should do in the next move
@@ -117,11 +120,13 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
                     case CA_wait_for_gap_before_moving_off: //TODO
                         //r171
                         break;
-                    case CA_wait_until_safe_gap: //TODO
+                    case CA_wait_until_safe_gap:
                         //r180
                         if(!safe_gap){
                             setSpeed(0);
                         }
+                        break;
+                    case CA_avoid_cutting_corner: //TODO
                         break;
                 }
             }
@@ -176,26 +181,24 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
         updateBeliefs(visibleWorld, location);
 
         //check whether the car finished overtaking or not...
-        if(overtaking){
-            if(cmd == Direction.north){
-                finished_overtaking = visibleWorld.containsCar(location.getX() - 1, location.getY() + 2 )
-                        ||visibleWorld.containsCar(location.getX() - 1, location.getY() + 3  );
-            }
-            else if(cmd == Direction.south){
+        if(overtaking) {
+            if (cmd == Direction.north) {
+                finished_overtaking = visibleWorld.containsCar(location.getX() - 1, location.getY() + 2)
+                        || visibleWorld.containsCar(location.getX() - 1, location.getY() + 3);
+            } else if (cmd == Direction.south) {
                 finished_overtaking = visibleWorld.containsCar(location.getX() + 1, location.getY() - 2)
-                        ||visibleWorld.containsCar(location.getX() + 1 , location.getY() - 3);
+                        || visibleWorld.containsCar(location.getX() + 1, location.getY() - 3);
+            } else if (cmd == Direction.east) {
+                finished_overtaking = visibleWorld.containsCar(location.getX() - 2, location.getY() - 1)
+                        || visibleWorld.containsCar(location.getX() - 3, location.getY() - 1);
+            } else if (cmd == Direction.west) {
+                finished_overtaking = visibleWorld.containsCar(location.getX() + 2, location.getY() - 1)
+                        || visibleWorld.containsCar(location.getX() - 3, location.getY() - 1);
             }
-            else if(cmd == Direction.east){
-                finished_overtaking = visibleWorld.containsCar( location.getX() - 2, location.getY() - 1)
-                        ||visibleWorld.containsCar(location.getX() - 3, location.getY() - 1);
-            }
-            else if(cmd == Direction.west){
-                finished_overtaking = visibleWorld.containsCar( location.getX() + 2 , location.getY() - 1)
-                        ||visibleWorld.containsCar(location.getX() - 3, location.getY() - 1);
-            }
-            if(finished_overtaking){
+            if (finished_overtaking) {
                 overtaking = false;
             }
+        }
 
             safe_gap = true;
             //check if safe gap for turning right
@@ -257,7 +260,6 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
 
             System.out.println("current we got safe gap: " + safe_gap);
         }
-    }
 
 
     @Override

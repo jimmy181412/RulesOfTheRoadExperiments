@@ -151,7 +151,7 @@ public class RunExperiment{
 	private void initialize(){
 	    // initialize the frame
 		frame = new JFrame();
-		frame.setBounds(100, 100, 1300, 1000);
+		frame.setBounds(100, 100, 1000, 1000);
 		frame.setTitle("Third Year Project");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setJMenuBar(menuBar);

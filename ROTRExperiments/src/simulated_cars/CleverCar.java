@@ -172,55 +172,50 @@ public class CleverCar extends AbstractROTRCar implements CarEvents{
             setSpeed(2);
         }
 
-        //According to the speed, get the direction list
-        ArrayDeque<Direction> currentDirection = new ArrayDeque<>();
-        for(int i = 0; i < getSpeed(); i++){
-            if(!directions.isEmpty()){
-                currentDirection.add(directions.pop());
-            }
-        }
-
-        // remember current car's position before making simulated move
-        Point referenceCurrentPosition = getCurrentPosition();
-        // use for simulated move
-        Point tmpCurrentPosition = getCurrentPosition();
-
-        ArrayDeque<Direction> copyOfCurrentDirection = currentDirection;
-        // see how many steps that the car will finally reach the end position after following the must rule
-        for(int j = 0; j < copyOfCurrentDirection.size();j++){
-            Direction tmp = copyOfCurrentDirection.pop();
-            tmpCurrentPosition.moveDirection(tmp);
-            setCurrentPosition(tmpCurrentPosition);
-        }
-        ArrayList<RoadCell> cellsToTravel1 = this.search(world);
-
-        int steps1 = cellsToTravel1.size();
-        System.out.println("the steps to make it to the end: " + steps1);
-        //reset the current position
-        this.setCurrentPosition(referenceCurrentPosition);
-
-
+        int steps1 = getStepsToEndPosition(directions, getSpeed(), getCurrentPosition(), world);
 
         for(Entry<CarAction, CarPriority> entry : actionsToDo.entrySet()){
             CarAction ca = entry.getKey();
             CarPriority pr = entry.getValue();
+            //reference directions and speed of the car after following the must rules
+            ArrayDeque<Direction> copyOfDirection = directions.clone();
+            int copySpeed = getSpeed();
+
             // we first only execute the must rules
             if(pr == CarPriority.CP_SHOULD){
                 switch(ca){
                     case CA_avoid_overtaking, CA_cancel_overtaking:
                         intentions.put(CarIntention.CI_overtake,false);
+                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
+                            intentions.put(CarIntention.CI_overtake,false);
+                        }
                         break;
                     case CA_do_not_overtake: //TODO
+                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
+                            finalActionToDo.put(CarAction.CA_do_not_overtake, pr);
+                        }
                         break;
                     case CA_dont_cross_solid_white: //TODO
+                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
+                            finalActionToDo.put(CarAction.CA_dont_cross_solid_white, pr);
+                        }
                         break;
                     case CA_drop_back://TODO
+                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
+                            finalActionToDo.put(CarAction.CA_drop_back, pr);
+                        }
                         break;
                     case CA_give_way_to_pedestrians: //TODO
+                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
+                            finalActionToDo.put(CarAction.CA_give_way_to_pedestrians, pr);
+                        }
                         break;
                     case CA_increase_distance_to_car_infront:
                         //should increase the distance to infront car
                         // r126
+                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
+                            finalActionToDo.put(CarAction.CA_increase_distance_to_car_infront, pr);
+                        }
                         break;
                     case CA_move_left: //TODO
                         //after finishing overtaking, the AI car should go to its original line
@@ -240,39 +235,117 @@ public class CleverCar extends AbstractROTRCar implements CarEvents{
                             }
                             finished_overtaking = false;
                         }
+
+                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
+                            finalActionToDo.put(CarAction.CA_move_left, pr);
+                        }
                         break;
                     case CA_move_quickly_past: //TODO
                         if(overtaking){
                             setSpeed(2);
                         }
+
+                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
+                            finalActionToDo.put(CarAction.CA_move_quickly_past, pr);
+                        }
                         break;
                     case CA_not_overtaken: //TODO
+
+                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
+                            finalActionToDo.put(CarAction.CA_not_overtaken, pr);
+                        }
                         break;
-                    case CA_reduce_overall_speed, CA_reduce_speed: //TODO
+                    case CA_reduce_overall_speed: //TODO
                         if(getSpeed() > 1){
                             setSpeed(getSpeed() - 1);
                         }
+
+                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
+                            finalActionToDo.put(CarAction.CA_reduce_overall_speed, pr);
+                        }
+                        break;
+
+                    case CA_reduce_speed:
+                        if(getSpeed() > 1){
+                            setSpeed(getSpeed() - 1);
+                        }
+                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
+                            finalActionToDo.put(CarAction.CA_reduce_speed, pr);
+                        }
+
                         break;
                     case CA_reduce_speed_if_pedestrians://TODO
+                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
+                            finalActionToDo.put(CarAction.CA_reduce_speed_if_pedestrians, pr);
+                        }
                         break;
                     case CA_space_for_vehicle:
                         //overtaking,should not get too close to the vehicle you intend to overtake
                         startOvertaking = true;
+                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
+                            finalActionToDo.put(CarAction.CA_space_for_vehicle, pr);
+                        }
                         break;
                     case CA_wait_for_gap_before_moving_off: //TODO
                         //r171
+                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
+                            finalActionToDo.put(CarAction.CA_wait_for_gap_before_moving_off, pr);
+                        }
                         break;
                     case CA_wait_until_safe_gap: //TODO
                         //r180
+
                         if(!safe_gap){
                             setSpeed(0);
                         }
+
+                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
+                            finalActionToDo.put(CarAction.CA_wait_until_safe_gap, pr);
+                        }
+
                         break;
                 }
             }
         }
+
+        //According to the speed, get the direction list
+        ArrayDeque<Direction> currentDirection = new ArrayDeque<>();
+        for(int i = 0; i < getSpeed(); i++){
+            if(!directions.isEmpty()){
+                currentDirection.add(directions.pop());
+            }
+        }
+
         //get current car position
         return currentDirection;
+    }
+
+    // get the distance to the destination after making the "must" actions
+    public int getStepsToEndPosition(ArrayDeque<Direction> directions, int speed, Point currentPosition, WorldSim world){
+        int steps = 0;
+        Point copyOfCurrentPosition = currentPosition.clone();
+        ArrayDeque<Direction> copyOfDirections = directions.clone();
+
+        ArrayDeque<Direction> currentDirections = new ArrayDeque<>();
+        for(int i = 0; i < speed;i++){
+            currentDirections.add(copyOfDirections.pop());
+        }
+        for(int j = 0; j < currentDirections.size();j++){
+            copyOfCurrentPosition.moveDirection(currentDirections.pop());
+        }
+        setCurrentPosition(copyOfCurrentPosition);
+        if(!isFinished(copyOfCurrentPosition)){
+            ArrayList<RoadCell> roadCells = this.search(world);
+            steps = roadCells.size();
+        }
+
+        //reset the current position;
+        setCurrentPosition(currentPosition);
+        return steps;
+    }
+    public boolean compareCost(int steps, ArrayDeque<Direction> directions, int speed, Point currentPosition, WorldSim world){
+        int stepsByFollowingShouldRule = getStepsToEndPosition(directions, speed, currentPosition, world);
+        return stepsByFollowingShouldRule <= steps;
     }
 
     @Override

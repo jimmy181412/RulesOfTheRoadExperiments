@@ -39,9 +39,14 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
         directions = getCurrentMovingDirectionList();
         updateOutcomes();
 
+        //the car can not crush with other cars
         if(exitIsClear){
             setSpeed(1);
         }
+        else{
+            setSpeed(0);
+        }
+
 
         if(overtaking){
             actionsToDo.put(CarAction.CA_move_quickly_past, CarPriority.CP_SHOULD);
@@ -122,7 +127,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                 case CA_wait_for_gap_before_moving_off: //TODO
                     //r171
                     break;
-                case CA_wait_until_safe_gap: //TODO
+                case CA_wait_until_safe_gap, CA_avoid_cutting_corner: //TODO
                     //r180
                     if(!safe_gap){
                         setSpeed(0);
@@ -181,21 +186,24 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                     finished_overtaking = visibleWorld.containsCar(location.getX() - 1, location.getY() + 2 )
                             ||visibleWorld.containsCar(location.getX() - 1, location.getY() + 3  );
                 }
-                else if(cmd == Direction.south){
-                    finished_overtaking = visibleWorld.containsCar(location.getX() + 1, location.getY() - 2)
-                            ||visibleWorld.containsCar(location.getX() + 1 , location.getY() - 3);
-                }
-                else if(cmd == Direction.east){
-                    finished_overtaking = visibleWorld.containsCar( location.getX() - 2, location.getY() - 1)
-                            ||visibleWorld.containsCar(location.getX() - 3, location.getY() - 1);
-                }
-                else if(cmd == Direction.west){
-                    finished_overtaking = visibleWorld.containsCar( location.getX() + 2 , location.getY() - 1)
-                            ||visibleWorld.containsCar(location.getX() - 3, location.getY() - 1);
-                }
+            else if(cmd == Direction.south){
+                finished_overtaking = visibleWorld.containsCar(location.getX() + 1, location.getY() - 2)
+                        ||visibleWorld.containsCar(location.getX() + 1 , location.getY() - 3);
+            }
+            else if(cmd == Direction.east){
+                finished_overtaking = visibleWorld.containsCar( location.getX() - 2, location.getY() - 1)
+                        ||visibleWorld.containsCar(location.getX() - 3, location.getY() - 1);
+            }
+            else if(cmd == Direction.west){
+                finished_overtaking = visibleWorld.containsCar( location.getX() + 2 , location.getY() - 1)
+                        ||visibleWorld.containsCar(location.getX() - 3, location.getY() - 1);
+            }
+
             if(finished_overtaking){
                 overtaking = false;
             }
+        }
+
 
         safe_gap = true;
         //check if safe gap for turning right
@@ -257,7 +265,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
 
         System.out.println("current we got safe gap: " + safe_gap);
         }
-    }
+
 
 
     @Override
@@ -305,7 +313,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                     actionsToDo.put(CarAction.CA_avoid_crossing_crossing, priority);
             case CA_avoid_crossing_level_crossing ->//not simulated
                     actionsToDo.put(CarAction.CA_avoid_crossing_level_crossing, priority);
-            case CA_avoid_cutting_corner ->//not simulated
+            case CA_avoid_cutting_corner ->
                     actionsToDo.put(CarAction.CA_avoid_cutting_corner, priority);
             case CA_avoid_drive_against_traffic_flow ->//not simulated
                     actionsToDo.put(CarAction.CA_avoid_drive_against_traffic_flow, priority);
@@ -2126,7 +2134,7 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
             case CB_onMotorway: //not simulated
                 beliefs.put(CarBelief. CB_onMotorway,false);
                 break;
-            case CB_onPavement: //not simulated
+            case CB_onPavement: //not simulated //the car can not be on pavement
                 beliefs.put(CarBelief. CB_onPavement,false);
                 break;
             case CB_overtaken: //not simulated //TODO
@@ -2218,12 +2226,11 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                        for(int j = location.getY() - 1; j >= location.getY() - espeed;j--) {
                            if(visibleWorld.containsPedestrian(i,j)) {
                                if(j == location.getY() - 1 && i == location.getX()) {
-                                   System.out.println(i + " " +j);
+                                   System.out.println(i + " " + j);
                                    Pedestrian p1 = visibleWorld.getPedestrianAtPosition(i,j);
                                    pedestrainInRoad = true;
                                    beliefs.put(cb, true);
                                }
-                              
                            }
                        }
                    }
@@ -2234,13 +2241,11 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                             if(visibleWorld.containsPedestrian(i,j)) {
                                 if(j == location.getY() + 1 && i == location.getX()) {
                                     pedestrainInRoad = true;
-                                    beliefs.put(cb, pedestrainInRoad );
+                                    beliefs.put(cb, pedestrainInRoad);
                                 }
-                               
                             }
                          }
                     }
-                               
                 }
                 else if(cmd == Direction.east) {
                     for(int i = location.getX() + 1; i <= location.getX() + espeed; i++) {
@@ -2248,22 +2253,19 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                             if(visibleWorld.containsPedestrian(i,j)) {
                                 if(i == location.getX() + 1 && j == location.getY()) {
                                     pedestrainInRoad = true;
-                                    beliefs.put(cb, pedestrainInRoad );
+                                    beliefs.put(cb, pedestrainInRoad);
                                 }
-                               
                             }
-                           }
                         }
-                    } 
-                
-                
+                    }
+                }
                 else if(cmd == Direction.west) {
                     for(int i = location.getX() - 1; i >= location.getX() - espeed; i--) {
                         for(int j = 0; j < visibleWorld.getHeight(); j++) {
                             if(visibleWorld.containsPedestrian(i,j)) {
                                if(i == location.getX() - 1 && j == location.getY()) {
                                    pedestrainInRoad = true;
-                                   beliefs.put(cb, pedestrainInRoad );
+                                   beliefs.put(cb, pedestrainInRoad);
                                }
                             }
                         }
