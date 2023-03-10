@@ -13,10 +13,15 @@ public class LargeAICar extends AbstractROTRCar
 	private boolean haveMoved = false;
 	ArrayDeque<Direction> movement = new ArrayDeque<>();
 
-	public LargeAICar(Point startPos, Point endPos, Point referenceLoca, int startingSpeed)
+	public LargeAICar(Point startPos, Point endPos, Point referencePos, Direction initialDirection, int startingSpeed)
 	{
-		super(startPos, endPos, referenceLoca, startingSpeed, System.getProperty("user.dir") + "/RoTRExperiments/resources/redcar.png",CarType.car_large);
-		// TODO Auto-generated constructor stub
+		super(startPos, endPos, referencePos,startingSpeed
+				,initialDirection
+				,System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesicon/basicCarImage1.png"
+				,System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesicon/basicCarImage2.png"
+				,System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesicon/basicCarImage3.png"
+				,System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesicon/basicCarImage4.png"
+				,CarType.car_large);
 	}
 
 	@Override

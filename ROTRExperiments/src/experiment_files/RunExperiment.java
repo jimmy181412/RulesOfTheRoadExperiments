@@ -91,37 +91,37 @@ public class RunExperiment{
 		initialize();
 		cal = new CarAddedListener() {
 			@Override
-			public AbstractCar createCar(String name, Point startingLoca, Point endingLoca, Point referenceLoca){
+			public AbstractCar createCar(String name, Point startingLoca, Point endingLoca, Point referenceLoca,Direction initialDirection){
 				if(name.equalsIgnoreCase("slow")){
-					return new SmallAICar(startingLoca, endingLoca, referenceLoca,1, Direction.west);
+					return new SmallAICar(startingLoca, endingLoca, referenceLoca, initialDirection,1, Direction.west);
 				}
 				else{
 					if (cbAI.getSelectedItem() == "Reactive"){
-						return new ReactiveCar(startingLoca, endingLoca, referenceLoca,1);
+						return new ReactiveCar(startingLoca, endingLoca, referenceLoca,initialDirection, 1);
 					}
 					else if(cbAI.getSelectedItem() == "Must Only"){
-						return new RudeCar(startingLoca, endingLoca, referenceLoca, 1);
+						return new RudeCar(startingLoca, endingLoca, referenceLoca, initialDirection, 1);
 					}
                     else{
-                        return new CleverCar(startingLoca, endingLoca, referenceLoca, 1);
+                        return new CleverCar(startingLoca, endingLoca, referenceLoca,initialDirection,1);
                     }
 				}
 			}
 	
 			@Override
-			public AbstractCar createCar(String name, Point startingLoca, Point endingLoca, Point referenceLoca, String av){
+			public AbstractCar createCar(String name, Point startingLoca, Point endingLoca, Point referenceLoca, Direction initialDirection, String av){
 				if(name.equalsIgnoreCase("slow")){
-					return new SmallAICar(startingLoca, endingLoca, referenceLoca,1, Direction.north);
+					return new SmallAICar(startingLoca, endingLoca, referenceLoca,initialDirection,1, Direction.north);
 				}
 				else{
 					if (cbAI.getSelectedItem() == "Reactive"){
-						return new ReactiveCar(startingLoca, endingLoca, referenceLoca, 1);
+						return new ReactiveCar(startingLoca, endingLoca, referenceLoca, initialDirection,1);
 					}
                     else if(cbAI.getSelectedItem() == "Must Only"){
-                        return new RudeCar(startingLoca, endingLoca, referenceLoca, 1);
+                        return new RudeCar(startingLoca, endingLoca, referenceLoca, initialDirection,1);
                     }
                     else{
-                        return new CleverCar(startingLoca, endingLoca, referenceLoca, 1);
+                        return new CleverCar(startingLoca, endingLoca, referenceLoca, initialDirection,1);
                     }
 				}
 			}
@@ -129,16 +129,16 @@ public class RunExperiment{
 		
 		pal = (name, startingLoca, endingLoca, referenceLoca, d) -> {
             if(d == Direction.east) {
-                return new Pedestrian(startingLoca, endingLoca, referenceLoca,d,System.getProperty("user.dir") + "/RoTRExperiments/resources/pedestrian1.png");
+                return new Pedestrian(startingLoca, endingLoca, referenceLoca,d,System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesIcon/Pedestrian3.png");
             }
             else if( d == Direction.west) {
-                return new Pedestrian(startingLoca, endingLoca, referenceLoca,d,System.getProperty("user.dir") + "/RoTRExperiments/resources/pedestrian2.png");
+                return new Pedestrian(startingLoca, endingLoca, referenceLoca,d,System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesIcon/Pedestrian4.png");
             }
             else if( d == Direction.north) {
-                return new Pedestrian(startingLoca, endingLoca, referenceLoca,d,System.getProperty("user.dir") + "/RoTRExperiments/resources/pedestrian2.png");
+                return new Pedestrian(startingLoca, endingLoca, referenceLoca,d,System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesIcon/Pedestrian1.png");
             }
             else if( d == Direction.south) {
-                return new Pedestrian(startingLoca, endingLoca, referenceLoca,d,System.getProperty("user.dir") + "/RoTRExperiments/resources/pedestrian2.png");
+                return new Pedestrian(startingLoca, endingLoca, referenceLoca,d,System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesIcon/Pedestrian2.png");
             }
             return null;
 
@@ -525,8 +525,44 @@ public class RunExperiment{
         //update cars
         for (AbstractCar car : simworld.getCars()){
             Point p = simworld.getCarPosition(car);
-            ImageIcon iicon1 = car.getCarIcon();
 
+            //check world cell's direction of the current
+            if(simworld.getCell(p.getX(), p.getY()).getClass() == RoadCell.class){
+                RoadCell rc = (RoadCell)simworld.getCell(p.getX(), p.getY());
+                if(rc.getTravelDirection().size() == 1){
+                    Direction d = rc.getTravelDirection().get(0);
+                    if(d == Direction.north){
+                        car.setCurrentIcon(car.getNorthCarIcon());
+                    }
+                    else if(d == Direction.south){
+                        car.setCurrentIcon(car.getSouthCarIcon());
+                    }
+                    else if(d == Direction.east){
+                        car.setCurrentIcon(car.getEastCarIcon());
+                    }
+                    else if(d == Direction.west){
+                        car.setCurrentIcon(car.getWestCarIcon());
+                    }
+                }
+                //if the car is on a multiple directions cell
+                else{
+                    Direction d = car.getCMD();
+                    if(d == Direction.north){
+                        car.setCurrentIcon(car.getNorthCarIcon());
+                    }
+                    else if(d == Direction.south){
+                        car.setCurrentIcon(car.getSouthCarIcon());
+                    }
+                    else if(d == Direction.east){
+                        car.setCurrentIcon(car.getEastCarIcon());
+                    }
+                    else if(d == Direction.west){
+                        car.setCurrentIcon(car.getWestCarIcon());
+                    }
+                }
+            }
+
+            ImageIcon iicon1 = car.getCarIcon();
             Image img1 = iicon1.getImage();
             //adjust size
             Image newImg1 = img1.getScaledInstance(iconWidth,iconHeight, Image.SCALE_SMOOTH);

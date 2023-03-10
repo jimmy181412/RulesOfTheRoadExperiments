@@ -1,6 +1,7 @@
 package simulated_cars;
 
 import core_car_sim.AbstractCar;
+import core_car_sim.Direction;
 import core_car_sim.Point;
 import core_car_sim.WorldSim;
 import prologfiles.RulesOfTheRoad;
@@ -641,9 +642,11 @@ public abstract class AbstractROTRCar extends AbstractCar
     HashMap<CarBelief, Boolean> beliefs = new HashMap<>();
     HashMap<CarIntention, Boolean> intentions = new HashMap<>();
 
-    public AbstractROTRCar(Point startPos, Point endPos, Point referencePos,int startingSpeed, String fileImage,CarType ct)
+    public AbstractROTRCar(Point startPos, Point endPos, Point referencePos, int startingSpeed
+            , Direction initialDirection, String fileImage1, String fileImage2, String fileImage3
+            , String fileImage4, CarType ct)
     {
-        super(startPos,endPos,referencePos,startingSpeed,fileImage,ct);
+        super(startPos,endPos,referencePos,startingSpeed,initialDirection,fileImage1,fileImage2,fileImage3,fileImage4,ct);
         clearBeliefs();
         clearIntentions();
     }

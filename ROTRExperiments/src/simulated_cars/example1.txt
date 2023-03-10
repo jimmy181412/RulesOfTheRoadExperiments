@@ -123,7 +123,7 @@ pavement V 11 3
 pavement V 12 3
 pavement V 13 3
 
-Car testingCar 6 10 13 4 6 10 JIM
-Car slow 13 5 0 5 13 5
+Car testingCar 6 10 13 4 6 10 ^ JIM
+Car slow 13 5 0 5 13 5 ^
 pedestrian p1 5 7 8 7 5 7 >
 pedestrian p3 8 2 5 2 8 2 <

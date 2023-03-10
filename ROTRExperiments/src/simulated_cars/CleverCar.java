@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-// reactive car: the car will follow all the recommendations from RoTRA
 public class CleverCar extends AbstractROTRCar implements CarEvents{
 
     private boolean isFinished = false;
@@ -24,15 +23,20 @@ public class CleverCar extends AbstractROTRCar implements CarEvents{
     private boolean finished_overtaking;
     private boolean safe_gap;
 
-
     private HashMap<CarAction,CarPriority> actionsRecommended = new HashMap<>();
     private HashMap<CarAction,CarPriority> actionsToDo = new HashMap<>();
 
     // the actions the car finally executed;
     private HashMap<CarAction, CarPriority> finalActionToDo = new HashMap<>();
 
-    public CleverCar(Point startPos, Point endPos,Point referencePos, int startingSpeed){
-        super(startPos,endPos, referencePos,startingSpeed, System.getProperty("user.dir") + "/RoTRExperiments/resources/bluecar.png",CarType.car_AI);
+    public CleverCar(Point startPos, Point endPos,Point referencePos,Direction initialDirection, int startingSpeed){
+        super(startPos, endPos, referencePos,startingSpeed
+                ,initialDirection
+                ,System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesicon/AICarImage1.png"
+                ,System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesicon/AICarImage2.png"
+                ,System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesicon/AICarImage3.png"
+                ,System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesicon/AICarImage4.png"
+                ,CarType.car_AI);
         addCarEventListener(this);
     }
 
@@ -42,20 +46,22 @@ public class CleverCar extends AbstractROTRCar implements CarEvents{
     protected ArrayDeque<Direction> getSimulationRoute(WorldSim world){
 
         ArrayDeque<Direction> directions = getCurrentMovingDirectionList();
-
         updateOutcomes();
-
         //car can only set off if the exit is clear
         if(exitIsClear){
             setSpeed(1);
         }
+        else{
+            setSpeed(0);
+        }
 
-        if(overtaking){
-            actionsToDo.put(CarAction.CA_move_quickly_past, CarPriority.CP_SHOULD);
-        }
-        if(finished_overtaking){
-            actionsToDo.put(CarAction.CA_move_left, CarPriority.CP_SHOULD);
-        }
+        //copy of current directions and speed of the car
+        ArrayDeque<Direction> copyOfDirections = directions.clone();
+        int copyOfSpeed = getSpeed();
+        boolean tmpStartOvertaking = startOvertaking;
+        boolean tmpOvertaking = overtaking;
+        boolean tmpFinishedOvertaking = finished_overtaking;
+
         //after update the outcome, we get the actionsToDo list which indicates what
         // the car should do in the next move
         for(Entry<CarAction, CarPriority> entry : actionsToDo.entrySet()){
@@ -84,68 +90,254 @@ public class CleverCar extends AbstractROTRCar implements CarEvents{
                         //should increase the distance to infront car
                         // r126
                         break;
-                    case CA_move_left: //TODO
-                        //after finishing overtaking, the AI car should go to its original line
-                        if(finished_overtaking){
-                            //for cmd == north
-                            if (cmd == Direction.north) {
-                                directions.push(Direction.west);
-                            }
-                            else if(cmd  == Direction.south){
-                                directions.push(Direction.east);
-                            }
-                            else if(cmd == Direction.east){
-                                directions.push(Direction.north);
-                            }
-                            else if(cmd == Direction.west){
-                                directions.push(Direction.south);
-                            }
-                            finished_overtaking = false;
-                        }
-                        break;
-                    case CA_move_quickly_past: //TODO
-                        if(overtaking){
-                            setSpeed(2);
-                        }
-                        break;
                     case CA_must_stop_pedestrian_crossing: //TODO
                         break;
-                    case CA_not_drive_dangerously: //TODO
-                        //we do nothing about this
+                    case CA_not_drive_dangerously:
                         break;
                     case CA_not_overtaken: //TODO
                         break;
-                    case CA_reduce_overall_speed, CA_reduce_speed: //TODO
-                        if(getSpeed() > 1){
-                            setSpeed(getSpeed() - 1);
+                    case CA_reduce_overall_speed, CA_reduce_speed:
+                        if(copyOfSpeed > 1){
+                            copyOfSpeed -= 1;
                         }
                         break;
                     case CA_reduce_speed_if_pedestrians://TODO
                         break;
-                    case CA_space_for_vehicle:
-                        //overtaking,should not get too close to the vehicle you intend to overtake
-                        startOvertaking = true;
-                        break;
                     case CA_stop_at_white_line, CA_wait_at_white_line: //TODO
-                        setSpeed(0);
-                        break;
-                    case CA_wait_for_gap_before_moving_off: //TODO
-                        //r171
-                        break;
-                    case CA_wait_until_safe_gap: //TODO
-                        //r180
-                        if(!safe_gap){
-                            setSpeed(0);
-                        }
+                        copyOfSpeed = 0;
                         break;
                 }
             }
         }
 
         if(intentions.get(CarIntention.CI_overtake)) {
-            startOvertaking = true;
+            tmpStartOvertaking = true;
         }
 
+        if(tmpStartOvertaking){
+            if(cmd == Direction.north){
+                copyOfDirections.push(Direction.east);
+            }
+            else if(cmd == Direction.south){
+                copyOfDirections.push(Direction.west);
+            }
+            else if(cmd == Direction.west){
+                copyOfDirections.push(Direction.north);
+            }
+            else if(cmd == Direction.east){
+                copyOfDirections.push(Direction.south);
+            }
+        }
+        else if(tmpOvertaking){
+            copyOfSpeed = 2;
+        }
+
+        int steps1 = getStepsToEndPosition(copyOfDirections, copyOfSpeed, getCurrentPosition(), world);
+        for(Entry<CarAction, CarPriority> entry : actionsToDo.entrySet()){
+            CarAction ca = entry.getKey();
+            CarPriority pr = entry.getValue();
+            //reference directions and speed of the car after following the must rules
+            ArrayDeque<Direction> copyOfDirections2 = copyOfDirections.clone();
+            int copyOfSpeed2 = copyOfSpeed;
+
+            // we first only execute the must rules
+            if(pr == CarPriority.CP_SHOULD){
+                switch (ca) {
+                    case CA_avoid_overtaking, CA_cancel_overtaking -> {
+                        intentions.put(CarIntention.CI_overtake, false);
+                        if (compareCost(steps1, copyOfDirections2, copyOfSpeed2, getCurrentPosition(), world)) {
+                            intentions.put(CarIntention.CI_overtake, false);
+                        }
+                    }
+                    case CA_do_not_overtake -> { //TODO
+                        if (compareCost(steps1, copyOfDirections2, copyOfSpeed2, getCurrentPosition(), world)) {
+                            finalActionToDo.put(CarAction.CA_do_not_overtake, pr);
+                        }
+                    }
+                    case CA_dont_cross_solid_white -> { //TODO
+                        if (compareCost(steps1, copyOfDirections2, copyOfSpeed2, getCurrentPosition(), world)) {
+                            finalActionToDo.put(CarAction.CA_dont_cross_solid_white, pr);
+                        }
+                    }
+                    case CA_drop_back -> {//TODO
+                        if (compareCost(steps1, copyOfDirections2, copyOfSpeed2, getCurrentPosition(), world)) {
+                            finalActionToDo.put(CarAction.CA_drop_back, pr);
+                        }
+                    }
+                    case CA_give_way_to_pedestrians -> { //TODO
+                        if (compareCost(steps1, copyOfDirections2, copyOfSpeed2, getCurrentPosition(), world)) {
+                            finalActionToDo.put(CarAction.CA_give_way_to_pedestrians, pr);
+                        }
+                    }
+                    case CA_increase_distance_to_car_infront -> {
+                        // r126
+                        if (compareCost(steps1, copyOfDirections2, copyOfSpeed2, getCurrentPosition(), world)) {
+                            finalActionToDo.put(CarAction.CA_increase_distance_to_car_infront, pr);
+                        }
+                    }
+                    case CA_move_left -> { //TODO
+                        //after finishing overtaking, the AI car should go to its original line
+                        if (tmpFinishedOvertaking) {
+                            //for cmd == north
+                            if (cmd == Direction.north) {
+                                copyOfDirections2.push(Direction.west);
+                            } else if (cmd == Direction.south) {
+                                copyOfDirections2.push(Direction.east);
+                            } else if (cmd == Direction.east) {
+                                copyOfDirections2.push(Direction.north);
+                            } else if (cmd == Direction.west) {
+                                copyOfDirections2.push(Direction.south);
+                            }
+                            tmpFinishedOvertaking = false;
+                        }
+                        if (compareCost(steps1, copyOfDirections2, copyOfSpeed2, getCurrentPosition(), world)) {
+                            finalActionToDo.put(CarAction.CA_move_left, pr);
+                        }
+                    }
+                    case CA_move_quickly_past -> { //TODO
+                        if (overtaking) {
+                            copyOfSpeed2 = 2;
+                        }
+                        if (compareCost(steps1, copyOfDirections2, copyOfSpeed2, getCurrentPosition(), world)) {
+                            finalActionToDo.put(CarAction.CA_move_quickly_past, pr);
+                        }
+                    }
+                    case CA_not_overtaken -> { //TODO
+                        if (compareCost(steps1, copyOfDirections2, copyOfSpeed2, getCurrentPosition(), world)) {
+                            finalActionToDo.put(CarAction.CA_not_overtaken, pr);
+                        }
+                    }
+                    case CA_reduce_overall_speed -> {
+                        copyOfSpeed2 = copyOfSpeed2 - 1;
+                        if (compareCost(steps1, copyOfDirections2, copyOfSpeed2, getCurrentPosition(), world)) {
+                            finalActionToDo.put(CarAction.CA_reduce_overall_speed, pr);
+                        }
+                    }
+                    case CA_reduce_speed -> {
+                        if (getSpeed() > 1) {
+                            copyOfSpeed2 = copyOfSpeed2 - 1;
+                        }
+                        if (compareCost(steps1, copyOfDirections2, copyOfSpeed2, getCurrentPosition(), world)) {
+                            finalActionToDo.put(CarAction.CA_reduce_speed, pr);
+                        }
+                    }
+                    case CA_reduce_speed_if_pedestrians -> {//TODO
+                        if (compareCost(steps1, copyOfDirections2, copyOfSpeed2, getCurrentPosition(), world)) {
+                            finalActionToDo.put(CarAction.CA_reduce_speed_if_pedestrians, pr);
+                        }
+                    }
+                    case CA_space_for_vehicle -> {
+                        //overtaking,should not get too close to the vehicle you intend to overtake
+                        startOvertaking = true;
+                        if (compareCost(steps1, copyOfDirections2, copyOfSpeed2, getCurrentPosition(), world)) {
+                            finalActionToDo.put(CarAction.CA_space_for_vehicle, pr);
+                        }
+                    }
+                    case CA_wait_for_gap_before_moving_off -> { //TODO
+                        //r171
+                        if (compareCost(steps1, copyOfDirections2, copyOfSpeed2, getCurrentPosition(), world)) {
+                            finalActionToDo.put(CarAction.CA_wait_for_gap_before_moving_off, pr);
+                        }
+                    }
+                    case CA_wait_until_safe_gap -> { //TODO
+                        //r180
+                        if (!safe_gap) {
+                            copyOfSpeed2 = 0;
+                        }
+                        if (compareCost(steps1, copyOfDirections2, copyOfSpeed2, getCurrentPosition(), world)) {
+                            finalActionToDo.put(CarAction.CA_wait_until_safe_gap, pr);
+                        }
+                    }
+                }
+            }
+        }
+
+        if(overtaking){
+            finalActionToDo.put(CarAction.CA_move_quickly_past, CarPriority.CP_SHOULD);
+        }
+        if(finished_overtaking){
+            finalActionToDo.put(CarAction.CA_move_left, CarPriority.CP_SHOULD);
+        }
+        //after update the outcome, we get the final actionsToDo list which indicates what
+        // the car should do in the next move
+        for(Entry<CarAction, CarPriority> entry : finalActionToDo.entrySet()){
+            CarAction ca = entry.getKey();
+            switch(ca){
+                case CA_avoid_overtaking, CA_cancel_overtaking:
+                    intentions.put(CarIntention.CI_overtake,false);
+                    break;
+                case CA_consideration_others://not simulated actually //TODO
+                    break;
+                case CA_dont_cross_solid_white: //TODO
+                    break;
+                case CA_drive_care_attention://TODO
+                    break;
+                case CA_drive_slowly: //TODO
+                    break;
+                case CA_drop_back://TODO
+                    break;
+                case CA_give_way_to_pedestrians: //TODO
+                    break;
+                case CA_increase_distance_to_car_infront:
+                    //should increase the distance to infront car
+                    // r126
+                    break;
+                case CA_move_left: //TODO
+                    //after finishing overtaking, the AI car should go to its original line
+                    if(finished_overtaking){
+                        //for cmd == north
+                        if (cmd == Direction.north) {
+                            directions.push(Direction.west);
+                        }
+                        else if(cmd  == Direction.south){
+                            directions.push(Direction.east);
+                        }
+                        else if(cmd == Direction.east){
+                            directions.push(Direction.north);
+                        }
+                        else if(cmd == Direction.west){
+                            directions.push(Direction.south);
+                        }
+                        finished_overtaking = false;
+                    }
+                    break;
+                case CA_move_quickly_past: //TODO
+                    if(overtaking){
+                        setSpeed(2);
+                    }
+                    break;
+                case CA_must_stop_pedestrian_crossing: //TODO
+                    break;
+                case CA_not_drive_dangerously: //TODO
+                    //we do nothing about this
+                    break;
+                case CA_not_overtaken: //TODO
+                    break;
+                case CA_reduce_overall_speed, CA_reduce_speed: //TODO
+                    if(getSpeed() > 1){
+                        setSpeed(getSpeed() - 1);
+                    }
+                    break;
+                case CA_reduce_speed_if_pedestrians://TODO
+                    break;
+                case CA_space_for_vehicle:
+                    //overtaking,should not get too close to the vehicle you intend to overtake
+                    startOvertaking = true;
+                    break;
+                case CA_stop_at_white_line, CA_wait_at_white_line: //TODO
+                    setSpeed(0);
+                    break;
+                case CA_wait_for_gap_before_moving_off: //TODO
+                    //r171
+                    break;
+                case CA_wait_until_safe_gap, CA_avoid_cutting_corner: //TODO
+                    //r180
+                    if(!safe_gap){
+                        setSpeed(0);
+                    }
+                    break;
+            }
+        }
         if(startOvertaking){
             if(cmd == Direction.north){
                 directions.push(Direction.east);
@@ -168,146 +360,6 @@ public class CleverCar extends AbstractROTRCar implements CarEvents{
                 overtaking = true;
             }
         }
-        else if(overtaking){
-            setSpeed(2);
-        }
-
-        int steps1 = getStepsToEndPosition(directions, getSpeed(), getCurrentPosition(), world);
-
-        for(Entry<CarAction, CarPriority> entry : actionsToDo.entrySet()){
-            CarAction ca = entry.getKey();
-            CarPriority pr = entry.getValue();
-            //reference directions and speed of the car after following the must rules
-            ArrayDeque<Direction> copyOfDirection = directions.clone();
-            int copySpeed = getSpeed();
-
-            // we first only execute the must rules
-            if(pr == CarPriority.CP_SHOULD){
-                switch(ca){
-                    case CA_avoid_overtaking, CA_cancel_overtaking:
-                        intentions.put(CarIntention.CI_overtake,false);
-                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
-                            intentions.put(CarIntention.CI_overtake,false);
-                        }
-                        break;
-                    case CA_do_not_overtake: //TODO
-                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
-                            finalActionToDo.put(CarAction.CA_do_not_overtake, pr);
-                        }
-                        break;
-                    case CA_dont_cross_solid_white: //TODO
-                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
-                            finalActionToDo.put(CarAction.CA_dont_cross_solid_white, pr);
-                        }
-                        break;
-                    case CA_drop_back://TODO
-                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
-                            finalActionToDo.put(CarAction.CA_drop_back, pr);
-                        }
-                        break;
-                    case CA_give_way_to_pedestrians: //TODO
-                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
-                            finalActionToDo.put(CarAction.CA_give_way_to_pedestrians, pr);
-                        }
-                        break;
-                    case CA_increase_distance_to_car_infront:
-                        //should increase the distance to infront car
-                        // r126
-                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
-                            finalActionToDo.put(CarAction.CA_increase_distance_to_car_infront, pr);
-                        }
-                        break;
-                    case CA_move_left: //TODO
-                        //after finishing overtaking, the AI car should go to its original line
-                        if(finished_overtaking){
-                            //for cmd == north
-                            if (cmd == Direction.north) {
-                                directions.push(Direction.west);
-                            }
-                            else if(cmd  == Direction.south){
-                                directions.push(Direction.east);
-                            }
-                            else if(cmd == Direction.east){
-                                directions.push(Direction.north);
-                            }
-                            else if(cmd == Direction.west){
-                                directions.push(Direction.south);
-                            }
-                            finished_overtaking = false;
-                        }
-
-                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
-                            finalActionToDo.put(CarAction.CA_move_left, pr);
-                        }
-                        break;
-                    case CA_move_quickly_past: //TODO
-                        if(overtaking){
-                            setSpeed(2);
-                        }
-
-                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
-                            finalActionToDo.put(CarAction.CA_move_quickly_past, pr);
-                        }
-                        break;
-                    case CA_not_overtaken: //TODO
-
-                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
-                            finalActionToDo.put(CarAction.CA_not_overtaken, pr);
-                        }
-                        break;
-                    case CA_reduce_overall_speed: //TODO
-                        if(getSpeed() > 1){
-                            setSpeed(getSpeed() - 1);
-                        }
-
-                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
-                            finalActionToDo.put(CarAction.CA_reduce_overall_speed, pr);
-                        }
-                        break;
-
-                    case CA_reduce_speed:
-                        if(getSpeed() > 1){
-                            setSpeed(getSpeed() - 1);
-                        }
-                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
-                            finalActionToDo.put(CarAction.CA_reduce_speed, pr);
-                        }
-
-                        break;
-                    case CA_reduce_speed_if_pedestrians://TODO
-                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
-                            finalActionToDo.put(CarAction.CA_reduce_speed_if_pedestrians, pr);
-                        }
-                        break;
-                    case CA_space_for_vehicle:
-                        //overtaking,should not get too close to the vehicle you intend to overtake
-                        startOvertaking = true;
-                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
-                            finalActionToDo.put(CarAction.CA_space_for_vehicle, pr);
-                        }
-                        break;
-                    case CA_wait_for_gap_before_moving_off: //TODO
-                        //r171
-                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
-                            finalActionToDo.put(CarAction.CA_wait_for_gap_before_moving_off, pr);
-                        }
-                        break;
-                    case CA_wait_until_safe_gap: //TODO
-                        //r180
-
-                        if(!safe_gap){
-                            setSpeed(0);
-                        }
-
-                        if(compareCost(steps1,copyOfDirection,copySpeed,getCurrentPosition(),world)){
-                            finalActionToDo.put(CarAction.CA_wait_until_safe_gap, pr);
-                        }
-
-                        break;
-                }
-            }
-        }
-
         //According to the speed, get the direction list
         ArrayDeque<Direction> currentDirection = new ArrayDeque<>();
         for(int i = 0; i < getSpeed(); i++){
@@ -315,7 +367,6 @@ public class CleverCar extends AbstractROTRCar implements CarEvents{
                 currentDirection.add(directions.pop());
             }
         }
-
         //get current car position
         return currentDirection;
     }
@@ -386,30 +437,30 @@ public class CleverCar extends AbstractROTRCar implements CarEvents{
             safe_gap = true;
             //check if safe gap for turning right
             if(cmd == Direction.east || cmd == Direction.west) {
-                for (int y3 = 0; y3 < visibleWorld.getHeight(); y3++) {
+                for (int y = 0; y < visibleWorld.getHeight(); y++) {
                     if (cmd == Direction.east && pmd == Direction.north) {
-                        if (visibleWorld.containsCar(location.getX() + 1, y3)) {
+                        if (visibleWorld.containsCar(location.getX() + 1, y)) {
                             //check the car current direction
-                            AbstractCar car1 = visibleWorld.getCarAtPosition(location.getX() + 1, y3);
-                            if (y3 < (visibleWorld.getHeight() / 2)) {
+                            AbstractCar car1 = visibleWorld.getCarAtPosition(location.getX() + 1, y);
+                            if (y < (visibleWorld.getHeight() / 2)) {
                                 if (car1.getCMD() == Direction.south) {
                                     safe_gap = false;
                                 }
-                            } else if (y3 > (visibleWorld.getHeight() / 2)) {
+                            } else if (y > (visibleWorld.getHeight() / 2)) {
                                 if (car1.getCMD() == Direction.north) {
                                     safe_gap = false;
                                 }
                             }
                         }
                     } else if (cmd == Direction.west && pmd == Direction.south) {
-                        if (visibleWorld.containsCar(location.getX() - 1, y3)) {
+                        if (visibleWorld.containsCar(location.getX() - 1, y)) {
                             //check the car current direction
-                            AbstractCar car1 = visibleWorld.getCarAtPosition(location.getX() - 1, y3);
-                            if (y3 < visibleWorld.getHeight() / 2) {
+                            AbstractCar car1 = visibleWorld.getCarAtPosition(location.getX() - 1, y);
+                            if (y < visibleWorld.getHeight() / 2) {
                                 if (car1.getCMD() == Direction.south) {
                                     safe_gap = false;
                                 }
-                            } else if (y3 > visibleWorld.getHeight() / 2) {
+                            } else if (y > visibleWorld.getHeight() / 2) {
                                 if (car1.getCMD() == Direction.north) {
                                     safe_gap = false;
                                 }
@@ -419,19 +470,31 @@ public class CleverCar extends AbstractROTRCar implements CarEvents{
                 }
             }
             else if(cmd == Direction.north || cmd == Direction.south){
-                for(int x3 = 0 ; x3 < visibleWorld.getWidth(); x3++){
+                for(int x = 0 ; x < visibleWorld.getWidth(); x++){
                     if(cmd == Direction.north && pmd == Direction.west){
-
-                    }
-                    else if(cmd == Direction.south && pmd ==  Direction.east){
-                        if(visibleWorld.containsCar(x3, location.getY() + 1)){
-                            AbstractCar car1 = visibleWorld.getCarAtPosition(x3, location.getY() + 1);
-                            if(x3 < (visibleWorld.getWidth() / 2)){
+                        if(visibleWorld.containsCar(x, location.getY() - 1)){
+                            AbstractCar car1 = visibleWorld.getCarAtPosition(x, location.getY() - 1);
+                            if(x < (visibleWorld.getWidth() / 2)){
                                 if(car1.getCMD() == Direction.east){
                                     safe_gap = false;
                                 }
                             }
-                            else if(x3 > (visibleWorld.getWidth() / 2)){
+                            else if(x > (visibleWorld.getWidth() / 2)){
+                                if(car1.getCMD() == Direction.west){
+                                    safe_gap = false;
+                                }
+                            }
+                        }
+                    }
+                    else if(cmd == Direction.south && pmd ==  Direction.east){
+                        if(visibleWorld.containsCar(x, location.getY() + 1)){
+                            AbstractCar car1 = visibleWorld.getCarAtPosition(x, location.getY() + 1);
+                            if(x < (visibleWorld.getWidth() / 2)){
+                                if(car1.getCMD() == Direction.east){
+                                    safe_gap = false;
+                                }
+                            }
+                            else if(x > (visibleWorld.getWidth() / 2)){
                                 if(car1.getCMD() == Direction.west){
                                     safe_gap = false;
                                 }
@@ -2398,7 +2461,6 @@ public class CleverCar extends AbstractROTRCar implements CarEvents{
                                 if(visibleWorld.containsPedestrian(i,j)) {
                                     if(j == location.getY() - 1 && i == location.getX()) {
                                         Pedestrian p1 = visibleWorld.getPedestrianAtPosition(i,j);
-                                        pedestrainInRoad = true;
                                         beliefs.put(cb, true);
                                     }
 
@@ -2671,7 +2733,6 @@ public class CleverCar extends AbstractROTRCar implements CarEvents{
                     beliefs.put(CarBelief.CB_yellowMarkingsOnKerb,false);
                     break;
                 case CB_zebraCrossing:
-                    boolean approaching_zebra_crossing;
                     beliefs.put(cb, false);
                     for(int x = 0 ; x < visibleWorld.getWidth(); x++) {
                         for(int y = 0; y < visibleWorld.getHeight(); y++) {
@@ -2681,12 +2742,10 @@ public class CleverCar extends AbstractROTRCar implements CarEvents{
                                     if(rm == RoadMarking.rm_Zebra_Horizontal) {
                                         if(x == location.getX()){
                                             if(cmd == Direction.north && y == location.getY() - 1) {
-                                                approaching_zebra_crossing = true;
-                                                beliefs.put(cb, approaching_zebra_crossing);
+                                                beliefs.put(cb, true);
                                             }
                                             else if(cmd == Direction.south && y == location.getY() + 1) {
-                                                approaching_zebra_crossing = true;
-                                                beliefs.put(cb, approaching_zebra_crossing);
+                                                beliefs.put(cb, true);
                                             }
                                         }
                                     }
@@ -2694,12 +2753,10 @@ public class CleverCar extends AbstractROTRCar implements CarEvents{
                                         //check the car's current position
                                         if(y == location.getY()) {
                                             if(cmd == Direction.east && x == location.getX() + 1) {
-                                                approaching_zebra_crossing = true;
-                                                beliefs.put(cb, approaching_zebra_crossing);
+                                                beliefs.put(cb, true);
                                             }
                                             else if(cmd == Direction.south && x == location.getX() - 1) {
-                                                approaching_zebra_crossing = true;
-                                                beliefs.put(cb, approaching_zebra_crossing);
+                                                beliefs.put(cb, true);
                                             }
                                         }
                                     }
@@ -2823,6 +2880,7 @@ public class CleverCar extends AbstractROTRCar implements CarEvents{
     // reset the action list
     public void resetActions() {
         this.actionsToDo.clear();
+        this.finalActionToDo.clear();
     }
 
     // reset the recommendation list

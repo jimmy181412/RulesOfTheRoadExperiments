@@ -16,9 +16,15 @@ public class SmallAICar extends AbstractCar {
 	// 2. end Position
 	// 3. starting speed
 	// 4. its driving direction
-	public SmallAICar(Point startPos, Point endPos, Point referencePos,int startingSpeed, Direction directionToDrive)
+	public SmallAICar(Point startPos, Point endPos, Point referencePos,Direction initialDirection,int startingSpeed, Direction directionToDrive)
 	{
-		super(startPos, endPos, referencePos,startingSpeed,System.getProperty("user.dir") + "/RoTRExperiments/resources/redcar.png", CarType.car_small);
+		super(startPos, endPos, referencePos,startingSpeed
+				,initialDirection
+				,System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesicon/basicCarImage1.png"
+				,System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesicon/basicCarImage2.png"
+				,System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesicon/basicCarImage3.png"
+				,System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesicon/basicCarImage4.png"
+				,CarType.car_small);
 		toDrive = directionToDrive;
 	}
 

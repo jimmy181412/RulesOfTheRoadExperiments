@@ -27,8 +27,14 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
     ArrayDeque<Direction> directions = new ArrayDeque<>();
     private HashMap<CarAction,CarPriority> actionsRecommended = new HashMap<>();
     private HashMap<CarAction,CarPriority> actionsToDo = new HashMap<>();
-    public RudeCar(Point startPos, Point endPos,Point referencePos, int startingSpeed){
-        super(startPos,endPos, referencePos,startingSpeed, System.getProperty("user.dir") + "/RoTRExperiments/resources/bluecar.png",CarType.car_AI);
+    public RudeCar(Point startPos, Point endPos,Point referencePos,Direction initialDirection, int startingSpeed){
+        super(startPos, endPos, referencePos,startingSpeed
+                ,initialDirection
+                ,System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesicon/AICarImage1.png"
+                ,System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesicon/AICarImage2.png"
+                ,System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesicon/AICarImage3.png"
+                ,System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesicon/AICarImage4.png"
+                ,CarType.car_AI);
         addCarEventListener(this);
     }
 
@@ -203,30 +209,30 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
             safe_gap = true;
             //check if safe gap for turning right
             if(cmd == Direction.east || cmd == Direction.west) {
-                for (int y3 = 0; y3 < visibleWorld.getHeight(); y3++) {
+                for (int y = 0; y < visibleWorld.getHeight(); y++) {
                     if (cmd == Direction.east && pmd == Direction.north) {
-                        if (visibleWorld.containsCar(location.getX() + 1, y3)) {
+                        if (visibleWorld.containsCar(location.getX() + 1, y)) {
                             //check the car current direction
-                            AbstractCar car1 = visibleWorld.getCarAtPosition(location.getX() + 1, y3);
-                            if (y3 < (visibleWorld.getHeight() / 2)) {
+                            AbstractCar car1 = visibleWorld.getCarAtPosition(location.getX() + 1, y);
+                            if (y < (visibleWorld.getHeight() / 2)) {
                                 if (car1.getCMD() == Direction.south) {
                                     safe_gap = false;
                                 }
-                            } else if (y3 > (visibleWorld.getHeight() / 2)) {
+                            } else if (y > (visibleWorld.getHeight() / 2)) {
                                 if (car1.getCMD() == Direction.north) {
                                     safe_gap = false;
                                 }
                             }
                         }
                     } else if (cmd == Direction.west && pmd == Direction.south) {
-                        if (visibleWorld.containsCar(location.getX() - 1, y3)) {
+                        if (visibleWorld.containsCar(location.getX() - 1, y)) {
                             //check the car current direction
-                            AbstractCar car1 = visibleWorld.getCarAtPosition(location.getX() - 1, y3);
-                            if (y3 < visibleWorld.getHeight() / 2) {
+                            AbstractCar car1 = visibleWorld.getCarAtPosition(location.getX() - 1, y);
+                            if (y < visibleWorld.getHeight() / 2) {
                                 if (car1.getCMD() == Direction.south) {
                                     safe_gap = false;
                                 }
-                            } else if (y3 > visibleWorld.getHeight() / 2) {
+                            } else if (y > visibleWorld.getHeight() / 2) {
                                 if (car1.getCMD() == Direction.north) {
                                     safe_gap = false;
                                 }
@@ -236,19 +242,31 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
                 }
             }
             else if(cmd == Direction.north || cmd == Direction.south){
-                for(int x3 = 0 ; x3 < visibleWorld.getWidth(); x3++){
+                for(int x = 0 ; x < visibleWorld.getWidth(); x++){
                     if(cmd == Direction.north && pmd == Direction.west){
-
-                    }
-                    else if(cmd == Direction.south && pmd ==  Direction.east){
-                        if(visibleWorld.containsCar(x3, location.getY() + 1)){
-                            AbstractCar car1 = visibleWorld.getCarAtPosition(x3, location.getY() + 1);
-                            if(x3 < (visibleWorld.getWidth() / 2)){
+                        if(visibleWorld.containsCar(x, location.getY() - 1)){
+                            AbstractCar car1 = visibleWorld.getCarAtPosition(x, location.getY() - 1);
+                            if(x < (visibleWorld.getWidth() / 2)){
                                 if(car1.getCMD() == Direction.east){
                                     safe_gap = false;
                                 }
                             }
-                            else if(x3 > (visibleWorld.getWidth() / 2)){
+                            else if(x > (visibleWorld.getWidth() / 2)){
+                                if(car1.getCMD() == Direction.west){
+                                    safe_gap = false;
+                                }
+                            }
+                        }
+                    }
+                    else if(cmd == Direction.south && pmd ==  Direction.east){
+                        if(visibleWorld.containsCar(x, location.getY() + 1)){
+                            AbstractCar car1 = visibleWorld.getCarAtPosition(x, location.getY() + 1);
+                            if(x < (visibleWorld.getWidth() / 2)){
+                                if(car1.getCMD() == Direction.east){
+                                    safe_gap = false;
+                                }
+                            }
+                            else if(x > (visibleWorld.getWidth() / 2)){
                                 if(car1.getCMD() == Direction.west){
                                     safe_gap = false;
                                 }
