@@ -4,7 +4,7 @@
 |----^^----|
 |----^^----|
 |----^^----|
-|<<<<^^----|
+<<<<<^^>>>>>
 |----^^----|
 |----^^----|
 |----^^----|
@@ -44,7 +44,6 @@ edgeline > 6 7
 edgeline > 6 6
 edgeline > 6 5
 edgeline > 6 4
-edgeline > 6 3
 edgeline > 6 2
 edgeline > 6 1
 edgeline > 6 0
@@ -65,17 +64,29 @@ laneline < 6 2
 laneline < 6 1
 laneline < 6 0
 
-
+edgeline ^ 0 3
 edgeline ^ 1 3
 edgeline ^ 2 3
 edgeline ^ 3 3
 edgeline ^ 4 3
+edgeline ^ 7 3
+edgeline ^ 8 3
+edgeline ^ 9 3
+edgeline ^ 10 3
+edgeline ^ 11 3
+edgeline V 0 3
 edgeline V 1 3
 edgeline V 2 3
 edgeline V 3 3
 edgeline V 4 3
+edgeline V 7 3
+edgeline V 8 3
+edgeline V 9 3
+edgeline V 10 3
+edgeline V 11 3
 
 
-Car testingCar 5 14 1 3 5 11 jim
-Car slow 5 13 5 2 5 10
+
+Car testingCar 5 14 1 3 5 14 ^ jim
+Car slow 5 13 5 2 5 13 ^
 

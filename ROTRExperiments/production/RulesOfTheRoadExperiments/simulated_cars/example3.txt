@@ -140,6 +140,6 @@ edgeline V 13 10
 edgeline V 14 10
 
 
-car test 1 15 14 9 1 14 JIM
-car slow 2 16 2 0 2 14
-car slow 3 0 3 14 3 0
+car test 1 15 14 9 1 14 ^ JIM
+car slow 2 16 2 0 2 14 ^
+car slow 3 0 3 14 3 0 V

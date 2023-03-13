@@ -67,11 +67,11 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                 case CA_avoid_overtaking, CA_cancel_overtaking:
                     intentions.put(CarIntention.CI_overtake,false);
                     break;
-                case CA_consideration_others://not simulated actually //TODO
+                case CA_consideration_others://not simulated actually
                     break;
                 case CA_dont_cross_solid_white: //TODO
                     break;
-                case CA_drive_care_attention://TODO
+                case CA_drive_care_attention:
                     break;
                 case CA_drive_slowly: //TODO
                     break;
