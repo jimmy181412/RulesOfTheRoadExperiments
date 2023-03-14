@@ -151,7 +151,7 @@ public class RunExperiment{
 	private void initialize(){
 	    // initialize the frame
 		frame = new JFrame();
-		frame.setBounds(100, 100, 1000, 1000);
+		frame.setBounds(0,0, 800, 1400);
 		frame.setTitle("Third Year Project");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setJMenuBar(menuBar);
@@ -169,7 +169,11 @@ public class RunExperiment{
 		scenario1.addActionListener(e -> {
             try {
                 BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/RoTRExperiments/src/simulated_cars/example1.txt"));
-                simworld = LoadWorld.loadWorldFromFile(br, cal, pal);
+                simworld = LoadWorld.loadWorldFromFile(br, cal, pal,
+                        System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesIcon/greenLight.png",
+                        System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesIcon/yellowLight.png",
+                        System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesIcon/redLightPath.png"
+                );
                 pnlWorld.setLayout(new GridLayout(simworld.getHeight(), simworld.getWidth(), 1, 1));
                 updateGUIWorld();
             }
@@ -182,7 +186,10 @@ public class RunExperiment{
 		scenario2.addActionListener(e -> {
             try{
                 BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/RoTRExperiments/src/simulated_cars/example2.txt"));
-                simworld = LoadWorld.loadWorldFromFile(br, cal, pal);
+                simworld = LoadWorld.loadWorldFromFile(br, cal, pal,
+                        System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesIcon/greenLight.png",
+                        System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesIcon/yellowLight.png",
+                        System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesIcon/redLightPath.png");
                 pnlWorld.setLayout(new GridLayout(simworld.getHeight(), simworld.getWidth(), 1, 1));
                 updateGUIWorld();
 
@@ -196,7 +203,10 @@ public class RunExperiment{
 		scenario3.addActionListener(e -> {
             try{
                 BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/RoTRExperiments/src/simulated_cars/example3.txt"));
-                simworld = LoadWorld.loadWorldFromFile(br, cal,pal);
+                simworld = LoadWorld.loadWorldFromFile(br, cal,pal,
+                        System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesIcon/greenLight.png",
+                        System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesIcon/yellowLight.png",
+                        System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesIcon/redLight.png");
                 pnlWorld.setLayout(new GridLayout(simworld.getHeight(), simworld.getWidth(), 1, 1));
                 updateGUIWorld();
             }
@@ -340,6 +350,7 @@ public class RunExperiment{
 		
 		// initialize the scenario panel and add the panel to the frame
 		frame.getContentPane().add(pnlWorld, BorderLayout.CENTER);
+        pnlWorld.setPreferredSize(new Dimension(1000,1000));
         pnlWorld.setLayout(new GridLayout(3, 3, 0, 0));
         pnlWorld.setBackground(new Color(66,66,66).darker().darker());
         
@@ -362,19 +373,28 @@ public class RunExperiment{
             try {
                 if(cbScenarios.getSelectedItem() == "Scenario 1") {
                     BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/RoTRExperiments/src/simulated_cars/example1.txt"));
-                    simworld = LoadWorld.loadWorldFromFile(br, cal, pal);
+                    simworld = LoadWorld.loadWorldFromFile(br, cal, pal,
+                            System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesIcon/greenLight.png",
+                            System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesIcon/yellowLight.png",
+                            System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesIcon/redLight.png");
                     pnlWorld.setLayout(new GridLayout(simworld.getHeight(), simworld.getWidth(), 0, 0));
                     updateGUIWorld();
                 }
                 else if(cbScenarios.getSelectedItem() == "Scenario 2") {
                     BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/RoTRExperiments/src/simulated_cars/example2.txt"));
-                    simworld = LoadWorld.loadWorldFromFile(br, cal, pal);
+                    simworld = LoadWorld.loadWorldFromFile(br, cal, pal,
+                            System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesIcon/greenLight.png",
+                            System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesIcon/yellowLight.png",
+                            System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesIcon/redLight.png");
                     pnlWorld.setLayout(new GridLayout(simworld.getHeight(), simworld.getWidth(), 0, 0));
                     updateGUIWorld();
                 }
                 else if(cbScenarios.getSelectedItem() == "Scenario 3") {
                     BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/RoTRExperiments/src/simulated_cars/example3.txt"));
-                    simworld = LoadWorld.loadWorldFromFile(br, cal, pal);
+                    simworld = LoadWorld.loadWorldFromFile(br, cal, pal,
+                            System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesIcon/greenLight.png",
+                            System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesIcon/yellowLight.png",
+                            System.getProperty("user.dir") + "/RoTRExperiments/resources/imagesIcon/redLight.png");
                     pnlWorld.setLayout(new GridLayout(simworld.getHeight(), simworld.getWidth(), 0, 0));
                     updateGUIWorld();
                 }

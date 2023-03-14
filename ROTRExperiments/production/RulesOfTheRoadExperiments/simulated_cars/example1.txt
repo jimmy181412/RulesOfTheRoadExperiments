@@ -1,129 +1,157 @@
-14
-11
-1
------p^Vp-----
-|    p^Vp    |
-|    p^Vp    |
-pppppp^Vpppppp
->>>>>>++>>>>>>
-<<<<<<++<<<<<<
-pppppp^Vpppppp
-|    p^Vp    |
-|    p^Vp    |
-|    p^Vp    |
------p^Vp-----
+20
+20
+3
+|-------p^Vp-------|
+|-------p^Vp-------|
+|-------p^Vp-------|
+|-------p^Vp-------|
+|-------p^Vp-------|
+|-------p^Vp-------|
+|-------p^Vp-------|
+|-------p^Vp-------|
+ppppppppp^Vppppppppp
+>>>>>>>>>++>>>>>>>>>
+<<<<<<<<<++<<<<<<<<<
+ppppppppp^Vppppppppp
+|-------p^Vp-------|
+|-------p^Vp-------|
+|-------p^Vp-------|
+|-------p^Vp-------|
+|-------p^Vp-------|
+|-------p^Vp-------|
+|-------p^Vp-------|
+|-------p^Vp-------|
+|-------p^Vp-------|
 
-trafficlight V 5 6 6 6
-trafficlight > 8 6 8 5
-trafficlight ^ 8 3 7 3
-trafficlight < 5 3 5 4
+trafficLight < 8 8 8 9
+trafficLight V 8 11 9 11
+trafficLight ^ 11 8 10 8
+trafficLight > 11 11 11 10
 
-zebracrossing > 6 7
-zebracrossing > 7 7
-zebracrossing > 6 2
-zebracrossing > 7 2
-zebracrossing ^ 4 4
-zebracrossing ^ 4 5
-zebracrossing ^ 9 4
-zebracrossing ^ 9 5
+zebracrossing ^ 6 9
+zebracrossing ^ 6 10
+zebracrossing ^ 13 9
+zebracrossing ^ 13 10
+zebracrossing > 9 13
+zebracrossing > 10 13
+zebracrossing > 9 6
+zebracrossing > 10 6
 
-edgeline < 6 0
-edgeline < 6 1
-edgeline < 6 2
-edgeline < 6 3
-edgeline < 6 6
-edgeline < 6 7
-edgeline < 6 8
-edgeline < 6 9
-edgeline < 6 10
-edgeline > 7 0
-edgeline > 7 1
-edgeline > 7 2
-edgeline > 7 3
-edgeline > 7 6
-edgeline > 7 7
-edgeline > 7 8
-edgeline > 7 9
-edgeline > 7 10
-edgeline ^ 0 4
-edgeline ^ 1 4
-edgeline ^ 2 4
-edgeline ^ 3 4
-edgeline ^ 4 4
-edgeline ^ 5 4
-edgeline ^ 8 4
-edgeline ^ 9 4
-edgeline ^ 10 4
-edgeline ^ 11 4
-edgeline ^ 12 4
-edgeline ^ 13 4
-edgeline V 0 5
-edgeline V 1 5
-edgeline V 2 5
-edgeline V 3 5
-edgeline V 4 5
-edgeline V 5 5
-edgeline V 8 5
-edgeline V 9 5
-edgeline V 10 5
-edgeline V 11 5
-edgeline V 12 5
-edgeline V 13 5
 
-centreline < 7 0
-centreline < 7 1
-centreline < 7 3
-centreline < 7 6
-centreline < 7 8
-centreline < 7 9
-centreline < 7 10
-centreline ^ 0 5
-centreline ^ 1 5
-centreline ^ 2 5
-centreline ^ 3 5
-centreline ^ 5 5
-centreline ^ 8 5
-centreline ^ 10 5
-centreline ^ 11 5
-centreline ^ 12 5
-centreline ^ 13 5
+edgeline < 9 19
+edgeline < 9 18
+edgeline < 9 17
+edgeline < 9 16
+edgeline < 9 15
+edgeline < 9 14
+edgeline < 9 12
+edgeline < 9 11
+edgeline < 9 8
+edgeline < 9 7
+edgeline < 9 6
+edgeline < 9 5
+edgeline < 9 4
+edgeline < 9 3
+edgeline < 9 2
+edgeline < 9 1
+edgeline < 9 0
+edgeline > 10 19
+edgeline > 10 18
+edgeline > 10 17
+edgeline > 10 16
+edgeline > 10 15
+edgeline > 10 14
+edgeline > 10 12
+edgeline > 10 11
+edgeline > 10 8
+edgeline > 10 7
+edgeline > 10 6
+edgeline > 10 5
+edgeline > 10 4
+edgeline > 10 3
+edgeline > 10 2
+edgeline > 10 1
+edgeline > 10 0
 
-pavement > 5 10
-pavement > 5 9
-pavement > 5 8
-pavement > 5 7
-pavement > 5 2
-pavement > 5 1
-pavement > 5 0
-pavement < 8 10
-pavement < 8 9
-pavement < 8 8
-pavement < 8 7
-pavement < 8 2
-pavement < 8 1
-pavement < 8 0
-pavement ^ 0 6
-pavement ^ 1 6
-pavement ^ 2 6
-pavement ^ 3 6
-pavement ^ 4 6
-pavement ^ 9 6
-pavement ^ 10 6
-pavement ^ 11 6
-pavement ^ 12 6
-pavement ^ 13 6
-pavement V 0 3
-pavement V 1 3
-pavement V 2 3
-pavement V 3 3
-pavement V 4 3
-pavement V 9 3
-pavement V 10 3
-pavement V 11 3
-pavement V 12 3
-pavement V 13 3
+edgeline ^ 0 9
+edgeline ^ 1 9
+edgeline ^ 2 9
+edgeline ^ 3 9
+edgeline ^ 4 9
+edgeline ^ 5 9
+edgeline ^ 7 9
+edgeline ^ 8 9
+edgeline ^ 11 9
+edgeline ^ 12 9
+edgeline ^ 14 9
+edgeline ^ 15 9
+edgeline ^ 16 9
+edgeline ^ 17 9
+edgeline ^ 18 9
+edgeline ^ 19 9
 
-Car testingCar 6 10 13 4 6 10 ^ JIM
-Car slow 13 5 0 5 13 5 ^
-pedestrian p1 5 7 8 7 5 7 >
-pedestrian p3 8 2 5 2 8 2 <
+edgeline V 0 10
+edgeline V 1 10
+edgeline V 2 10
+edgeline V 3 10
+edgeline V 4 10
+edgeline V 5 10
+edgeline V 7 10
+edgeline V 8 10
+edgeline V 11 10
+edgeline V 12 10
+edgeline V 14 10
+edgeline V 15 10
+edgeline V 16 10
+edgeline V 17 10
+edgeline V 18 10
+edgeline V 19 10
+
+centreline < 10 0
+centreline < 10 1
+centreline < 10 2
+centreline < 10 3
+centreline < 10 4
+centreline < 10 5
+centreline < 10 7
+centreline < 10 8
+centreline < 10 11
+centreline < 10 12
+centreline < 10 14
+centreline < 10 15
+centreline < 10 16
+centreline < 10 17
+centreline < 10 18
+centreline < 10 19
+
+centreline ^ 0 10
+centreline ^ 1 10
+centreline ^ 2 10
+centreline ^ 3 10
+centreline ^ 4 10
+centreline ^ 5 10
+centreline ^ 7 10
+centreline ^ 8 10
+centreline ^ 11 10
+centreline ^ 12 10
+centreline ^ 13 10
+centreline ^ 14 10
+centreline ^ 15 10
+centreline ^ 16 10
+centreline ^ 17 10
+centreline ^ 18 10
+centreline ^ 19 10
+
+pedestrian p1 8 13 11 13 8 13 >
+pedestrian p2 11 6 8 6 11 6 <
+pedestrian p3 13 8 13 11 13 8 V
+car jim 9 19 19 9 9 19 ^ jim
+car slow 19 10 0 10 19 10 <
+
+
+
+
+
+
+
+

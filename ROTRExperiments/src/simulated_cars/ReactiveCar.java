@@ -22,8 +22,9 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
     private boolean startOvertaking;
     private boolean overtaking;
     private boolean finished_overtaking;
+    private boolean PedestrianIsCrossing;
     private boolean safe_gap;
-
+    //detect whether pedestrian is crossing or not
     ArrayDeque<Direction> directions = new ArrayDeque<>();
     private HashMap<CarAction,CarPriority> actionsRecommended = new HashMap<>();
     private HashMap<CarAction,CarPriority> actionsToDo = new HashMap<>();
@@ -44,7 +45,6 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
     protected ArrayDeque<Direction> getSimulationRoute(WorldSim world){
         directions = getCurrentMovingDirectionList();
         updateOutcomes();
-
         //the car can not crush with other cars
         if(exitIsClear){
             setSpeed(1);
@@ -52,7 +52,6 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
         else{
             setSpeed(0);
         }
-        
         if(overtaking){
             actionsToDo.put(CarAction.CA_move_quickly_past, CarPriority.CP_SHOULD);
         }
@@ -69,21 +68,22 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                     break;
                 case CA_consideration_others://not simulated actually
                     break;
-                case CA_dont_cross_solid_white: //TODO
-                    break;
                 case CA_drive_care_attention:
                     break;
-                case CA_drive_slowly: //TODO
-                    break;
-                case CA_drop_back://TODO
-                    break;
-                case CA_give_way_to_pedestrians: //TODO
+                case CA_give_way_to_pedestrians:
+                    setSpeed(0);
                     break;
                 case CA_increase_distance_to_car_infront:
                     //should increase the distance to infront car
+                    if(getSpeed() > 0){
+                        setSpeed(getSpeed() - 1);
+                    }
+                    else{
+                        setSpeed(0);
+                    }
                     // r126
                     break;
-                case CA_move_left: //TODO
+                case CA_move_left:
                     //after finishing overtaking, the AI car should go to its original line
                     if(finished_overtaking){
                         //for cmd == north
@@ -102,41 +102,43 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                         finished_overtaking = false;
                     }
                     break;
-                case CA_move_quickly_past: //TODO
+                case CA_move_quickly_past:
                     if(overtaking){
                         setSpeed(2);
                     }
                     break;
-                case CA_must_stop_pedestrian_crossing: //TODO
+                case CA_must_stop_pedestrian_crossing:
+                    if(PedestrianIsCrossing){
+                        setSpeed(0);
+                    }
                     break;
-                case CA_not_drive_dangerously: //TODO
+                case CA_not_drive_dangerously:
                     //we do nothing about this
                     break;
-                case CA_not_overtaken: //TODO
-                    break;
-                case CA_reduce_overall_speed, CA_reduce_speed: //TODO
+                case CA_reduce_overall_speed, CA_reduce_speed:
                     if(getSpeed() > 1){
                         setSpeed(getSpeed() - 1);
                     }
                     break;
-                case CA_reduce_speed_if_pedestrians://TODO
+                case CA_reduce_speed_if_pedestrians:
                     break;
                 case CA_space_for_vehicle:
                     //overtaking,should not get too close to the vehicle you intend to overtake
                     startOvertaking = true;
                     break;
-                case CA_stop_at_white_line, CA_wait_at_white_line: //TODO
+                case CA_stop_at_white_line, CA_wait_at_white_line:
                     setSpeed(0);
                     break;
-                case CA_wait_for_gap_before_moving_off: //TODO
-                    //r171
-                    break;
-                case CA_wait_until_safe_gap, CA_avoid_cutting_corner: //TODO
+                case CA_wait_until_safe_gap:
                     //r180
                     if(!safe_gap){
                         setSpeed(0);
                     }
                     break;
+                case  CA_avoid_cutting_corner:
+                    if(!exitIsClear){
+                        setSpeed(0);
+                    }
             }
         }
         if(startOvertaking){
@@ -210,33 +212,23 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
 
 
         safe_gap = true;
-        //check if safe gap for turning right
-        if(cmd == Direction.east || cmd == Direction.west) {
-            for (int y = 0; y < visibleWorld.getHeight(); y++) {
-                if (cmd == Direction.east && pmd == Direction.north) {
-                    if (visibleWorld.containsCar(location.getX() + 1, y)) {
-                        //check the car current direction
-                        AbstractCar car1 = visibleWorld.getCarAtPosition(location.getX() + 1, y);
-                        if (y < (visibleWorld.getHeight() / 2)) {
-                            if (car1.getCMD() == Direction.south) {
-                                safe_gap = false;
-                            }
-                        } else if (y > (visibleWorld.getHeight() / 2)) {
-                            if (car1.getCMD() == Direction.north) {
+        int espeed = getSpeed();
+        if(espeed == 0){
+            espeed = 1;
+        }
+        //check car current moving direction
+        if(cmd == Direction.north) {
+            for(int i = 0; i < visibleWorld.getWidth(); i++) {
+                for(int j = location.getY() - 1; j >= location.getY() - espeed;j--) {
+                    if(visibleWorld.containsCar(i,j)) {
+                        AbstractCar car = visibleWorld.getCarAtPosition(i,j);
+                        if(i < (visibleWorld.getWidth() / 2)){
+                            if(car.getCMD() == Direction.east){
                                 safe_gap = false;
                             }
                         }
-                    }
-                } else if (cmd == Direction.west && pmd == Direction.south) {
-                    if (visibleWorld.containsCar(location.getX() - 1, y)) {
-                        //check the car current direction
-                        AbstractCar car1 = visibleWorld.getCarAtPosition(location.getX() - 1, y);
-                        if (y < visibleWorld.getHeight() / 2) {
-                            if (car1.getCMD() == Direction.south) {
-                                safe_gap = false;
-                            }
-                        } else if (y > visibleWorld.getHeight() / 2) {
-                            if (car1.getCMD() == Direction.north) {
+                        else if(i > (visibleWorld.getWidth() / 2)){
+                            if(car.getCMD() == Direction.west){
                                 safe_gap = false;
                             }
                         }
@@ -244,34 +236,57 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                 }
             }
         }
-        else if(cmd == Direction.north || cmd == Direction.south){
-            for(int x = 0 ; x < visibleWorld.getWidth(); x++){
-                if(cmd == Direction.north && pmd == Direction.west){
-                    if(visibleWorld.containsCar(x, location.getY() - 1)){
-                        AbstractCar car1 = visibleWorld.getCarAtPosition(x, location.getY() - 1);
-                        if(x < (visibleWorld.getWidth() / 2)){
-                            if(car1.getCMD() == Direction.east){
-                                safe_gap = false;
+        else if(cmd == Direction.south) {
+            for(int i = 0; i < visibleWorld.getWidth(); i++) {
+                for(int j = location.getY() + 1; j <= location.getY() + espeed; j++) {
+                    if(visibleWorld.containsCar(i,j)) {
+                        AbstractCar car = visibleWorld.getCarAtPosition(i,j);
+                        if(i <  (visibleWorld.getWidth()) / 2){
+                            if(car.getCMD() == Direction.east){
+                              safe_gap = false;
                             }
                         }
-                        else if(x > (visibleWorld.getWidth() / 2)){
-                            if(car1.getCMD() == Direction.west){
+                        else if(i > (visibleWorld.getWidth() / 2)){
+                            if(car.getCMD() == Direction.west){
                                 safe_gap = false;
                             }
                         }
                     }
                 }
-                else if(cmd == Direction.south && pmd ==  Direction.east){
-                    if(visibleWorld.containsCar(x, location.getY() + 1)){
-                        AbstractCar car1 = visibleWorld.getCarAtPosition(x, location.getY() + 1);
-                        if(x < (visibleWorld.getWidth() / 2)){
-                            if(car1.getCMD() == Direction.east){
+            }
+        }
+        else if(cmd == Direction.east) {
+            for(int i = location.getX() + 1; i <= location.getX() + espeed; i++) {
+                for(int j = 0; j < visibleWorld.getHeight(); j++) {
+                    if(visibleWorld.containsCar(i,j)) {
+                        AbstractCar car = visibleWorld.getCarAtPosition(i,j);
+                        if( j < (visibleWorld.getHeight() / 2)){
+                            if(car.getCMD() == Direction.south){
                                 safe_gap = false;
                             }
                         }
-                        else if(x > (visibleWorld.getWidth() / 2)){
-                            if(car1.getCMD() == Direction.west){
+                        else if(j > (visibleWorld.getHeight() / 2)){
+                            if(car.getCMD() == Direction.north){
                                 safe_gap = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else if(cmd == Direction.west) {
+            for(int i = location.getX() - 1; i >= location.getX() - espeed; i--) {
+                for(int j = 0; j < visibleWorld.getHeight(); j++) {
+                    if(visibleWorld.containsCar(i,j)) {
+                        AbstractCar car = visibleWorld.getCarAtPosition(i,j);
+                        if( j < (visibleWorld.getHeight() / 2)) {
+                            if (car.getCMD() == Direction.south) {
+                                safe_gap = false;
+                            }
+                        }
+                        else if(j >  (visibleWorld.getHeight() / 2)){
+                            if(car.getCMD() == Direction.north){
+                               safe_gap = false;
                             }
                         }
                     }
@@ -285,7 +300,6 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
     {
         actionsRecommended.put(action, priority);
         switch (action) {
-            //TODO
             case CA_adjust_speed -> actionsToDo.put(CarAction.CA_adjust_speed, priority);
             case CA_allow_cyclists_moto_pass -> //not simulated
                     actionsToDo.put(CarAction.CA_allow_cyclists_moto_pass, priority);
@@ -2173,99 +2187,89 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
             case CB_pavement: //not simulated
                 beliefs.put(CarBelief.CB_pavement,false);
                 break;
-            case CB_pedestrianCrossing: //TODO
-                boolean pedestraincrossing = false;
-                
-               
-//                espeed = 1;
-//                //check car current moving direction
-//                if(cmd == Direction.north) {         
-//                 for(int i = 0; i < visibleWorld.getWidth(); i++) {
-//                       for(int j = location.getY() - 1; j >= location.getY() - espeed;j--) {
-//                           if(visibleWorld.containsPedestrain(i,j)) { 
-//                               
-//                               Pedestrian p1 = visibleWorld.getPedestrainAtPosition(i, j);
-//                               //get pedestrian moving direction
-//                               Direction d1 = p1.getMovingDirection(); 
-//                               
-//                               pedestraincrossing = true;
-//                               beliefs.put(cb,  pedestraincrossing);
-//                           }
-//                       }
-//                   }
-//                }
-//                else if(cmd == Direction.south) { 
-//                    for(int i = 0; i < visibleWorld.getWidth(); i++) {
-//                        for(int j = location.getY() + 1; j <= location.getY() + espeed; j++) {
-//                            if(visibleWorld.containsPedestrain(i,j)) {
-//                                pedestraincrossing = true;
-//                                beliefs.put(cb,  pedestraincrossing);
-//                            }
-//                         }
-//                    }
-//                               
-//                }
-//                else if(cmd == Direction.east) {
-//                    for(int i = location.getX() + 1; i <= location.getX() + espeed; i++) {
-//                        for(int j = 0; j < visibleWorld.getHeight(); j++) {
-//                            if(visibleWorld.containsPedestrain(i,j)) {
-//                                pedestraincrossing = true;
-//                                beliefs.put(cb,  pedestraincrossing);
-//                            }
-//                           }
-//                        }
-//                    } 
-//                
-//                
-//                else if(cmd == Direction.west) {
-//                    for(int i = location.getX() - 1; i >= location.getX() - espeed; i--) {
-//                        for(int j = 0; j < visibleWorld.getHeight(); j++) {
-//                            if(visibleWorld.containsPedestrain(i,j)) {
-//                                pedestraincrossing = true;
-//                                beliefs.put(cb,  pedestraincrossing);
-//                            }
-//                        }
-//                    } 
-//                }
+            case CB_pedestrianCrossing: //not simulated
                 break;
             case CB_pedestriansInRoad:
-                boolean pedestrainInRoad = false;
-                
+                PedestrianIsCrossing = false;
                 espeed = 1;
                 //check car current moving direction
-                if(cmd == Direction.north) {         
-                 for(int i = 0; i < visibleWorld.getWidth(); i++) {
-                       for(int j = location.getY() - 1; j >= location.getY() - espeed;j--) {
-                           if(visibleWorld.containsPedestrian(i,j)) {
-                               if(j == location.getY() - 1 && i == location.getX()) {
-                                   System.out.println(i + " " + j);
-                                   Pedestrian p1 = visibleWorld.getPedestrianAtPosition(i,j);
-                                   pedestrainInRoad = true;
-                                   beliefs.put(cb, true);
-                               }
-                           }
-                       }
-                   }
+                if(cmd == Direction.north) {
+                    for(int i = 0; i < visibleWorld.getWidth(); i++) {
+                        for(int j = location.getY() - 1; j >= location.getY() - espeed;j--) {
+                            if(visibleWorld.containsPedestrian(i,j)) {
+                                Pedestrian p = visibleWorld.getPedestrianAtPosition(i,j);
+                                if(i <= (visibleWorld.getWidth() / 2)){
+                                    if(p.getMovingDirection() == Direction.east){
+                                        PedestrianIsCrossing = true;
+                                        beliefs.put(cb, true);
+                                        if(i == location.getX() - 1){
+                                            exitIsClear = false;
+                                        }
+                                    }
+                                }
+                                else if(i > (visibleWorld.getWidth() / 2)){
+                                    if(p.getMovingDirection() == Direction.west){
+                                        PedestrianIsCrossing = true;
+                                        beliefs.put(cb, true);
+                                        if(i == location.getX() + 1){
+                                            exitIsClear = false;
+                                        }
+
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
-                else if(cmd == Direction.south) { 
+                else if(cmd == Direction.south) {
                     for(int i = 0; i < visibleWorld.getWidth(); i++) {
                         for(int j = location.getY() + 1; j <= location.getY() + espeed; j++) {
                             if(visibleWorld.containsPedestrian(i,j)) {
-                                if(j == location.getY() + 1 && i == location.getX()) {
-                                    pedestrainInRoad = true;
-                                    beliefs.put(cb, pedestrainInRoad);
+                                Pedestrian p = visibleWorld.getPedestrianAtPosition(i,j);
+                                if(i <= (visibleWorld.getWidth()) / 2){
+                                    if(p.getMovingDirection() == Direction.east){
+                                        PedestrianIsCrossing = true;
+                                        beliefs.put(cb, true);
+                                        if(i == location.getX() - 1){
+                                            exitIsClear = false;
+                                        }
+                                    }
+                                }
+                                else if(i > (visibleWorld.getWidth() / 2)){
+                                    if(p.getMovingDirection() == Direction.west){
+                                        PedestrianIsCrossing = true;
+                                        beliefs.put(cb, true);
+                                        if(i == location.getX() + 1){
+                                            exitIsClear = false;
+                                        }
+                                    }
                                 }
                             }
-                         }
+                        }
                     }
                 }
                 else if(cmd == Direction.east) {
                     for(int i = location.getX() + 1; i <= location.getX() + espeed; i++) {
                         for(int j = 0; j < visibleWorld.getHeight(); j++) {
                             if(visibleWorld.containsPedestrian(i,j)) {
-                                if(i == location.getX() + 1 && j == location.getY()) {
-                                    pedestrainInRoad = true;
-                                    beliefs.put(cb, pedestrainInRoad);
+                                Pedestrian p = visibleWorld.getPedestrianAtPosition(i,j);
+                                if( j <= (visibleWorld.getHeight() / 2)){
+                                    if(p.getMovingDirection() == Direction.south){
+                                        PedestrianIsCrossing = true;
+                                        beliefs.put(cb,true);
+                                        if(j == location.getY() - 1){
+                                            exitIsClear = false;
+                                        }
+                                    }
+                                }
+                                else if(j > (visibleWorld.getHeight() / 2)){
+                                    if(p.getMovingDirection() == Direction.north){
+                                        PedestrianIsCrossing = true;
+                                        beliefs.put(cb,true);
+                                        if(j == location.getY() + 1){
+                                            exitIsClear = false;
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -2275,13 +2279,28 @@ public class ReactiveCar extends AbstractROTRCar implements CarEvents{
                     for(int i = location.getX() - 1; i >= location.getX() - espeed; i--) {
                         for(int j = 0; j < visibleWorld.getHeight(); j++) {
                             if(visibleWorld.containsPedestrian(i,j)) {
-                               if(i == location.getX() - 1 && j == location.getY()) {
-                                   pedestrainInRoad = true;
-                                   beliefs.put(cb, pedestrainInRoad);
-                               }
+                                Pedestrian p = visibleWorld.getPedestrianAtPosition(i,j);
+                                if( j <= (visibleWorld.getHeight() / 2)) {
+                                    if (p.getMovingDirection() == Direction.south) {
+                                        PedestrianIsCrossing = true;
+                                        beliefs.put(cb, true);
+                                        if (j == location.getY() - 1) {
+                                            exitIsClear = false;
+                                        }
+                                    }
+                                }
+                                else if(j >  (visibleWorld.getHeight() / 2)){
+                                    if(p.getMovingDirection() == Direction.north){
+                                        PedestrianIsCrossing = true;
+                                        beliefs.put(cb,true);
+                                        if(j == location.getY() + 1){
+                                            exitIsClear = false;
+                                        }
+                                    }
+                                }
                             }
                         }
-                    } 
+                    }
                 }
                 break;
             case CB_pelicanCrossing: //not simulated

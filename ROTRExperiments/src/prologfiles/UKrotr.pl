@@ -330,8 +330,8 @@ rule(r192, standard, [atCrossing], [], [should-keep_crossing_clear]).
 
 %Rule Description: Pay attention at crossing
 %Rule Description: Don't rev at pedestrians crossing
-%Rule Description: Zebra crossings
-rule(r195, standard, [zebraCrossing], [], [must-must_stop_pedestrian_crossing,  should-reduce_speed_if_pedestrians]).
+%Rule Description: Zebra crossing
+rule(r195, standard, [zebraCrossing], [], [must-must_stop_pedestrian_crossing]).
 
 %Rule Description: PelicanCrossing
 rule(r196, standard, [pelicanCrossing, lightRed, lightFlashingAmber, pedestriansInRoad], [], [must-stop_at_crossing]).%TODO: Hand check

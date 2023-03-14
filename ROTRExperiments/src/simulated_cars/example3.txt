@@ -1,84 +1,62 @@
-15
-17
-1
-|^^VV||||||||||
-|^^VV||||||||||
-|^^VV||||||||||
-|^^VV||||||||||
-|^^VV||||||||||
-|^^VV||||||||||
-|^^VV||||||||||
-|^^VV||||||||||
-|^^VV||||||||||
-|++++>>>>>>>>>>
-|++++<<<<<<<<<<
-|^^VV||||||||||
-|^^VV||||||||||
-|^^VV||||||||||
-|^^VV||||||||||
-|^^VV||||||||||
-|^^VV||||||||||
+20
+20
+3
+|||^^VV|||||||||||||
+|||^^VV|||||||||||||
+|||^^VV|||||||||||||
+|||^^VV|||||||||||||
+|||^^VV|||||||||||||
+|||^^VV|||||||||||||
+|||^^VV|||||||||||||
+|||^^VV|||||||||||||
+|||^^VV|||||||||||||
+|||^^VV|||||||||||||
+|||^^VV|||||||||||||
+|||++++>>>>>>>>>>>>>
+|||++++<<<<<<<<<<<<<
+|||^^VV|||||||||||||
+|||^^VV|||||||||||||
+|||^^VV|||||||||||||
+|||^^VV|||||||||||||
+|||^^VV|||||||||||||
+|||^^VV|||||||||||||
+|||^^VV|||||||||||||
 
 
-edgeline < 1 16
-edgeline < 1 15
-edgeline < 1 14
-edgeline < 1 13
-edgeline < 1 12
-edgeline < 1 11
-edgeline < 1 10
-edgeline < 1 9
-edgeline < 1 8
-edgeline < 1 7
-edgeline < 1 6
-edgeline < 1 5
-edgeline < 1 4
-edgeline < 1 3
-edgeline < 1 2
-edgeline < 1 1
-edgeline < 1 0
+car nick 3 17 19 11 3 17 ^ jim
+car slow 4 19 4 0 4 19 ^
+car slow 5 1 5 19 5 0 V
+car slow 6 0 6 19 6 0 V
 
-laneline < 2 16
-laneline < 2 15
-laneline < 2 14
-laneline < 2 13
-laneline < 2 12
-laneline < 2 11
-laneline < 2 10
-laneline < 2 9
-laneline < 2 8
-laneline < 2 7
-laneline < 2 6
-laneline < 2 5
-laneline < 2 4
-laneline < 2 3
-laneline < 2 2
-laneline < 2 1
-laneline < 2 0
+edgeline < 3 19
+edgeline < 3 18
+edgeline < 3 17
+edgeline < 3 16
+edgeline < 3 15
+edgeline < 3 14
+edgeline < 3 13
+edgeline < 3 12
+edgeline < 3 11
+edgeline < 3 10
+edgeline < 3 9
+edgeline < 3 8
+edgeline < 3 7
+edgeline < 3 6
+edgeline < 3 5
+edgeline < 3 4
+edgeline < 3 3
+edgeline < 3 2
+edgeline < 3 1
+edgeline < 3 0
 
-centreline < 3 16
-centreline < 3 15
-centreline < 3 14
-centreline < 3 13
-centreline < 3 12
-centreline < 3 11
-centreline < 3 10
-centreline < 3 9
-centreline < 3 8
-centreline < 3 7
-centreline < 3 6
-centreline < 3 5
-centreline < 3 4
-centreline < 3 3
-centreline < 3 2
-centreline < 3 1
-centreline < 3 0
-
+laneline < 4 19
+laneline < 4 18
+laneline < 4 17
 laneline < 4 16
 laneline < 4 15
 laneline < 4 14
-laneline < 4 13
 laneline < 4 12
+laneline < 4 13
 laneline < 4 11
 laneline < 4 10
 laneline < 4 9
@@ -92,54 +70,122 @@ laneline < 4 2
 laneline < 4 1
 laneline < 4 0
 
-edgeline > 4 16
-edgeline > 4 15
-edgeline > 4 14
-edgeline > 4 13
-edgeline > 4 12
-edgeline > 4 11
-edgeline > 4 8
-edgeline > 4 7
-edgeline > 4 6
-edgeline > 4 5
-edgeline > 4 4
-edgeline > 4 3
-edgeline > 4 2
-edgeline > 4 1
-edgeline > 4 0
+centreline < 5 19
+centreline < 5 18
+centreline < 5 17
+centreline < 5 16
+centreline < 5 15
+centreline < 5 14
+centreline < 5 13
+centreline < 5 12
+centreline < 5 11
+centreline < 5 10
+centreline < 5 9
+centreline < 5 8
+centreline < 5 7
+centreline < 5 6
+centreline < 5 5
+centreline < 5 4
+centreline < 5 3
+centreline < 5 2
+centreline < 5 1
+centreline < 5 0
 
-centreline ^ 5 10
-centreline ^ 6 10
-centreline ^ 7 10
-centreline ^ 8 10
-centreline ^ 9 10
-centreline ^ 10 10
-centreline ^ 11 10
-centreline ^ 12 10
-centreline ^ 13 10
-centreline ^ 14 10
-edgeline ^ 5 9
-edgeline ^ 6 9
-edgeline ^ 7 9
-edgeline ^ 8 9
-edgeline ^ 9 9
-edgeline ^ 10 9
-edgeline ^ 11 9
-edgeline ^ 12 9
-edgeline ^ 13 9
-edgeline ^ 14 9
-edgeline V 5 10
-edgeline V 6 10
-edgeline V 7 10
-edgeline V 8 10
-edgeline V 9 10
-edgeline V 10 10
-edgeline V 11 10
-edgeline V 12 10
-edgeline V 13 10
-edgeline V 14 10
+laneline < 6 19
+laneline < 6 18
+laneline < 6 17
+laneline < 6 16
+laneline < 6 15
+laneline < 6 14
+laneline < 6 12
+laneline < 6 13
+laneline < 6 11
+laneline < 6 10
+laneline < 6 9
+laneline < 6 8
+laneline < 6 7
+laneline < 6 6
+laneline < 6 5
+laneline < 6 4
+laneline < 6 3
+laneline < 6 2
+laneline < 6 1
+laneline < 6 0
+
+edgeline > 6 19
+edgeline > 6 18
+edgeline > 6 17
+edgeline > 6 16
+edgeline > 6 15
+edgeline > 6 14
+edgeline > 6 13
+edgeline > 6 8
+edgeline > 6 9
+edgeline > 6 10
+edgeline > 6 7
+edgeline > 6 6
+edgeline > 6 5
+edgeline > 6 4
+edgeline > 6 3
+edgeline > 6 2
+edgeline > 6 1
+edgeline > 6 0
+
+edgeline ^ 7 11
+edgeline ^ 8 11
+edgeline ^ 9 11
+edgeline ^ 10 11
+edgeline ^ 11 11
+edgeline ^ 12 11
+edgeline ^ 13 11
+edgeline ^ 14 11
+edgeline ^ 15 11
+edgeline ^ 16 11
+edgeline ^ 17 11
+edgeline ^ 18 11
+edgeline ^ 19 11
+
+centreline ^ 7 12
+centreline ^ 8 12
+centreline ^ 9 12
+centreline ^ 10 12
+centreline ^ 11 12
+centreline ^ 12 12
+centreline ^ 13 12
+centreline ^ 14 12
+centreline ^ 15 12
+centreline ^ 16 12
+centreline ^ 17 12
+centreline ^ 18 12
+centreline ^ 19 12
+
+edgeline V 7 12
+edgeline V 8 12
+edgeline V 9 12
+edgeline V 10 12
+edgeline V 11 12
+edgeline V 12 12
+edgeline V 13 12
+edgeline V 14 12
+edgeline V 15 12
+edgeline V 16 12
+edgeline V 17 12
+edgeline V 18 12
+edgeline V 19 12
 
 
-car test 1 15 14 9 1 14 ^ JIM
-car slow 2 16 2 0 2 14 ^
-car slow 3 0 3 14 3 0 V
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

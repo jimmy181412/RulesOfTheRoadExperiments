@@ -1,92 +1,112 @@
-12
-15
+20
+20
 3
-|----^^----|
-|----^^----|
-|----^^----|
-<<<<<^^>>>>>
-|----^^----|
-|----^^----|
-|----^^----|
-|----^^----|
-|----^^----|
-|----^^----|
-|----^^----|
-|----^^----|
-|----^^----|
-|----^^----|
-|----^^----|
-|----^^----|
+|--------^^--------|
+|--------^^--------|
+|--------^^--------|
+|--------^^--------|
+|--------^^--------|
+<<<<<<<<<++--------|
+|--------^^--------|
+|--------^^--------|
+|--------^^--------|
+|--------^^--------|
+|--------^^--------|
+|--------^^--------|
+|--------^^--------|
+|--------^^--------|
+|--------^^--------|
+|--------^^--------|
+|--------^^--------|
+|--------^^--------|
+|--------^^--------|
+|--------^^--------|
+|--------^^--------|
 
-edgeline < 5 14
-edgeline < 5 13
-edgeline < 5 12
-edgeline < 5 11
-edgeline < 5 10
-edgeline < 5 9
-edgeline < 5 8
-edgeline < 5 7
-edgeline < 5 5
-edgeline < 5 6
-edgeline < 5 4
-edgeline < 5 2
-edgeline < 5 1
-edgeline < 5 0
+car jim 9 19 0 5 9 19 ^ Jim
+car slow 9 18 9 0 9 18 ^
 
-edgeline > 6 14
-edgeline > 6 13
-edgeline > 6 12
-edgeline > 6 11
-edgeline > 6 10
-edgeline > 6 9
-edgeline > 6 8
-edgeline > 6 7
-edgeline > 6 6
-edgeline > 6 5
-edgeline > 6 4
-edgeline > 6 2
-edgeline > 6 1
-edgeline > 6 0
+edgeline < 9 19
+edgeline < 9 18
+edgeline < 9 17
+edgeline < 9 16
+edgeline < 9 15
+edgeline < 9 14
+edgeline < 9 13
+edgeline < 9 12
+edgeline < 9 11
+edgeline < 9 10
+edgeline < 9 9
+edgeline < 9 8
+edgeline < 9 7
+edgeline < 9 6
+edgeline < 9 4
+edgeline < 9 3
+edgeline < 9 2
+edgeline < 9 1
+edgeline < 9 0
 
-laneline < 6 14
-laneline < 6 13
-laneline < 6 12
-laneline < 6 11
-laneline < 6 10
-laneline < 6 9
-laneline < 6 8
-laneline < 6 7
-laneline < 6 6
-laneline < 6 5
-laneline < 6 4
-laneline < 6 3
-laneline < 6 2
-laneline < 6 1
-laneline < 6 0
+laneline < 10 19
+laneline < 10 18
+laneline < 10 17
+laneline < 10 16
+laneline < 10 15
+laneline < 10 14
+laneline < 10 13
+laneline < 10 12
+laneline < 10 11
+laneline < 10 10
+laneline < 10 9
+laneline < 10 8
+laneline < 10 7
+laneline < 10 6
+laneline < 10 5
+laneline < 10 4
+laneline < 10 3
+laneline < 10 2
+laneline < 10 1
+laneline < 10 0
 
-edgeline ^ 0 3
-edgeline ^ 1 3
-edgeline ^ 2 3
-edgeline ^ 3 3
-edgeline ^ 4 3
-edgeline ^ 7 3
-edgeline ^ 8 3
-edgeline ^ 9 3
-edgeline ^ 10 3
-edgeline ^ 11 3
-edgeline V 0 3
-edgeline V 1 3
-edgeline V 2 3
-edgeline V 3 3
-edgeline V 4 3
-edgeline V 7 3
-edgeline V 8 3
-edgeline V 9 3
-edgeline V 10 3
-edgeline V 11 3
+edgeline > 10 19
+edgeline > 10 18
+edgeline > 10 17
+edgeline > 10 16
+edgeline > 10 15
+edgeline > 10 14
+edgeline > 10 13
+edgeline > 10 12
+edgeline > 10 11
+edgeline > 10 10
+edgeline > 10 9
+edgeline > 10 8
+edgeline > 10 7
+edgeline > 10 6
+edgeline > 10 5
+edgeline > 10 4
+edgeline > 10 3
+edgeline > 10 2
+edgeline > 10 1
+edgeline > 10 0
+
+edgeline ^ 0 5
+edgeline ^ 1 5
+edgeline ^ 2 5
+edgeline ^ 3 5
+edgeline ^ 4 5
+edgeline ^ 5 5
+edgeline ^ 6 5
+edgeline ^ 7 5
+edgeline ^ 8 5
 
 
+edgeline V 0 5
+edgeline V 2 5
+edgeline V 1 5
+edgeline V 3 5
+edgeline V 4 5
+edgeline V 5 5
+edgeline V 6 5
+edgeline V 7 5
+edgeline V 8 5
 
-Car testingCar 5 14 1 3 5 14 ^ jim
-Car slow 5 13 5 2 5 13 ^
 
