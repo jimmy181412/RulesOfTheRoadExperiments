@@ -1,3 +1,6 @@
+/*
+ *  it is building on work by Joe Collenette.
+ */
 package simulated_cars;
 
 import core_car_sim.Direction;

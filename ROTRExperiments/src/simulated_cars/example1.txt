@@ -28,14 +28,8 @@ trafficLight V 8 11 9 11
 trafficLight ^ 11 8 10 8
 trafficLight > 11 11 11 10
 
-zebracrossing ^ 6 9
-zebracrossing ^ 6 10
-zebracrossing ^ 13 9
-zebracrossing ^ 13 10
-zebracrossing > 9 13
-zebracrossing > 10 13
-zebracrossing > 9 6
-zebracrossing > 10 6
+zebracrossing ^ 18 9
+zebracrossing ^ 18 10
 
 
 edgeline < 9 19
@@ -44,6 +38,7 @@ edgeline < 9 17
 edgeline < 9 16
 edgeline < 9 15
 edgeline < 9 14
+edgeline < 9 13
 edgeline < 9 12
 edgeline < 9 11
 edgeline < 9 8
@@ -55,12 +50,14 @@ edgeline < 9 3
 edgeline < 9 2
 edgeline < 9 1
 edgeline < 9 0
+
 edgeline > 10 19
 edgeline > 10 18
 edgeline > 10 17
 edgeline > 10 16
 edgeline > 10 15
 edgeline > 10 14
+edgeline > 10 13
 edgeline > 10 12
 edgeline > 10 11
 edgeline > 10 8
@@ -79,10 +76,12 @@ edgeline ^ 2 9
 edgeline ^ 3 9
 edgeline ^ 4 9
 edgeline ^ 5 9
+edgeline ^ 6 9
 edgeline ^ 7 9
 edgeline ^ 8 9
 edgeline ^ 11 9
 edgeline ^ 12 9
+edgeline ^ 13 9
 edgeline ^ 14 9
 edgeline ^ 15 9
 edgeline ^ 16 9
@@ -95,11 +94,13 @@ edgeline V 1 10
 edgeline V 2 10
 edgeline V 3 10
 edgeline V 4 10
+edgeline V 6 10
 edgeline V 5 10
 edgeline V 7 10
 edgeline V 8 10
 edgeline V 11 10
 edgeline V 12 10
+edgeline V 13 10
 edgeline V 14 10
 edgeline V 15 10
 edgeline V 16 10
@@ -113,10 +114,12 @@ centreline < 10 2
 centreline < 10 3
 centreline < 10 4
 centreline < 10 5
+centreline < 10 6
 centreline < 10 7
 centreline < 10 8
 centreline < 10 11
 centreline < 10 12
+centreline < 10 13
 centreline < 10 14
 centreline < 10 15
 centreline < 10 16
@@ -130,6 +133,7 @@ centreline ^ 2 10
 centreline ^ 3 10
 centreline ^ 4 10
 centreline ^ 5 10
+centreline ^ 6 10
 centreline ^ 7 10
 centreline ^ 8 10
 centreline ^ 11 10
@@ -139,14 +143,14 @@ centreline ^ 14 10
 centreline ^ 15 10
 centreline ^ 16 10
 centreline ^ 17 10
-centreline ^ 18 10
 centreline ^ 19 10
 
-pedestrian p1 8 13 11 13 8 13 >
-pedestrian p2 11 6 8 6 11 6 <
-pedestrian p3 13 8 13 11 13 8 V
+
+pedestrian p3 18 8 18 11 18 8 V
 car jim 9 19 19 9 9 19 ^ jim
 car slow 19 10 0 10 19 10 <
+car slow 10 0 10 19 10 0 V
+
 
 
 

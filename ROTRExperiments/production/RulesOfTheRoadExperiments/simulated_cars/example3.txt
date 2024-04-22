@@ -24,9 +24,14 @@
 
 
 car nick 3 17 19 11 3 17 ^ jim
-car slow 4 19 4 0 4 19 ^
-car slow 5 1 5 19 5 0 V
-car slow 6 0 6 19 6 0 V
+car slow 4 19 4 2 4 19 ^
+car slow 5 0 5 17 5 0 V
+car slow 5 1 5 18 5 1 V
+car slow 5 2 5 19 5 2 V
+car slow 6 0 6 17 6 0 V
+car slow 6 1 6 18 6 1 V
+car slow 6 2 6 19 6 2 V
+
 
 edgeline < 3 19
 edgeline < 3 18

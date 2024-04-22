@@ -1,12 +1,15 @@
-package simulated_cars;
+/*
+ *  it is building on work by Joe Collenette.
+ */
 
+
+package simulated_cars;
 
 import core_car_sim.*;
 import core_car_sim.AbstractCell.CellType;
 import core_car_sim.AbstractInformationCell.InformationCell;
 import core_car_sim.RoadCell.RoadMarking;
 import core_car_sim.TrafficLightCell.TrafficLightCellInformation;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,6 +20,7 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
 
     private boolean isFinished = false;
     private boolean wallAhead;
+    private boolean Inturningright;
     private boolean atWhiteLine;
     private boolean exitIsClear;
     private boolean startOvertaking;
@@ -188,17 +192,17 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
         //check whether the car finished overtaking or not...
         if(overtaking) {
             if (cmd == Direction.north) {
-                finished_overtaking = visibleWorld.containsCar(location.getX() - 1, location.getY() + 2)
-                        || visibleWorld.containsCar(location.getX() - 1, location.getY() + 3);
+                finished_overtaking = visibleWorld.containsCar(location.getX() - 1, location.getY() + 3)
+                        || visibleWorld.containsCar(location.getX() - 1, location.getY() + 4);
             } else if (cmd == Direction.south) {
-                finished_overtaking = visibleWorld.containsCar(location.getX() + 1, location.getY() - 2)
-                        || visibleWorld.containsCar(location.getX() + 1, location.getY() - 3);
+                finished_overtaking = visibleWorld.containsCar(location.getX() + 1, location.getY() - 3)
+                        || visibleWorld.containsCar(location.getX() + 1, location.getY() - 4);
             } else if (cmd == Direction.east) {
-                finished_overtaking = visibleWorld.containsCar(location.getX() - 2, location.getY() - 1)
-                        || visibleWorld.containsCar(location.getX() - 3, location.getY() - 1);
+                finished_overtaking = visibleWorld.containsCar(location.getX() - 3, location.getY() - 1)
+                        || visibleWorld.containsCar(location.getX() - 4, location.getY() - 1);
             } else if (cmd == Direction.west) {
-                finished_overtaking = visibleWorld.containsCar(location.getX() + 2, location.getY() - 1)
-                        || visibleWorld.containsCar(location.getX() - 3, location.getY() - 1);
+                finished_overtaking = visibleWorld.containsCar(location.getX() + 3, location.getY() - 1)
+                        || visibleWorld.containsCar(location.getX() - 4, location.getY() - 1);
             }
             if (finished_overtaking) {
                 overtaking = false;
@@ -216,13 +220,13 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
                 for(int j = location.getY() - 1; j >= location.getY() - espeed;j--) {
                     if(visibleWorld.containsCar(i,j)) {
                         AbstractCar car = visibleWorld.getCarAtPosition(i,j);
-                        if(i < (visibleWorld.getWidth() / 2)){
-                            if(car.getCMD() == Direction.east){
+                        if(i < 3 && i >= 1){
+                            if(car.getCMD() == Direction.east && car.getSpeed() > 1){
                                 safe_gap = false;
                             }
                         }
-                        else if(i > (visibleWorld.getWidth() / 2)){
-                            if(car.getCMD() == Direction.west){
+                        else if(i >= 3 && i <= 5){
+                            if(car.getCMD() == Direction.west && car.getSpeed() > 1){
                                 safe_gap = false;
                             }
                         }
@@ -235,13 +239,13 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
                 for(int j = location.getY() + 1; j <= location.getY() + espeed; j++) {
                     if(visibleWorld.containsCar(i,j)) {
                         AbstractCar car = visibleWorld.getCarAtPosition(i,j);
-                        if(i <  (visibleWorld.getWidth()) / 2){
-                            if(car.getCMD() == Direction.east){
+                        if(i < 3 && i >= 1){
+                            if(car.getCMD() == Direction.east && car.getSpeed() > 1){
                                 safe_gap = false;
                             }
                         }
-                        else if(i > (visibleWorld.getWidth() / 2)){
-                            if(car.getCMD() == Direction.west){
+                        else if(i >= 3 && i <= 5){
+                            if(car.getCMD() == Direction.west && car.getSpeed() > 1){
                                 safe_gap = false;
                             }
                         }
@@ -254,13 +258,13 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
                 for(int j = 0; j < visibleWorld.getHeight(); j++) {
                     if(visibleWorld.containsCar(i,j)) {
                         AbstractCar car = visibleWorld.getCarAtPosition(i,j);
-                        if( j < (visibleWorld.getHeight() / 2)){
-                            if(car.getCMD() == Direction.south){
+                        if(j < 3 && j >= 1){
+                            if(car.getCMD() == Direction.south && car.getSpeed() > 1){
                                 safe_gap = false;
                             }
                         }
-                        else if(j > (visibleWorld.getHeight() / 2)){
-                            if(car.getCMD() == Direction.north){
+                        else if(j >= 3 && j <= 5){
+                            if(car.getCMD() == Direction.north && car.getSpeed() > 1){
                                 safe_gap = false;
                             }
                         }
@@ -273,13 +277,13 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
                 for(int j = 0; j < visibleWorld.getHeight(); j++) {
                     if(visibleWorld.containsCar(i,j)) {
                         AbstractCar car = visibleWorld.getCarAtPosition(i,j);
-                        if( j < (visibleWorld.getHeight() / 2)) {
-                            if (car.getCMD() == Direction.south) {
+                        if(j < 3 && j >= 1){
+                            if(car.getCMD() == Direction.south && car.getSpeed() > 1){
                                 safe_gap = false;
                             }
                         }
-                        else if(j >  (visibleWorld.getHeight() / 2)){
-                            if(car.getCMD() == Direction.north){
+                        else if(j >= 3 && j <= 5){
+                            if(car.getCMD() == Direction.north && car.getSpeed() > 1){
                                 safe_gap = false;
                             }
                         }
@@ -287,441 +291,559 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
                 }
             }
         }
+
+
+
     }
 
 
     @Override
     public void actionUpdate(CarAction action, CarPriority priority)
     {
-        actionsRecommended.put(action, priority);
-        if(priority == CarPriority.CP_MUST) {
-            switch (action) {
-                //TODO
-                case CA_adjust_speed -> actionsToDo.put(CarAction.CA_adjust_speed, priority);
-                case CA_allow_cyclists_moto_pass -> //not simulated
-                        actionsToDo.put(CarAction.CA_allow_cyclists_moto_pass, priority);
-                case CA_allow_emergency_vehicle_to_pass -> //not simulated
-                        actionsToDo.put(CarAction.CA_allow_emergency_vehicle_to_pass, priority);
-                case CA_allow_extra_space -> //not simulated
-                        actionsToDo.put(CarAction.CA_allow_extra_space, priority);
-                case CA_allow_extra_space_for_works_vehicles -> //not simulated
-                        actionsToDo.put(CarAction.CA_allow_extra_space_for_works_vehicles, priority);
-                case CA_allow_traffic_to_pass -> //not simulated
-                        actionsToDo.put(CarAction.CA_allow_traffic_to_pass, priority);
-                case CA_allow_undertaking -> //not simulated
-                        actionsToDo.put(CarAction.CA_allow_undertaking, priority);
-                case CA_allowed_to_proceed -> //not simulated
-                        actionsToDo.put(CarAction.CA_allowed_to_proceed, priority);
-                case CA_approach_left_hand_lane -> //not simulated
-                        actionsToDo.put(CarAction.CA_approach_left_hand_lane, priority);
-                case CA_approach_with_caution -> //not simulated
-                        actionsToDo.put(CarAction.CA_approach_with_caution, priority);
-                case CA_avoidLaneChanges -> //not simulated
-                        actionsToDo.put(CarAction.CA_avoidLaneChanges, priority);
-                case CA_avoidRightHandLane -> //not simulated
-                        actionsToDo.put(CarAction.CA_avoidRightHandLane, priority);
-                case CA_avoid_blocking_sideroads ->//not simulated
-                        actionsToDo.put(CarAction.CA_avoid_blocking_sideroads, priority);
-                case CA_avoid_bus_lane -> //not simulated
-                        actionsToDo.put(CarAction.CA_avoid_bus_lane, priority);
-                case CA_avoid_closed_lane ->//not simulated
-                        actionsToDo.put(CarAction.CA_avoid_closed_lane, priority);
-                case CA_avoid_coasting ->//not simulated
-                        actionsToDo.put(CarAction.CA_avoid_coasting, priority);
-                case CA_avoid_coned_off_area ->//not simulated
-                        actionsToDo.put(CarAction.CA_avoid_coned_off_area, priority);
-                case CA_avoid_crossing_central_reservation ->//not simulated
-                        actionsToDo.put(CarAction.CA_avoid_crossing_central_reservation, priority);
-                case CA_avoid_crossing_crossing ->//not simulated
-                        actionsToDo.put(CarAction.CA_avoid_crossing_crossing, priority);
-                case CA_avoid_crossing_level_crossing ->//not simulated
-                        actionsToDo.put(CarAction.CA_avoid_crossing_level_crossing, priority);
-                case CA_avoid_cutting_corner ->//not simulated
-                        actionsToDo.put(CarAction.CA_avoid_cutting_corner, priority);
-                case CA_avoid_drive_against_traffic_flow ->//not simulated
-                        actionsToDo.put(CarAction.CA_avoid_drive_against_traffic_flow, priority);
-                case CA_avoid_driving_on_rails ->//not simulated
-                        actionsToDo.put(CarAction.CA_avoid_driving_on_rails, priority);
-                case CA_avoid_emergency_area ->//not simulated
-                        actionsToDo.put(CarAction.CA_avoid_emergency_area, priority);
-                case CA_avoid_hard_shoulder -> //not simulated
-                        actionsToDo.put(CarAction.CA_avoid_hard_shoulder, priority);
-                case CA_avoid_harsh_braking ->//not simulated
-                        actionsToDo.put(CarAction.CA_avoid_harsh_braking, priority);
-                case CA_avoid_horn ->//not simulated
-                        actionsToDo.put(CarAction.CA_avoid_horn, priority);
-                case CA_avoid_hov_lane ->//not simulated
-                        actionsToDo.put(CarAction.CA_avoid_hov_lane, priority);
-                case CA_avoid_lane_lane ->//not simulated
-                        actionsToDo.put(CarAction.CA_avoid_lane_lane, priority);
-                case CA_avoid_lane_switching -> // not simulated
-                        actionsToDo.put(CarAction.CA_avoid_lane_switching, priority);
-                case CA_avoid_level_crossing ->//not simulated
-                        actionsToDo.put(CarAction.CA_avoid_level_crossing, priority);
-                case CA_avoid_loading_unloading ->//not simulated
-                        actionsToDo.put(CarAction.CA_avoid_loading_unloading, priority);
-                case CA_avoid_motorway ->//not simulated
-                        actionsToDo.put(CarAction.CA_avoid_motorway, priority);
-                case CA_avoid_non ->//not simulated
-                        actionsToDo.put(CarAction.CA_avoid_non, priority);
-                case CA_avoid_overtaking -> actionsToDo.put(CarAction.CA_avoid_overtaking, priority);
-                case CA_avoid_overtaking_on_left -> //not simulated
-                        actionsToDo.put(CarAction.CA_avoid_overtaking_on_left, priority);
-                case CA_avoid_parking -> //not simulated
-                        actionsToDo.put(CarAction.CA_avoid_parking, priority);
-                case CA_avoid_parking_against_flow -> //not simulated
-                        actionsToDo.put(CarAction.CA_avoid_parking_against_flow, priority);
-                case CA_avoid_pick_up_set_down -> // not simulated
-                        actionsToDo.put(CarAction.CA_avoid_pick_up_set_down, priority);
-                case CA_avoid_reversing -> //not simulated=
-                        actionsToDo.put(CarAction.CA_avoid_reversing, priority);
-                case CA_avoid_revs ->// not simulated
-                        actionsToDo.put(CarAction.CA_avoid_revs, priority);
-                case CA_avoid_stopping ->// not simulated
-                        actionsToDo.put(CarAction.CA_avoid_stopping, priority);
-                case CA_avoid_tram_reserved_road -> // not simulated
-                        actionsToDo.put(CarAction.CA_avoid_tram_reserved_road, priority);
-                case CA_avoid_undertaking -> //not simulated
-                        actionsToDo.put(CarAction.CA_avoid_undertaking, priority);
-                case CA_avoid_uturn -> //not simulated
-                        actionsToDo.put(CarAction.CA_avoid_uturn, priority);
-                case CA_avoid_waiting ->//not simulated
-                        actionsToDo.put(CarAction.CA_avoid_waiting, priority);
-                case CA_avoid_weaving ->//not simulated
-                        actionsToDo.put(CarAction.CA_avoid_weaving, priority);
-                case CA_brake_early_lightly ->//not simulated
-                        actionsToDo.put(CarAction.CA_brake_early_lightly, priority);
-                case CA_brake_hard ->//not simulated
-                        actionsToDo.put(CarAction.CA_brake_hard, priority);
-                case CA_buildup_speed_on_motorway ->//not simulated
-                        actionsToDo.put(CarAction.CA_buildup_speed_on_motorway, priority);
-                case CA_cancel_overtaking -> actionsToDo.put(CarAction.CA_cancel_overtaking, priority);
-                case CA_cancel_reverse -> //not simulated
-                        actionsToDo.put(CarAction.CA_cancel_reverse, priority);
-                case CA_cancel_signals ->//not simulated
-                        actionsToDo.put(CarAction.CA_cancel_signals, priority);
-                case CA_cancel_undertaking -> //not simulated
-                        actionsToDo.put(CarAction.CA_cancel_undertaking, priority);
-                case CA_clear_ice_snow_all_windows ->//not simulated
-                        actionsToDo.put(CarAction.CA_clear_ice_snow_all_windows, priority);
-                case CA_close_to_kerb ->//not simulated
-                        actionsToDo.put(CarAction.CA_close_to_kerb, priority);
-                case CA_consideration_others ->//not simulated actually
-                        actionsToDo.put(CarAction.CA_consideration_others, priority);
-                case CA_doNotEnterWhiteDiagonalStripeWhiteBrokenBorder ->//not simulated
-                        actionsToDo.put(CarAction.CA_doNotEnterWhiteDiagonalStripeWhiteBrokenBorder, priority);
-                case CA_doNotEnterWhiteDiagonalStripeWhiteSolidBorder ->//not simulated
-                        actionsToDo.put(CarAction.CA_doNotEnterWhiteDiagonalStripeWhiteSolidBorder, priority);
-                case CA_do_not_drive ->//not simulated
-                        actionsToDo.put(CarAction.CA_do_not_drive, priority);
-                case CA_do_not_hestitate ->//not simulated
-                        actionsToDo.put(CarAction.CA_do_not_hestitate, priority);
-                case CA_do_not_overtake -> actionsToDo.put(CarAction.CA_do_not_overtake, priority);
-                case CA_do_not_park_in_passing_place -> //not simulated
-                        actionsToDo.put(CarAction.CA_do_not_park_in_passing_place, priority);
-                case CA_do_not_reverse -> //not simulated
-                        actionsToDo.put(CarAction.CA_do_not_reverse, priority);
-                case CA_do_not_stop -> //not simulated
-                        actionsToDo.put(CarAction.CA_do_not_stop, priority);
-                case CA_dontExceedTempSpeedLimit ->
-                    // adjust speed according to the world speed limit
-                        actionsToDo.put(CarAction.CA_dontExceedTempSpeedLimit, priority);
-                case CA_dont_cross_solid_white -> actionsToDo.put(CarAction.CA_dont_cross_solid_white, priority);
-                case CA_dont_use_central_reservation ->//not simulated
-                        actionsToDo.put(CarAction.CA_dont_use_central_reservation, priority);
-                case CA_drive_care_attention -> actionsToDo.put(CarAction.CA_drive_care_attention, priority);
-                case CA_drive_slowly -> actionsToDo.put(CarAction.CA_drive_slowly, priority);
-                case CA_drive_very_slowly -> actionsToDo.put(CarAction.CA_drive_very_slowly, priority);
-                case CA_drive_very_slowly_on_bends -> //not simulated
-                        actionsToDo.put(CarAction.CA_drive_very_slowly_on_bends, priority);
-                case CA_drop_back -> actionsToDo.put(CarAction.CA_drop_back, priority);
-                case CA_dry_brakes ->//not simulated
-                        actionsToDo.put(CarAction.CA_dry_brakes, priority);
-                case CA_ease_off ->//not simulated
-                        actionsToDo.put(CarAction.CA_ease_off, priority);
-                case CA_engage_child_locks ->//not simulated
-                        actionsToDo.put(CarAction.CA_engage_child_locks, priority);
-                case CA_engage_parking_break ->//not simulated
-                        actionsToDo.put(CarAction.CA_engage_parking_break, priority);
-                case CA_engine_off -> actionsToDo.put(CarAction.CA_engine_off, priority);
-                case CA_find_other_route ->//not simulated
-                        actionsToDo.put(CarAction.CA_find_other_route, priority);
-                case CA_find_quiet_side_road ->//not simulated
-                        actionsToDo.put(CarAction.CA_find_quiet_side_road, priority);
-                case CA_find_safe_place_to_stop ->//not simulated
-                        actionsToDo.put(CarAction.CA_find_safe_place_to_stop, priority);
-                case CA_fit_booster_seat ->//not simulated
-                        actionsToDo.put(CarAction.CA_fit_booster_seat, priority);
-                case CA_flash_amber_beacon ->//not simulated
-                        actionsToDo.put(CarAction.CA_flash_amber_beacon, priority);
-                case CA_fog_lights_off ->//not simulated
-                        actionsToDo.put(CarAction.CA_fog_lights_off, priority);
-                case CA_fog_lights_on ->//not simulated
-                        actionsToDo.put(CarAction.CA_fog_lights_on, priority);
-                case CA_followLaneSigns ->//not simulated
-                        actionsToDo.put(CarAction.CA_followLaneSigns, priority);
-                case CA_follow_dvsa_until_stopped ->//not simulated
-                        actionsToDo.put(CarAction.CA_follow_dvsa_until_stopped, priority);
-                case CA_follow_police_direction ->//not simulated
-                        actionsToDo.put(CarAction.CA_follow_police_direction, priority);
-                case CA_follow_sign ->//not simulated
-                        actionsToDo.put(CarAction.CA_follow_sign, priority);
-                case CA_follow_signs ->//not simulated
-                        actionsToDo.put(CarAction.CA_follow_signs, priority);
-                case CA_get_in_lane ->//not simulated
-                        actionsToDo.put(CarAction.CA_get_in_lane, priority);
-                case CA_get_into_lane ->//not simulated
-                        actionsToDo.put(CarAction.CA_get_into_lane, priority);
-                case CA_get_off_road ->//not simulated
-                        actionsToDo.put(CarAction.CA_get_off_road, priority);
-                case CA_give_extensive_extra_seperation_distance ->//not simulated
-                        actionsToDo.put(CarAction.CA_give_extensive_extra_seperation_distance, priority);
-                case CA_give_extra_seperation_distance ->//not simulated
-                        actionsToDo.put(CarAction.CA_give_extra_seperation_distance, priority);
-                case CA_give_priority_to_public_transport ->//not simulated
-                        actionsToDo.put(CarAction.CA_give_priority_to_public_transport, priority);
-                case CA_give_priority_to_right ->//not simulated
-                        actionsToDo.put(CarAction.CA_give_priority_to_right, priority);
-                case CA_give_room_when_passing ->//not simulated
-                        actionsToDo.put(CarAction.CA_give_room_when_passing, priority);
-                case CA_give_signal ->//not simulated
-                        actionsToDo.put(CarAction.CA_give_signal, priority);
-                case CA_give_up_control ->//not simulated
-                        actionsToDo.put(CarAction.CA_give_up_control, priority);
-                case CA_give_way_at_dotted_white_line ->//not simulated
-                        actionsToDo.put(CarAction.CA_give_way_at_dotted_white_line, priority);
-                case CA_give_way_other_roads ->//not simulated
-                        actionsToDo.put(CarAction.CA_give_way_other_roads, priority);
-                case CA_give_way_to_other ->//not simulated
-                        actionsToDo.put(CarAction.CA_give_way_to_other, priority);
-                case CA_give_way_to_pedestrians -> actionsToDo.put(CarAction.CA_give_way_to_pedestrians, priority);
-                case CA_give_way_to_tram ->//not simulated
-                        actionsToDo.put(CarAction.CA_give_way_to_tram, priority);
-                case CA_goBetweenLaneDividers ->//not simulated
-                        actionsToDo.put(CarAction.CA_goBetweenLaneDividers, priority);
-                case CA_go_to_left_hand_land ->//not simulated
-                        actionsToDo.put(CarAction.CA_go_to_left_hand_land, priority);
-                case CA_going_left_use_left ->//not simulated
-                        actionsToDo.put(CarAction.CA_going_left_use_left, priority);
-                case CA_going_right_use_left ->//not simulated
-                        actionsToDo.put(CarAction.CA_going_right_use_left, priority);
-                case CA_handbrake_on ->//not simulated
-                        actionsToDo.put(CarAction.CA_handbrake_on, priority);
-                case CA_headlights_on ->//not simulated
-                        actionsToDo.put(CarAction.CA_headlights_on, priority);
-                case CA_increase_distance_to_car_infront ->
-                        actionsToDo.put(CarAction.CA_increase_distance_to_car_infront, priority);
-                case CA_indicatorOn ->//not simulated
-                        actionsToDo.put(CarAction.CA_indicatorOn, priority);
-                case CA_indicator_on ->//not simulated
-                        actionsToDo.put(CarAction.CA_indicator_on, priority);
-                case CA_keep_crossing_clear ->//not simulated\
-                        actionsToDo.put(CarAction.CA_keep_crossing_clear, priority);
-                case CA_keep_left -> //not simulated
-                        actionsToDo.put(CarAction.CA_keep_left, priority);
-                case CA_keep_left_lane ->//not simulated
-                        actionsToDo.put(CarAction.CA_keep_left_lane, priority);
-                case CA_keep_safe_distance -> actionsToDo.put(CarAction.CA_keep_safe_distance, priority);
-                case CA_keep_sidelights_on ->//not simulated
-                        actionsToDo.put(CarAction.CA_keep_sidelights_on, priority);
-                case CA_keep_under_speed_limit -> actionsToDo.put(CarAction.CA_keep_under_speed_limit, priority);
-                case CA_keep_well_back ->//not simulated
-                        actionsToDo.put(CarAction.CA_keep_well_back, priority);
-                case CA_lane_clear ->//not simulated
-                        actionsToDo.put(CarAction.CA_lane_clear, priority);
-                case CA_leave_space_for_manover ->//not simulated
-                        actionsToDo.put(CarAction.CA_leave_space_for_manover, priority);
-                case CA_leave_space_to_stop ->//not simulated
-                        actionsToDo.put(CarAction.CA_leave_space_to_stop, priority);
-                case CA_light_and_number_plates_clean ->//not simulated
-                        actionsToDo.put(CarAction.CA_light_and_number_plates_clean, priority);
-                case CA_lock ->//not simulated
-                        actionsToDo.put(CarAction.CA_lock, priority);
-                case CA_maintained_reduced_speed ->//not simulated
-                        actionsToDo.put(CarAction.CA_maintained_reduced_speed, priority);
-                case CA_match_speed_to_motorway ->//not simulated
-                        actionsToDo.put(CarAction.CA_match_speed_to_motorway, priority);
-                case CA_mergeInTurn ->//not simulated
-                        actionsToDo.put(CarAction.CA_mergeInTurn, priority);
-                case CA_merge_in_turn ->//not simulated
-                        actionsToDo.put(CarAction.CA_merge_in_turn, priority);
-                case CA_mini ->//not simulated
-                        actionsToDo.put(CarAction.CA_mini, priority);
-                case CA_minimise_reversing ->//not simulated
-                        actionsToDo.put(CarAction.CA_minimise_reversing, priority);
-                case CA_mirrors_clear ->//not simulated
-                        actionsToDo.put(CarAction.CA_mirrors_clear, priority);
-                case CA_move_adjacent_lane ->//not simulated
-                        actionsToDo.put(CarAction.CA_move_adjacent_lane, priority);
-                case CA_move_left ->
-                    //after finishing overtaking, the AI car should go to its original line
-                        actionsToDo.put(CarAction.CA_move_left, priority);
-                case CA_move_quickly_past -> actionsToDo.put(CarAction.CA_move_quickly_past, priority);
-                case CA_move_to_left_hand_lane -> //not simulated
-                        actionsToDo.put(CarAction.CA_move_to_left_hand_lane, priority);
-                case CA_must_stop_pedestrian_crossing ->
-                        actionsToDo.put(CarAction.CA_must_stop_pedestrian_crossing, priority);
-                case CA_nextLaneClear ->//not simulated
-                        actionsToDo.put(CarAction.CA_nextLaneClear, priority);
-                case CA_next_safe_stop ->//not simulated
-                        actionsToDo.put(CarAction.CA_next_safe_stop, priority);
-                case CA_not_drive_dangerously -> actionsToDo.put(CarAction.CA_not_drive_dangerously, priority);
-                case CA_not_overtaken -> actionsToDo.put(CarAction.CA_not_overtaken, priority);
-                case CA_obey_signal ->//not simulated
-                        actionsToDo.put(CarAction.CA_obey_signal, priority);
-                case CA_obey_work_vehicle_sign ->//not simulated
-                        actionsToDo.put(CarAction.CA_obey_work_vehicle_sign, priority);
-                case CA_overtake_on_right -> actionsToDo.put(CarAction.CA_overtake_on_right, priority);
-                case CA_park_as_close_to_side ->//not simulated
-                        actionsToDo.put(CarAction.CA_park_as_close_to_side, priority);
-                case CA_parking_lights_on ->//not simulated
-                        actionsToDo.put(CarAction.CA_parking_lights_on, priority);
-                case CA_pass_around ->//not simulated
-                        actionsToDo.put(CarAction.CA_pass_around, priority);
-                case CA_position_right_turn ->//not simulated
-                        actionsToDo.put(CarAction.CA_position_right_turn, priority);
-                case CA_prepare_drop_back -> actionsToDo.put(CarAction.CA_prepare_drop_back, priority);
-                case CA_prepare_load ->//not simulated
-                        actionsToDo.put(CarAction.CA_prepare_load, priority);
-                case CA_prepare_route ->//not simulated
-                        actionsToDo.put(CarAction.CA_prepare_route, priority);
-                case CA_prepare_to_change_lane ->//not simulated
-                        actionsToDo.put(CarAction.CA_prepare_to_change_lane, priority);
-                case CA_prepare_to_stop ->//not simulated
-                        actionsToDo.put(CarAction.CA_prepare_to_stop, priority);
-                case CA_priority_to_motoway_traffic ->//not simulated
-                        actionsToDo.put(CarAction.CA_priority_to_motoway_traffic, priority);
-                case CA_pull_into_hard_shoulder ->//not simulated
-                        actionsToDo.put(CarAction.CA_pull_into_hard_shoulder, priority);
-                case CA_pull_into_passing_place ->//not simulated
-                        actionsToDo.put(CarAction.CA_pull_into_passing_place, priority);
-                case CA_pull_over_safe_place ->//not simulated
-                        actionsToDo.put(CarAction.CA_pull_over_safe_place, priority);
-                case CA_pull_up_in_visible_distance ->//not simulated
-                        actionsToDo.put(CarAction.CA_pull_up_in_visible_distance, priority);
-                case CA_put_on_seatbelts ->//not simulated
-                        actionsToDo.put(CarAction.CA_put_on_seatbelts, priority);
-                case CA_reduce_distance_between_front_vehicle ->
-                        actionsToDo.put(CarAction.CA_reduce_distance_between_front_vehicle, priority);
-                case CA_reduce_lighting ->//not simulated
-                        actionsToDo.put(CarAction.CA_reduce_lighting, priority);
-                case CA_reduce_overall_speed -> actionsToDo.put(CarAction.CA_reduce_overall_speed, priority);
-                case CA_reduce_speed -> actionsToDo.put(CarAction.CA_reduce_speed, priority);
-                case CA_reduce_speed_if_pedestrians -> actionsToDo.put(CarAction.CA_reduce_speed_if_pedestrians, priority);
-                case CA_reduce_speed_on_slip_road ->//not simulated
-                        actionsToDo.put(CarAction.CA_reduce_speed_on_slip_road, priority);
-                case CA_release_brake ->//not simulated
-                        actionsToDo.put(CarAction.CA_release_brake, priority);
-                case CA_remove_all_snow ->//not simulated
-                        actionsToDo.put(CarAction.CA_remove_all_snow, priority);
-                case CA_remove_flash_intention ->//not simulated
-                        actionsToDo.put(CarAction.CA_remove_flash_intention, priority);
-                case CA_remove_horn_intention ->//not simulated
-                        actionsToDo.put(CarAction.CA_remove_horn_intention, priority);
-                case CA_reverse_into_drive ->//not simulated
-                        actionsToDo.put(CarAction.CA_reverse_into_drive, priority);
-                case CA_reverse_to_passing_place ->//not simulated
-                        actionsToDo.put(CarAction.CA_reverse_to_passing_place, priority);
-                case CA_road_clear_to_manover ->//not simulated
-                        actionsToDo.put(CarAction.CA_road_clear_to_manover, priority);
-                case CA_safe_distance -> actionsToDo.put(CarAction.CA_safe_distance, priority);
-                case CA_safe_pull_over_and_stop ->//not simulated
-                        actionsToDo.put(CarAction.CA_safe_pull_over_and_stop, priority);
-                case CA_select_lane ->//not simulated
-                        actionsToDo.put(CarAction.CA_select_lane, priority);
-                case CA_set_hazards_off ->//not simulated (hazards is hazard warning light)
-                        actionsToDo.put(CarAction.CA_set_hazards_off, priority);
-                case CA_set_headlights_to_dipped ->//not simulated
-                        actionsToDo.put(CarAction.CA_set_headlights_to_dipped, priority);
-                case CA_signal -> //not simulated
-                        actionsToDo.put(CarAction.CA_signal, priority);
-                case CA_signal_left ->//not simulated
-                        actionsToDo.put(CarAction.CA_signal_left, priority);
-                case CA_signal_left_on_exit ->//not simulated
-                        actionsToDo.put(CarAction.CA_signal_left_on_exit, priority);
-                case CA_signal_right ->//not simulated
-                        actionsToDo.put(CarAction.CA_signal_right, priority);
-                case CA_slow_down -> //not simulated
-                    //car should slow down if it is in fog, this is not simulated
-                        actionsToDo.put(CarAction.CA_slow_down, priority);
-                case CA_slow_down_and_stop -> //not simulated
-                    //car should slow down if the sight is dazzled, this is not simulated
-                        actionsToDo.put(CarAction.CA_slow_down_and_stop, priority);
-                case CA_space_for_vehicle ->
-                    //overtaking,should not get too close to the vehicle you intend to overtake
-                        actionsToDo.put(CarAction.CA_space_for_vehicle, priority);
-                case CA_stay_in_lane ->//not simulated
-                        actionsToDo.put(CarAction.CA_stay_in_lane, priority);
-                case CA_stay_on_running_lane ->//not simulated
-                        actionsToDo.put(CarAction.CA_stay_on_running_lane, priority);
-                case CA_steady_speed ->//not simulated
-                        actionsToDo.put(CarAction.CA_steady_speed, priority);
-                case CA_stop -> actionsToDo.put(CarAction.CA_stop, priority);
-                case CA_stopCrossDoubleWhiteClosestSolid ->//not simulated
-                        actionsToDo.put(CarAction.CA_stopCrossDoubleWhiteClosestSolid, priority);
-                case CA_stopCrossingHazardWarningLine ->//not simulated
-                        actionsToDo.put(CarAction.CA_stopCrossingHazardWarningLine, priority);
-                case CA_stop_and_turn_engine_off -> actionsToDo.put(CarAction.CA_stop_and_turn_engine_off, priority);
-                case CA_stop_at_crossing -> //not simulated
-                        actionsToDo.put(CarAction.CA_stop_at_crossing, priority);
-                case CA_stop_at_crossing_patrol ->//not simulated
-                        actionsToDo.put(CarAction.CA_stop_at_crossing_patrol, priority);
-                case CA_stop_at_sign ->//not simulated
-                        actionsToDo.put(CarAction.CA_stop_at_sign, priority);
-                case CA_stop_at_white_line -> actionsToDo.put(CarAction.CA_stop_at_white_line, priority);
-                case CA_switch_off_engine -> actionsToDo.put(CarAction.CA_switch_off_engine, priority);
-                case CA_travel_sign_direction ->//not simulated
-                        actionsToDo.put(CarAction.CA_travel_sign_direction, priority);
-                case CA_treat_as_roundabout ->//not simulated
-                        actionsToDo.put(CarAction.CA_treat_as_roundabout, priority);
-                case CA_treat_as_traffic_light ->//not simulated
-                        actionsToDo.put(CarAction.CA_treat_as_traffic_light, priority);
-                case CA_turn_foglights_off ->//not simulated
-                        actionsToDo.put(CarAction.CA_turn_foglights_off, priority);
-                case CA_turn_into_skid ->//not simulated
-                        actionsToDo.put(CarAction.CA_turn_into_skid, priority);
-                case CA_turn_sidelights_on ->//not simulated
-                        actionsToDo.put(CarAction.CA_turn_sidelights_on, priority);
-                case CA_use_central_reservation ->//not simulated
-                        actionsToDo.put(CarAction.CA_use_central_reservation, priority);
-                case CA_use_crawler_lane ->//not simulated
-                        actionsToDo.put(CarAction.CA_use_crawler_lane, priority);
-                case CA_use_demisters ->//not simulated
-                        actionsToDo.put(CarAction.CA_use_demisters, priority);
-                case CA_use_hazard_lights ->//not simulated
-                        actionsToDo.put(CarAction.CA_use_hazard_lights, priority);
-                case CA_use_left_indicator ->//not simulated
-                        actionsToDo.put(CarAction.CA_use_left_indicator, priority);
-                case CA_use_right_indicator ->//not simulated
-                        actionsToDo.put(CarAction.CA_use_right_indicator, priority);
-                case CA_use_road ->//not simulated
-                        actionsToDo.put(CarAction.CA_use_road, priority);
-                case CA_use_signals ->//not simulated
-                        actionsToDo.put(CarAction.CA_use_signals, priority);
-                case CA_use_tram_passing_lane ->//not simulated
-                        actionsToDo.put(CarAction.CA_use_tram_passing_lane, priority);
-                case CA_use_windscreen_wipers ->//not simulated
-                        actionsToDo.put(CarAction.CA_use_windscreen_wipers, priority);
-                case CA_wait_at_advanced_stop ->//not simulated
-                        actionsToDo.put(CarAction.CA_wait_at_advanced_stop, priority);
-                case CA_wait_at_white_line -> actionsToDo.put(CarAction.CA_wait_at_white_line, priority);
-                case CA_wait_at_first_white_line ->//not simulated
-                        actionsToDo.put(CarAction.CA_wait_at_first_white_line, priority);
-                case CA_wait_for_gap_before_moving_off ->
-                        actionsToDo.put(CarAction.CA_wait_for_gap_before_moving_off, priority);
-                case CA_wait_until_clear ->//not simulated
-                        actionsToDo.put(CarAction.CA_wait_until_clear, priority);
-                case CA_wait_until_route_clear ->//not simulated
-                        actionsToDo.put(CarAction.CA_wait_until_route_clear, priority);
-                case CA_wait_until_safe_gap -> actionsToDo.put(CarAction.CA_wait_until_safe_gap, priority);
-                case CA_wheel_away_from_kerb ->//not simulated
-                        actionsToDo.put(CarAction.CA_wheel_away_from_kerb, priority);
-                case CA_wheel_toward_from_kerb ->//not simulated
-                        actionsToDo.put(CarAction.CA_wheel_toward_from_kerb, priority);
-                default -> {
+        switch (action) {
+            case CA_adjust_speed -> {
+                actionsRecommended.put(action, priority);
+                if(priority == CarPriority.CP_MUST) {
+                    actionsToDo.put(action, priority);
                 }
+               }
+//            case CA_allow_cyclists_moto_pass -> //not simulated
+//                    actionsToDo.put(CarAction.CA_allow_cyclists_moto_pass, priority);
+//            case CA_allow_emergency_vehicle_to_pass -> //not simulated
+//                    actionsToDo.put(CarAction.CA_allow_emergency_vehicle_to_pass, priority);
+//            case CA_allow_extra_space -> //not simulated
+//                    actionsToDo.put(CarAction.CA_allow_extra_space, priority);
+//            case CA_allow_extra_space_for_works_vehicles -> //not simulated
+//                    actionsToDo.put(CarAction.CA_allow_extra_space_for_works_vehicles, priority);
+//            case CA_allow_traffic_to_pass -> //not simulated
+//                    actionsToDo.put(CarAction.CA_allow_traffic_to_pass, priority);
+//            case CA_allow_undertaking -> //not simulated
+//                    actionsToDo.put(CarAction.CA_allow_undertaking, priority);
+//            case CA_allowed_to_proceed -> //not simulated
+//                    actionsToDo.put(CarAction.CA_allowed_to_proceed, priority);
+//            case CA_approach_left_hand_lane -> //not simulated
+//                    actionsToDo.put(CarAction.CA_approach_left_hand_lane, priority);
+//            case CA_approach_with_caution -> //not simulated
+//                    actionsToDo.put(CarAction.CA_approach_with_caution, priority);
+//            case CA_avoidLaneChanges -> //not simulated
+//                    actionsToDo.put(CarAction.CA_avoidLaneChanges, priority);
+//            case CA_avoidRightHandLane -> //not simulated
+//                    actionsToDo.put(CarAction.CA_avoidRightHandLane, priority);
+//            case CA_avoid_blocking_sideroads ->//not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_blocking_sideroads, priority);
+//            case CA_avoid_bus_lane -> //not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_bus_lane, priority);
+//            case CA_avoid_closed_lane ->//not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_closed_lane, priority);
+//            case CA_avoid_coasting ->//not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_coasting, priority);
+//            case CA_avoid_coned_off_area ->//not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_coned_off_area, priority);
+//            case CA_avoid_crossing_central_reservation ->//not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_crossing_central_reservation, priority);
+//            case CA_avoid_crossing_crossing ->//not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_crossing_crossing, priority);
+//            case CA_avoid_crossing_level_crossing ->//not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_crossing_level_crossing, priority);
+            case CA_avoid_cutting_corner ->{
+                actionsRecommended.put(action, priority);
+                if(priority == CarPriority.CP_MUST) {
+
+                    actionsToDo.put(action, priority);
+                }
+            }
+//            case CA_avoid_drive_against_traffic_flow ->//not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_drive_against_traffic_flow, priority);
+//            case CA_avoid_driving_on_rails ->//not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_driving_on_rails, priority);
+//            case CA_avoid_emergency_area ->//not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_emergency_area, priority);
+//            case CA_avoid_hard_shoulder -> //not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_hard_shoulder, priority);
+//            case CA_avoid_harsh_braking ->//not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_harsh_braking, priority);
+//            case CA_avoid_horn ->//not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_horn, priority);
+//            case CA_avoid_hov_lane ->//not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_hov_lane, priority);
+//            case CA_avoid_lane_lane ->//not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_lane_lane, priority);
+//            case CA_avoid_lane_switching -> // not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_lane_switching, priority);
+//            case CA_avoid_level_crossing ->//not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_level_crossing, priority);
+//            case CA_avoid_loading_unloading ->//not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_loading_unloading, priority);
+//            case CA_avoid_motorway ->//not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_motorway, priority);
+//            case CA_avoid_non ->//not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_non, priority);
+//            case CA_avoid_overtaking -> actionsToDo.put(CarAction.CA_avoid_overtaking, priority);
+//            case CA_avoid_overtaking_on_left -> //not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_overtaking_on_left, priority);
+//            case CA_avoid_parking -> //not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_parking, priority);
+//            case CA_avoid_parking_against_flow -> //not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_parking_against_flow, priority);
+//            case CA_avoid_pick_up_set_down -> // not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_pick_up_set_down, priority);
+//            case CA_avoid_reversing -> //not simulated=
+//                    actionsToDo.put(CarAction.CA_avoid_reversing, priority);
+//            case CA_avoid_revs ->// not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_revs, priority);
+//            case CA_avoid_stopping ->// not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_stopping, priority);
+//            case CA_avoid_tram_reserved_road -> // not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_tram_reserved_road, priority);
+//            case CA_avoid_undertaking -> //not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_undertaking, priority);
+//            case CA_avoid_uturn -> //not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_uturn, priority);
+//            case CA_avoid_waiting ->//not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_waiting, priority);
+//            case CA_avoid_weaving ->//not simulated
+//                    actionsToDo.put(CarAction.CA_avoid_weaving, priority);
+//            case CA_brake_early_lightly ->//not simulated
+//                    actionsToDo.put(CarAction.CA_brake_early_lightly, priority);
+//            case CA_brake_hard ->//not simulated
+//                    actionsToDo.put(CarAction.CA_brake_hard, priority);
+//            case CA_buildup_speed_on_motorway ->//not simulated
+//                    actionsToDo.put(CarAction.CA_buildup_speed_on_motorway, priority);
+            case CA_cancel_overtaking -> {
+                actionsRecommended.put(action, priority);
+                if(priority == CarPriority.CP_MUST) {
+
+                    actionsToDo.put(action, priority);
+                }
+
+            }
+//            case CA_cancel_reverse -> //not simulated
+//                    actionsToDo.put(CarAction.CA_cancel_reverse, priority);
+//            case CA_cancel_signals ->//not simulated
+//                    actionsToDo.put(CarAction.CA_cancel_signals, priority);
+//            case CA_cancel_undertaking -> //not simulated
+//                    actionsToDo.put(CarAction.CA_cancel_undertaking, priority);
+//            case CA_clear_ice_snow_all_windows ->//not simulated
+//                    actionsToDo.put(CarAction.CA_clear_ice_snow_all_windows, priority);
+//            case CA_close_to_kerb ->//not simulated
+//                    actionsToDo.put(CarAction.CA_close_to_kerb, priority);
+            case CA_consideration_others ->//not simulated actually
+            {
+                actionsRecommended.put(action, priority);
+                if(priority == CarPriority.CP_MUST) {
+
+                    actionsToDo.put(action, priority);
+                }
+            }
+//            case CA_doNotEnterWhiteDiagonalStripeWhiteBrokenBorder ->//not simulated
+//                    actionsToDo.put(CarAction.CA_doNotEnterWhiteDiagonalStripeWhiteBrokenBorder, priority);
+//            case CA_doNotEnterWhiteDiagonalStripeWhiteSolidBorder ->//not simulated
+//                    actionsToDo.put(CarAction.CA_doNotEnterWhiteDiagonalStripeWhiteSolidBorder, priority);
+//            case CA_do_not_drive ->//not simulated
+//                    actionsToDo.put(CarAction.CA_do_not_drive, priority);
+//            case CA_do_not_hestitate ->//not simulated
+//                    actionsToDo.put(CarAction.CA_do_not_hestitate, priority);
+//            case CA_do_not_overtake -> actionsToDo.put(CarAction.CA_do_not_overtake, priority);
+//            case CA_do_not_park_in_passing_place -> //not simulated
+//                    actionsToDo.put(CarAction.CA_do_not_park_in_passing_place, priority);
+//            case CA_do_not_reverse -> //not simulated
+//                    actionsToDo.put(CarAction.CA_do_not_reverse, priority);
+//            case CA_do_not_stop -> //not simulated
+//                    actionsToDo.put(CarAction.CA_do_not_stop, priority);
+            case CA_dontExceedTempSpeedLimit ->
+            // adjust speed according to the world speed limit
+            {
+                actionsRecommended.put(action, priority);
+                if(priority == CarPriority.CP_MUST) {
+                    actionsToDo.put(action, priority);
+                }
+            }
+//            case CA_dont_cross_solid_white -> actionsToDo.put(CarAction.CA_dont_cross_solid_white, priority);
+//            case CA_dont_use_central_reservation ->//not simulated
+//                    actionsToDo.put(CarAction.CA_dont_use_central_reservation, priority);
+            case CA_drive_care_attention ->{
+                actionsRecommended.put(action, priority);
+                if(priority == CarPriority.CP_MUST) {
+
+                    actionsToDo.put(action, priority);
+                }
+            }
+
+//            case CA_drive_slowly -> actionsToDo.put(CarAction.CA_drive_slowly, priority);
+//            case CA_drive_very_slowly -> actionsToDo.put(CarAction.CA_drive_very_slowly, priority);
+//            case CA_drive_very_slowly_on_bends -> //not simulated
+//                    actionsToDo.put(CarAction.CA_drive_very_slowly_on_bends, priority);
+//            case CA_drop_back -> actionsToDo.put(CarAction.CA_drop_back, priority);
+//            case CA_dry_brakes ->//not simulated
+//                    actionsToDo.put(CarAction.CA_dry_brakes, priority);
+//            case CA_ease_off ->//not simulated
+//                    actionsToDo.put(CarAction.CA_ease_off, priority);
+//            case CA_engage_child_locks ->//not simulated
+//                    actionsToDo.put(CarAction.CA_engage_child_locks, priority);
+//            case CA_engage_parking_break ->//not simulated
+//                    actionsToDo.put(CarAction.CA_engage_parking_break, priority);
+//            case CA_engine_off -> actionsToDo.put(CarAction.CA_engine_off, priority);
+//            case CA_find_other_route ->//not simulated
+//                    actionsToDo.put(CarAction.CA_find_other_route, priority);
+//            case CA_find_quiet_side_road ->//not simulated
+//                    actionsToDo.put(CarAction.CA_find_quiet_side_road, priority);
+//            case CA_find_safe_place_to_stop ->//not simulated
+//                    actionsToDo.put(CarAction.CA_find_safe_place_to_stop, priority);
+//            case CA_fit_booster_seat ->//not simulated
+//                    actionsToDo.put(CarAction.CA_fit_booster_seat, priority);
+//            case CA_flash_amber_beacon ->//not simulated
+//                    actionsToDo.put(CarAction.CA_flash_amber_beacon, priority);
+//            case CA_fog_lights_off ->//not simulated
+//                    actionsToDo.put(CarAction.CA_fog_lights_off, priority);
+//            case CA_fog_lights_on ->//not simulated
+//                    actionsToDo.put(CarAction.CA_fog_lights_on, priority);
+//            case CA_followLaneSigns ->//not simulated
+//                    actionsToDo.put(CarAction.CA_followLaneSigns, priority);
+//            case CA_follow_dvsa_until_stopped ->//not simulated
+//                    actionsToDo.put(CarAction.CA_follow_dvsa_until_stopped, priority);
+//            case CA_follow_police_direction ->//not simulated
+//                    actionsToDo.put(CarAction.CA_follow_police_direction, priority);
+//            case CA_follow_sign ->//not simulated
+//                    actionsToDo.put(CarAction.CA_follow_sign, priority);
+//            case CA_follow_signs ->//not simulated
+//                    actionsToDo.put(CarAction.CA_follow_signs, priority);
+//            case CA_get_in_lane ->//not simulated
+//                    actionsToDo.put(CarAction.CA_get_in_lane, priority);
+//            case CA_get_into_lane ->//not simulated
+//                    actionsToDo.put(CarAction.CA_get_into_lane, priority);
+//            case CA_get_off_road ->//not simulated
+//                    actionsToDo.put(CarAction.CA_get_off_road, priority);
+//            case CA_give_extensive_extra_seperation_distance ->//not simulated
+//                    actionsToDo.put(CarAction.CA_give_extensive_extra_seperation_distance, priority);
+//            case CA_give_extra_seperation_distance ->//not simulated
+//                    actionsToDo.put(CarAction.CA_give_extra_seperation_distance, priority);
+//            case CA_give_priority_to_public_transport ->//not simulated
+//                    actionsToDo.put(CarAction.CA_give_priority_to_public_transport, priority);
+//            case CA_give_priority_to_right ->//not simulated
+//                    actionsToDo.put(CarAction.CA_give_priority_to_right, priority);
+//            case CA_give_room_when_passing ->//not simulated
+//                    actionsToDo.put(CarAction.CA_give_room_when_passing, priority);
+//            case CA_give_signal ->//not simulated
+//                    actionsToDo.put(CarAction.CA_give_signal, priority);
+//            case CA_give_up_control ->//not simulated
+//                    actionsToDo.put(CarAction.CA_give_up_control, priority);
+//            case CA_give_way_at_dotted_white_line ->//not simulated
+//                    actionsToDo.put(CarAction.CA_give_way_at_dotted_white_line, priority);
+//            case CA_give_way_other_roads ->//not simulated
+//                    actionsToDo.put(CarAction.CA_give_way_other_roads, priority);
+//            case CA_give_way_to_other ->//not simulated
+//                    actionsToDo.put(CarAction.CA_give_way_to_other, priority);
+            case CA_give_way_to_pedestrians -> {
+                actionsRecommended.put(action, priority);
+                if(priority == CarPriority.CP_MUST) {
+
+                    actionsToDo.put(action, priority);
+                }
+            }
+//            case CA_give_way_to_tram ->//not simulated
+//                    actionsToDo.put(CarAction.CA_give_way_to_tram, priority);
+            case CA_goBetweenLaneDividers ->//not simulated
+            {
+                actionsRecommended.put(action, priority);
+                if(priority == CarPriority.CP_MUST) {
+
+                    actionsToDo.put(action, priority);
+                }
+            }
+//            case CA_go_to_left_hand_land ->//not simulated
+//                    actionsToDo.put(CarAction.CA_go_to_left_hand_land, priority);
+//            case CA_going_left_use_left ->//not simulated
+//                    actionsToDo.put(CarAction.CA_going_left_use_left, priority);
+//            case CA_going_right_use_left ->//not simulated
+//                    actionsToDo.put(CarAction.CA_going_right_use_left, priority);
+//            case CA_handbrake_on ->//not simulated
+//                    actionsToDo.put(CarAction.CA_handbrake_on, priority);
+//            case CA_headlights_on ->//not simulated
+//                    actionsToDo.put(CarAction.CA_headlights_on, priority);
+//            case CA_increase_distance_to_car_infront ->
+//                    actionsToDo.put(CarAction.CA_increase_distance_to_car_infront, priority);
+//            case CA_indicatorOn ->//not simulated
+//                    actionsToDo.put(CarAction.CA_indicatorOn, priority);
+//            case CA_indicator_on ->//not simulated
+//                    actionsToDo.put(CarAction.CA_indicator_on, priority);
+//            case CA_keep_crossing_clear ->//not simulated\
+//                    actionsToDo.put(CarAction.CA_keep_crossing_clear, priority);
+//            case CA_keep_left -> //not simulated
+//                    actionsToDo.put(CarAction.CA_keep_left, priority);
+//            case CA_keep_left_lane ->//not simulated
+//                    actionsToDo.put(CarAction.CA_keep_left_lane, priority);
+//            case CA_keep_safe_distance -> actionsToDo.put(CarAction.CA_keep_safe_distance, priority);
+//            case CA_keep_sidelights_on ->//not simulated
+//                    actionsToDo.put(CarAction.CA_keep_sidelights_on, priority);
+//            case CA_keep_under_speed_limit -> actionsToDo.put(CarAction.CA_keep_under_speed_limit, priority);
+//            case CA_keep_well_back ->//not simulated
+//                    actionsToDo.put(CarAction.CA_keep_well_back, priority);
+//            case CA_lane_clear ->//not simulated
+//                    actionsToDo.put(CarAction.CA_lane_clear, priority);
+//            case CA_leave_space_for_manover ->//not simulated
+//                    actionsToDo.put(CarAction.CA_leave_space_for_manover, priority);
+//            case CA_leave_space_to_stop ->//not simulated
+//                    actionsToDo.put(CarAction.CA_leave_space_to_stop, priority);
+//            case CA_light_and_number_plates_clean ->//not simulated
+//                    actionsToDo.put(CarAction.CA_light_and_number_plates_clean, priority);
+//            case CA_lock ->//not simulated
+//                    actionsToDo.put(CarAction.CA_lock, priority);
+//            case CA_maintained_reduced_speed ->//not simulated
+//                    actionsToDo.put(CarAction.CA_maintained_reduced_speed, priority);
+//            case CA_match_speed_to_motorway ->//not simulated
+//                    actionsToDo.put(CarAction.CA_match_speed_to_motorway, priority);
+//            case CA_mergeInTurn ->//not simulated
+//                    actionsToDo.put(CarAction.CA_mergeInTurn, priority);
+//            case CA_merge_in_turn ->//not simulated
+//                    actionsToDo.put(CarAction.CA_merge_in_turn, priority);
+//            case CA_mini ->//not simulated
+//                    actionsToDo.put(CarAction.CA_mini, priority);
+//            case CA_minimise_reversing ->//not simulated
+//                    actionsToDo.put(CarAction.CA_minimise_reversing, priority);
+//            case CA_mirrors_clear ->//not simulated
+//                    actionsToDo.put(CarAction.CA_mirrors_clear, priority);
+//            case CA_move_adjacent_lane ->//not simulated
+//                    actionsToDo.put(CarAction.CA_move_adjacent_lane, priority);
+            case CA_move_left ->{
+                //after finishing overtaking, the AI car should go to its original line
+                actionsRecommended.put(action, priority);
+                if(priority == CarPriority.CP_MUST) {
+
+                    actionsToDo.put(action, priority);
+                }}
+            case CA_move_quickly_past -> {
+                actionsRecommended.put(action, priority);
+                if(priority == CarPriority.CP_MUST) {
+
+                    actionsToDo.put(action, priority);
+                }
+            }
+//            case CA_move_to_left_hand_lane -> //not simulated
+//                    actionsToDo.put(CarAction.CA_move_to_left_hand_lane, priority);
+            case CA_must_stop_pedestrian_crossing ->{
+                actionsRecommended.put(action, priority);
+                if(priority == CarPriority.CP_MUST) {
+
+                    actionsToDo.put(action, priority);
+                }}
+//            case CA_nextLaneClear ->//not simulated
+//                    actionsToDo.put(CarAction.CA_nextLaneClear, priority);
+//            case CA_next_safe_stop ->//not simulated
+//                    actionsToDo.put(CarAction.CA_next_safe_stop, priority);
+            case CA_not_drive_dangerously -> {
+                actionsRecommended.put(action, priority);
+                if(priority == CarPriority.CP_MUST) {
+
+                    actionsToDo.put(action, priority);
+                }
+            }
+//            case CA_not_overtaken -> actionsToDo.put(CarAction.CA_not_overtaken, priority);
+//            case CA_obey_signal ->//not simulated
+//                    actionsToDo.put(CarAction.CA_obey_signal, priority);
+//            case CA_obey_work_vehicle_sign ->//not simulated
+//                    actionsToDo.put(CarAction.CA_obey_work_vehicle_sign, priority);
+//            case CA_overtake_on_right -> actionsToDo.put(CarAction.CA_overtake_on_right, priority);
+//            case CA_park_as_close_to_side ->//not simulated
+//                    actionsToDo.put(CarAction.CA_park_as_close_to_side, priority);
+//            case CA_parking_lights_on ->//not simulated
+//                    actionsToDo.put(CarAction.CA_parking_lights_on, priority);
+//            case CA_pass_around ->//not simulated
+//                    actionsToDo.put(CarAction.CA_pass_around, priority);
+//            case CA_position_right_turn ->//not simulated
+//                    actionsToDo.put(CarAction.CA_position_right_turn, priority);
+//            case CA_prepare_drop_back -> actionsToDo.put(CarAction.CA_prepare_drop_back, priority);
+//            case CA_prepare_load ->//not simulated
+//                    actionsToDo.put(CarAction.CA_prepare_load, priority);
+//            case CA_prepare_route ->//not simulated
+//                    actionsToDo.put(CarAction.CA_prepare_route, priority);
+//            case CA_prepare_to_change_lane ->//not simulated
+//                    actionsToDo.put(CarAction.CA_prepare_to_change_lane, priority);
+//            case CA_prepare_to_stop ->//not simulated
+//                    actionsToDo.put(CarAction.CA_prepare_to_stop, priority);
+//            case CA_priority_to_motoway_traffic ->//not simulated
+//                    actionsToDo.put(CarAction.CA_priority_to_motoway_traffic, priority);
+//            case CA_pull_into_hard_shoulder ->//not simulated
+//                    actionsToDo.put(CarAction.CA_pull_into_hard_shoulder, priority);
+//            case CA_pull_into_passing_place ->//not simulated
+//                    actionsToDo.put(CarAction.CA_pull_into_passing_place, priority);
+//            case CA_pull_over_safe_place ->//not simulated
+//                    actionsToDo.put(CarAction.CA_pull_over_safe_place, priority);
+//            case CA_pull_up_in_visible_distance ->//not simulated
+//                    actionsToDo.put(CarAction.CA_pull_up_in_visible_distance, priority);
+//            case CA_put_on_seatbelts ->//not simulated
+//                    actionsToDo.put(CarAction.CA_put_on_seatbelts, priority);
+//            case CA_reduce_distance_between_front_vehicle ->
+//                    actionsToDo.put(CarAction.CA_reduce_distance_between_front_vehicle, priority);
+//            case CA_reduce_lighting ->//not simulated
+//                    actionsToDo.put(CarAction.CA_reduce_lighting, priority);
+            case CA_reduce_overall_speed -> {
+                actionsRecommended.put(action, priority);
+                if(priority == CarPriority.CP_MUST) {
+                    actionsToDo.put(action, priority);
+                }
+            }
+            case CA_reduce_speed -> {
+                actionsRecommended.put(action, priority);
+                if(priority == CarPriority.CP_MUST) {
+                    actionsToDo.put(action, priority);
+                }
+            }
+            case CA_reduce_speed_if_pedestrians -> {
+                actionsRecommended.put(action, priority);
+                if(priority == CarPriority.CP_MUST) {
+
+                    actionsToDo.put(action, priority);
+                }
+            }
+//            case CA_reduce_speed_on_slip_road ->//not simulated
+//                    actionsToDo.put(CarAction.CA_reduce_speed_on_slip_road, priority);
+//            case CA_release_brake ->//not simulated
+//                    actionsToDo.put(CarAction.CA_release_brake, priority);
+//            case CA_remove_all_snow ->//not simulated
+//                    actionsToDo.put(CarAction.CA_remove_all_snow, priority);
+//            case CA_remove_flash_intention ->//not simulated
+//                    actionsToDo.put(CarAction.CA_remove_flash_intention, priority);
+//            case CA_remove_horn_intention ->//not simulated
+//                    actionsToDo.put(CarAction.CA_remove_horn_intention, priority);
+//            case CA_reverse_into_drive ->//not simulated
+//                    actionsToDo.put(CarAction.CA_reverse_into_drive, priority);
+//            case CA_reverse_to_passing_place ->//not simulated
+//                    actionsToDo.put(CarAction.CA_reverse_to_passing_place, priority);
+//            case CA_road_clear_to_manover ->//not simulated
+//                    actionsToDo.put(CarAction.CA_road_clear_to_manover, priority);
+//            case CA_safe_distance -> actionsToDo.put(CarAction.CA_safe_distance, priority);
+//            case CA_safe_pull_over_and_stop ->//not simulated
+//                    actionsToDo.put(CarAction.CA_safe_pull_over_and_stop, priority);
+//            case CA_select_lane ->//not simulated
+//                    actionsToDo.put(CarAction.CA_select_lane, priority);
+//            case CA_set_hazards_off ->//not simulated (hazards is hazard warning light)
+//                    actionsToDo.put(CarAction.CA_set_hazards_off, priority);
+//            case CA_set_headlights_to_dipped ->//not simulated
+//                    actionsToDo.put(CarAction.CA_set_headlights_to_dipped, priority);
+//            case CA_signal -> //not simulated
+//                    actionsToDo.put(CarAction.CA_signal, priority);
+//            case CA_signal_left ->//not simulated
+//                    actionsToDo.put(CarAction.CA_signal_left, priority);
+//            case CA_signal_left_on_exit ->//not simulated
+//                    actionsToDo.put(CarAction.CA_signal_left_on_exit, priority);
+//            case CA_signal_right ->//not simulated
+//                    actionsToDo.put(CarAction.CA_signal_right, priority);
+//            case CA_slow_down -> //not simulated
+//                //car should slow down if it is in fog, this is not simulated
+//                    actionsToDo.put(CarAction.CA_slow_down, priority);
+//            case CA_slow_down_and_stop -> //not simulated
+//                //car should slow down if the sight is dazzled, this is not simulated
+//                    actionsToDo.put(CarAction.CA_slow_down_and_stop, priority);
+            case CA_space_for_vehicle ->
+            //overtaking,should not get too close to the vehicle you intend to overtake
+            {
+                actionsRecommended.put(action, priority);
+                if(priority == CarPriority.CP_MUST) {
+
+                    actionsToDo.put(action, priority);
+                }
+            }
+//            case CA_stay_in_lane ->//not simulated
+//                    actionsToDo.put(CarAction.CA_stay_in_lane, priority);
+//            case CA_stay_on_running_lane ->//not simulated
+//                    actionsToDo.put(CarAction.CA_stay_on_running_lane, priority);
+//            case CA_steady_speed ->//not simulated
+//                    actionsToDo.put(CarAction.CA_steady_speed, priority);
+            case CA_stop -> {
+                actionsRecommended.put(action, priority);
+                if(priority == CarPriority.CP_MUST) {
+
+                    actionsToDo.put(action, priority);
+                }
+            }
+//            case CA_stopCrossDoubleWhiteClosestSolid ->//not simulated
+//                    actionsToDo.put(CarAction.CA_stopCrossDoubleWhiteClosestSolid, priority);
+            case CA_stopCrossingHazardWarningLine ->{
+                actionsRecommended.put(action, priority);
+                if(priority == CarPriority.CP_MUST) {
+
+                    actionsToDo.put(action, priority);
+                }
+            }
+//            case CA_stop_and_turn_engine_off -> actionsToDo.put(CarAction.CA_stop_and_turn_engine_off, priority);
+//            case CA_stop_at_crossing -> //not simulated
+//                    actionsToDo.put(CarAction.CA_stop_at_crossing, priority);
+//            case CA_stop_at_crossing_patrol ->//not simulated
+//                    actionsToDo.put(CarAction.CA_stop_at_crossing_patrol, priority);
+//            case CA_stop_at_sign ->//not simulated
+//                    actionsToDo.put(CarAction.CA_stop_at_sign, priority);
+            case CA_stop_at_white_line ->{
+                actionsRecommended.put(action, priority);
+                if(priority == CarPriority.CP_MUST) {
+
+                    actionsToDo.put(action, priority);
+                }
+            }
+//            case CA_switch_off_engine -> actionsToDo.put(CarAction.CA_switch_off_engine, priority);
+//            case CA_travel_sign_direction ->//not simulated
+//                    actionsToDo.put(CarAction.CA_travel_sign_direction, priority);
+//            case CA_treat_as_roundabout ->//not simulated
+//                    actionsToDo.put(CarAction.CA_treat_as_roundabout, priority);
+//            case CA_treat_as_traffic_light ->//not simulated
+//                    actionsToDo.put(CarAction.CA_treat_as_traffic_light, priority);
+//            case CA_turn_foglights_off ->//not simulated
+//                    actionsToDo.put(CarAction.CA_turn_foglights_off, priority);
+//            case CA_turn_into_skid ->//not simulated
+//                    actionsToDo.put(CarAction.CA_turn_into_skid, priority);
+//            case CA_turn_sidelights_on ->//not simulated
+//                    actionsToDo.put(CarAction.CA_turn_sidelights_on, priority);
+//            case CA_use_central_reservation ->//not simulated
+//                    actionsToDo.put(CarAction.CA_use_central_reservation, priority);
+//            case CA_use_crawler_lane ->//not simulated
+//                    actionsToDo.put(CarAction.CA_use_crawler_lane, priority);
+//            case CA_use_demisters ->//not simulated
+//                    actionsToDo.put(CarAction.CA_use_demisters, priority);
+//            case CA_use_hazard_lights ->//not simulated
+//                    actionsToDo.put(CarAction.CA_use_hazard_lights, priority);
+//            case CA_use_left_indicator ->//not simulated
+//                    actionsToDo.put(CarAction.CA_use_left_indicator, priority);
+//            case CA_use_right_indicator ->//not simulated
+//                    actionsToDo.put(CarAction.CA_use_right_indicator, priority);
+//            case CA_use_road ->//not simulated
+//                    actionsToDo.put(CarAction.CA_use_road, priority);
+//            case CA_use_signals ->//not simulated
+//                    actionsToDo.put(CarAction.CA_use_signals, priority);
+//            case CA_use_tram_passing_lane ->//not simulated
+//                    actionsToDo.put(CarAction.CA_use_tram_passing_lane, priority);
+//            case CA_use_windscreen_wipers ->//not simulated
+//                    actionsToDo.put(CarAction.CA_use_windscreen_wipers, priority);
+//            case CA_wait_at_advanced_stop ->//not simulated
+//                    actionsToDo.put(CarAction.CA_wait_at_advanced_stop, priority);
+            case CA_wait_at_white_line -> {
+                actionsRecommended.put(action, priority);
+                if(priority == CarPriority.CP_MUST) {
+
+                    actionsToDo.put(action, priority);
+                }
+            }
+//            case CA_wait_at_first_white_line ->//not simulated
+//                    actionsToDo.put(CarAction.CA_wait_at_first_white_line, priority);
+//            case CA_wait_for_gap_before_moving_off ->
+//                    actionsToDo.put(CarAction.CA_wait_for_gap_before_moving_off, priority);
+//            case CA_wait_until_clear ->//not simulated
+//                    actionsToDo.put(CarAction.CA_wait_until_clear, priority);
+//            case CA_wait_until_route_clear ->//not simulated
+//                    actionsToDo.put(CarAction.CA_wait_until_route_clear, priority);
+            case CA_wait_until_safe_gap -> {
+                actionsRecommended.put(action, priority);
+                if(priority == CarPriority.CP_MUST) {
+
+                    actionsToDo.put(action, priority);
+                }
+            }
+//            case CA_wheel_away_from_kerb ->//not simulated
+//                    actionsToDo.put(CarAction.CA_wheel_away_from_kerb, priority);
+//            case CA_wheel_toward_from_kerb ->//not simulated
+//                    actionsToDo.put(CarAction.CA_wheel_toward_from_kerb, priority);
+            default -> {
+            }
         }
-        }
+
     }
 
     public void updateIntentions(WorldSim visibleWorld, Point location,Direction cmd, Direction pmd) {
@@ -903,17 +1025,83 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
                 case CI_turnRight:
                     //check the previous moving direction and current moving direction to
                     //identify the turn right intentions
+//                    if(pmd == Direction.north && cmd == Direction.east) {
+//                        intentions.put(ci, true);
+//                    }
+//                    else if(pmd == Direction.south && cmd == Direction.west) {
+//                        intentions.put(ci, true);
+//                    }
+//                    else if(pmd == Direction.east && cmd == Direction.south){
+//                        intentions.put(ci, true);
+//                    }
+//                    else if(pmd == Direction.west && cmd == Direction.north) {
+//                        intentions.put(ci, true);
+//                    }
+
+                    intentions.put(ci,false);
+
+
+                    //check the previous moving direction and current moving direction to
+                    //identify the turn right intentions
                     if(pmd == Direction.north && cmd == Direction.east) {
-                        intentions.put(ci, true);
+
+                        Inturningright = true;
                     }
                     else if(pmd == Direction.south && cmd == Direction.west) {
-                        intentions.put(ci, true);
+                        Inturningright = true;
                     }
                     else if(pmd == Direction.east && cmd == Direction.south){
-                        intentions.put(ci, true);
+                        Inturningright = true;
                     }
                     else if(pmd == Direction.west && cmd == Direction.north) {
-                        intentions.put(ci, true);
+                        Inturningright = true;
+                    }
+                    if(cmd == Direction.north){
+                        if(visibleWorld.getCell(visibleWorld.getVisibility(), visibleWorld.getVisibility()).getCellType() == CellType.ct_road){
+                            RoadCell rc = (RoadCell) visibleWorld.getCell(visibleWorld.getVisibility(), visibleWorld.getVisibility());
+                            if(rc.getTravelDirection().size() == 1){
+                                if(rc.getTravelDirection().get(0) == cmd){
+                                    Inturningright = false;
+                                }
+                            }
+
+                        }
+                    }
+                    else if(cmd == Direction.south){
+                        if(visibleWorld.getCell(visibleWorld.getVisibility(), visibleWorld.getVisibility()).getCellType() == CellType.ct_road){
+                            RoadCell rc = (RoadCell) visibleWorld.getCell(visibleWorld.getVisibility(), visibleWorld.getVisibility());
+                            if(rc.getTravelDirection().size() == 1){
+                                if(rc.getTravelDirection().get(0) == cmd){
+                                    Inturningright = false;
+                                }
+                            }
+
+                        }
+                    }
+                    else if(cmd == Direction.west){
+                        if(visibleWorld.getCell(visibleWorld.getVisibility(), visibleWorld.getVisibility()).getCellType() == CellType.ct_road){
+                            RoadCell rc = (RoadCell) visibleWorld.getCell(visibleWorld.getVisibility(), visibleWorld.getVisibility());
+                            if(rc.getTravelDirection().size() == 1){
+                                if(rc.getTravelDirection().get(0) == cmd){
+                                    Inturningright = false;
+                                }
+                            }
+
+                        }
+                    }
+                    else if(cmd == Direction.east){
+                        if(visibleWorld.getCell(visibleWorld.getVisibility(), visibleWorld.getVisibility()).getCellType() == CellType.ct_road){
+                            RoadCell rc = (RoadCell) visibleWorld.getCell(visibleWorld.getVisibility(), visibleWorld.getVisibility());
+                            if(rc.getTravelDirection().size() == 1){
+                                if(rc.getTravelDirection().get(0) == cmd){
+                                    Inturningright = false;
+                                }
+                            }
+                        }
+                    }
+
+                    if(Inturningright){
+                        intentions.put(ci,true);
                     }
                     break;
                 case CI_undertaking://not simulated
@@ -1176,7 +1364,8 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
                             Point tmpPoint = new Point(location.getX(), currentY);
                             pointPassing.add(tmpPoint);
                         }
-
+                        //the point list that the car will pass from its current location to its predicted point(without the current position)
+                        ArrayList<Point> pointPassing1 = new ArrayList<>();
                         for(int i = 0; i < visibleWorld.getWidth(); i++) {
                             for(int j = location.getY() - 1; j >= location.getY() - espeed;j--) {
                                 if(visibleWorld.containsCar(i,j)) {
@@ -1187,32 +1376,25 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
                                     if(d1 == Direction.east) {
                                         //the predicted location the car will be at
                                         Point predicted_point1 = new Point(i + speed1, j);
-                                        //the point list that the car will pass from its current location to its predicted point(without the current position)
-                                        ArrayList<Point> pointPassing1 = new ArrayList<>();
-
                                         for(int currentX = i + 1; currentX <= predicted_point1.getX(); currentX++) {
                                             Point tmpPoint1 = new Point(currentX, predicted_point1.getY());
                                             pointPassing1.add(tmpPoint1);
                                         }
-                                        if(checkCommonPoint(pointPassing, pointPassing1)) {
-                                            exitIsClear = false;
-                                        }
+
                                     }
                                     else if(d1 == Direction.west) {
                                         Point predicted_point1 = new Point(i - speed1,j);
-                                        //the point list that the car will pass from its current location to its predicted point(without the current position)
-                                        ArrayList<Point> pointPassing1 = new ArrayList<>();
-
                                         for(int currentX = i - 1; currentX >= predicted_point1.getX(); currentX--) {
                                             Point tmpPoint1 = new Point(currentX, predicted_point1.getY());
                                             pointPassing1.add(tmpPoint1);
                                         }
-                                        if(checkCommonPoint(pointPassing, pointPassing1)) {
-                                            exitIsClear = false;
-                                        }
+
                                     }
                                 }
                             }
+                        }
+                        if(checkCommonPoint(pointPassing, pointPassing1)) {
+                            exitIsClear = false;
                         }
                     }
                     else if(cmd == Direction.south) {
@@ -1227,6 +1409,9 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
                             pointPassing.add(tmpPoint);
                         }
 
+                        //the point list that the car will pass from its current location to its predicted point(without the current position)
+                        ArrayList<Point> pointPassing1 = new ArrayList<>();
+
                         for(int i = 0; i < visibleWorld.getWidth(); i++) {
                             for(int j = location.getY() + 1; j <= location.getY() + espeed; j++) {
                                 if(visibleWorld.containsCar(i, j)) {
@@ -1238,33 +1423,25 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
                                     if(d1 == Direction.east) {
                                         //the predicted location the car will be at
                                         Point predicted_point1 = new Point(i + speed1, j);
-                                        //the point list that the car will pass from its current location to its predicted point(without the current position)
-                                        ArrayList<Point> pointPassing1 = new ArrayList<>();
-
                                         for(int currentX = i + 1; currentX <= predicted_point1.getX(); currentX++) {
                                             Point tmpPoint1 = new Point(currentX, predicted_point1.getY());
                                             pointPassing1.add(tmpPoint1);
                                         }
-                                        if(checkCommonPoint(pointPassing, pointPassing1)) {
-                                            exitIsClear = false;
-                                        }
                                     }
                                     else if(d1 == Direction.west) {
                                         Point predicted_point1 = new Point(i - speed1,j);
-                                        //the point list that the car will pass from its current location to its predicted point(without the current position)
-                                        ArrayList<Point> pointPassing1 = new ArrayList<>();
-
                                         for(int currentX = i - 1; currentX >= predicted_point1.getX(); currentX --) {
                                             Point tmpPoint1 = new Point(currentX, predicted_point1.getY());
                                             pointPassing1.add(tmpPoint1);
-                                        }
-                                        if(checkCommonPoint(pointPassing, pointPassing1)) {
-                                            exitIsClear = false;
                                         }
                                     }
                                 }
                             }
                         }
+                        if(checkCommonPoint(pointPassing, pointPassing1)) {
+                            exitIsClear = false;
+                        }
+
                     }
                     else if(cmd == Direction.east) {
                         //  the point the car will be at in the next move
@@ -1275,47 +1452,58 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
                             Point tmpPoint = new Point(currentX, location.getY());
                             pointPassing.add(tmpPoint);
                         }
+//                    System.out.println("the point that will pass is: ");
+//                    System.out.println(pointPassing.get(0).getX() + " " + pointPassing.get(0).getY());
 
+                        //  the points list the car passing by in the next move(without current point)
+                        ArrayList<Point> pointPassing1 = new ArrayList<>();
                         for(int i = location.getX() + 1; i <= location.getX() + espeed; i++) {
                             for(int j = 0; j < visibleWorld.getHeight(); j++) {
                                 if(visibleWorld.containsCar(i, j)) {
                                     AbstractCar car1 = visibleWorld.getCarAtPosition(i, j);
                                     int speed1 = car1.getSpeed();
                                     Direction d1 = car1.getCMD();
+//                                System.out.println("speed is: " + speed1);
+//                                System.out.println(d1.toString());
                                     if(d1 == Direction.south) {
                                         //  get the predicted point of the car in the next move
                                         Point predicted_point1 = new Point(i,j+speed1);
-                                        //  the points list the car passing by in the next move(without current point)
-                                        ArrayList<Point> pointPassing1 = new ArrayList<>();
+
                                         for(int currentY = j + 1; currentY <= predicted_point1.getY(); currentY++) {
                                             Point tmpPoint1 = new Point(i, currentY);
                                             pointPassing1.add(tmpPoint1);
                                         }
-
-                                        // check if two ArrayLists conflict or not
-                                        if(checkCommonPoint(pointPassing, pointPassing1)) {
-                                            exitIsClear = false;
-                                        }
+//                                    System.out.println("predicted point is: ");
+//                                    System.out.println(predicted_point1.getX() + " " + predicted_point1.getY());
+//                                    System.out.println("the point added is: ");
+//                                    System.out.println(pointPassing1.get(0).getX() + " " + pointPassing1.get(0).getY());
                                     }
                                     else if(d1 == Direction.north) {
                                         //  get the predicted point of the car in the next move
                                         Point predicted_point1 = new Point(i,j-speed1);
-                                        //  the points list the car passing by in the next move(without current point)
-                                        ArrayList<Point> pointPassing1 = new ArrayList<>();
+//                                    //  the points list the car passing by in the next move(without current point)
+//                                    ArrayList<Point> pointPassing1 = new ArrayList<>();
                                         for(int currentY = j - 1; currentY >= predicted_point1.getY(); currentY--) {
                                             Point tmpPoint1 = new Point(i, currentY);
                                             pointPassing1.add(tmpPoint1);
 
                                         }
-
-                                        //  check if two ArrayLists conflict or not
-                                        if(checkCommonPoint(pointPassing, pointPassing1)) {
-                                            exitIsClear = false;
-                                        }
+//                                    System.out.println("predicted point is: ");
+//                                    System.out.println(predicted_point1.getX() + " " + predicted_point1.getY());
+//                                    System.out.println("the point added is: ");
+//                                    System.out.println(pointPassing1.get(0).getX() + " " + pointPassing1.get(0).getY());
                                     }
                                 }
                             }
                         }
+
+//                    System.out.println("sizr is" +  pointPassing1.size());
+                        //  check if two ArrayLists conflict or not
+                        if(checkCommonPoint(pointPassing, pointPassing1)) {
+
+                            exitIsClear = false;
+                        }
+
                     }
 
                     else if(cmd == Direction.west) {
@@ -1328,6 +1516,8 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
                             pointPassing.add(tmpPoint);
                         }
 
+                        //  the points list the car passing by in the next move(without current point)
+                        ArrayList<Point> pointPassing1 = new ArrayList<>();
                         for(int i = location.getX() - 1; i >= location.getX() - espeed; i--) {
                             for(int j = 0; j < visibleWorld.getHeight(); j++) {
                                 if(visibleWorld.containsCar(i, j)) {
@@ -1337,35 +1527,28 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
                                     if(d1 == Direction.south) {
                                         //  get the predicted point of the car in the next move
                                         Point predicted_point1 = new Point(i,j+speed1);
-                                        //  the points list the car passing by in the next move(without current point)
-                                        ArrayList<Point> pointPassing1 = new ArrayList<>();
                                         for(int currentY = j + 1; currentY <= predicted_point1.getY(); currentY++) {
                                             Point tmpPoint1 = new Point(i, currentY);
                                             pointPassing1.add(tmpPoint1);
-                                        }
-
-                                        // check if two ArrayLists conflict or not
-                                        if(checkCommonPoint(pointPassing, pointPassing1)) {
-                                            exitIsClear = false;
                                         }
                                     }
                                     else if(d1 == Direction.north) {
                                         //  get the predicted point of the car in the next move
                                         Point predicted_point1 = new Point(i,j-speed1);
-                                        //  the points list the car passing by in the next move(without current point)
-                                        ArrayList<Point> pointPassing1 = new ArrayList<>();
+
                                         for(int currentY = j - 1; currentY >= predicted_point1.getY(); currentY--) {
                                             Point tmpPoint1 = new Point(i, currentY);
                                             pointPassing1.add(tmpPoint1);
                                         }
 
-                                        //  check if two ArrayLists conflict or not
-                                        if(checkCommonPoint(pointPassing, pointPassing1)) {
-                                            exitIsClear = false;
-                                        }
+
                                     }
                                 }
                             }
+                        }
+                        // check if two ArrayLists conflict or not
+                        if(checkCommonPoint(pointPassing, pointPassing1)) {
+                            exitIsClear = false;
                         }
                     }
                     beliefs.put(cb, exitIsClear);
@@ -1697,7 +1880,7 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
                                                 affectedCells.add(new Point(visibleWorldStopPoint.getX(),k));
                                             }
                                             if(cmd == Direction.south && affectedCells.contains(location)) {
-                                                redLightOn = tlci.redOn;
+                                                redLightOn = tlci.redOn || tlci.redYellowOn;
                                                 beliefs.put(cb, redLightOn);
                                             }
 
@@ -1711,7 +1894,7 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
                                                 affectedCells.add(new Point(visibleWorldStopPoint.getX(),k));
                                             }
                                             if(cmd == Direction.north && affectedCells.contains(location)) {
-                                                redLightOn = tlci.redOn;
+                                                redLightOn = tlci.redOn || tlci.redYellowOn;
                                                 beliefs.put(cb, redLightOn);
                                             }
 
@@ -1725,7 +1908,7 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
                                                 affectedCells.add(new Point(k,visibleWorldStopPoint.getY()));
                                             }
                                             if(cmd == Direction.west && affectedCells.contains(location)) {
-                                                redLightOn = tlci.redOn;
+                                                redLightOn = tlci.redOn || tlci.redYellowOn;
                                                 beliefs.put(cb, redLightOn);
                                             }
 
@@ -1739,7 +1922,7 @@ public class RudeCar extends AbstractROTRCar implements CarEvents{
                                                 affectedCells.add(new Point(k,visibleWorldStopPoint.getY()));
                                             }
                                             if(cmd == Direction.east && affectedCells.contains(location)) {
-                                                redLightOn = tlci.redOn;
+                                                redLightOn = tlci.redOn || tlci.redYellowOn;
                                                 beliefs.put(cb, redLightOn);
                                             }
 
